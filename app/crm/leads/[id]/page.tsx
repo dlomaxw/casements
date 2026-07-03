@@ -3,11 +3,13 @@ import { notFound } from 'next/navigation';
 import { requireSession } from '@/lib/session';
 import { prisma } from '@/lib/db';
 import LeadStatusForm from '@/components/crm/LeadStatusForm';
+import ReassignForm from '@/components/crm/ReassignForm';
 
 export const dynamic = 'force-dynamic';
 
 export default async function LeadDetailPage({ params }: { params: { id: string } }) {
   const session = await requireSession();
+  const isAdmin = session.user.role === 'ADMIN';
 
   const lead = await prisma.lead.findUnique({
     where: { id: params.id },
@@ -18,7 +20,16 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
   });
   if (!lead) notFound();
   // §17: reps can only open their own leads
-  if (session.user.role !== 'ADMIN' && lead.assignedToId !== session.user.id) notFound();
+  if (!isAdmin && lead.assignedToId !== session.user.id) notFound();
+
+  // Admins can reassign — load the active team for the picker
+  const reps = isAdmin
+    ? await prisma.user.findMany({
+        where: { active: true },
+        orderBy: { name: 'asc' },
+        select: { id: true, name: true, role: true },
+      })
+    : [];
 
   const detail = (label: string, value?: string | null) => (
     <div>
@@ -90,12 +101,15 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
           </section>
         </div>
 
-        <div className="lg:sticky lg:top-6 lg:self-start">
+        <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
           <LeadStatusForm
             leadId={lead.id}
             currentStatus={lead.status}
             currentFollowUp={lead.followUpDate ? lead.followUpDate.toISOString() : null}
           />
+          {isAdmin && (
+            <ReassignForm leadId={lead.id} currentAssigneeId={lead.assignedToId} reps={reps} />
+          )}
         </div>
       </div>
     </div>

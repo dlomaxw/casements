@@ -28,6 +28,7 @@ const patchSchema = z.object({
   status: z.enum(['NEW', 'CONTACTED', 'SITE_ASSESSED', 'QUOTED', 'WON', 'LOST']).optional(),
   notes: z.string().optional(),
   followUpDate: z.string().datetime().optional(),
+  assignedToId: z.string().nullable().optional(), // ADMIN only — reassign the lead's owner
 });
 
 // PATCH /api/crm/leads/[id] — update status, notes, follow-up date
@@ -45,7 +46,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   const parsed = patchSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return Response.json({ error: 'Invalid input' }, { status: 400 });
 
-  const { status, notes, followUpDate } = parsed.data;
+  const { status, notes, followUpDate, assignedToId } = parsed.data;
 
   if (status) {
     await updateLeadStatus(params.id, status as LeadStatus, notes);
@@ -53,11 +54,29 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     await prisma.activity.create({ data: { leadId: params.id, type: 'NOTE', note: notes } });
   }
 
+  // Reassignment is ADMIN-only and logged to the activity trail
+  let reassign: { assignedToId: string | null } | undefined;
+  if (assignedToId !== undefined) {
+    if (session.user.role !== 'ADMIN') {
+      return Response.json({ error: 'Only admins can reassign leads' }, { status: 403 });
+    }
+    if (assignedToId) {
+      const rep = await prisma.user.findUnique({ where: { id: assignedToId } });
+      if (!rep || !rep.active) return Response.json({ error: 'Invalid assignee' }, { status: 400 });
+      reassign = { assignedToId };
+      await prisma.activity.create({ data: { leadId: params.id, type: 'STATUS_CHANGE', note: `Reassigned to ${rep.name}` } });
+    } else {
+      reassign = { assignedToId: null };
+      await prisma.activity.create({ data: { leadId: params.id, type: 'STATUS_CHANGE', note: 'Unassigned' } });
+    }
+  }
+
   const lead = await prisma.lead.update({
     where: { id: params.id },
     data: {
       ...(notes ? { notes } : {}),
       ...(followUpDate ? { followUpDate: new Date(followUpDate) } : {}),
+      ...(reassign ?? {}),
     },
     include: { activities: { orderBy: { createdAt: 'desc' } } },
   });
