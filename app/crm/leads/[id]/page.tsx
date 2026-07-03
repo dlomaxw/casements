@@ -38,9 +38,15 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
             Created {new Date(lead.createdAt).toLocaleString()} · Status <span className="font-semibold text-brand-700">{lead.status}</span>
           </p>
         </div>
-        <a href={`tel:${lead.phone}`} className="rounded-md bg-brand-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-800">
-          Call {lead.phone}
-        </a>
+        {lead.phone ? (
+          <a href={`tel:${lead.phone}`} className="rounded-md bg-brand-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-800">
+            Call {lead.phone}
+          </a>
+        ) : lead.email ? (
+          <a href={`mailto:${lead.email}`} className="rounded-md bg-brand-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-800">
+            Email {lead.email}
+          </a>
+        ) : null}
       </div>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-3">
@@ -50,7 +56,7 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
             <dl className="mt-4 grid gap-4 sm:grid-cols-2">
               {detail('Phone', lead.phone)}
               {detail('Email', lead.email)}
-              {detail('Product Category', lead.productCategory)}
+              {detail('Product Category', lead.productCategory === 'general-enquiry' ? 'General enquiry' : lead.productCategory)}
               {detail('Project Size', lead.projectSize)}
               {detail('Timeline', lead.timeline)}
               {detail('Source Page', lead.sourcePage)}

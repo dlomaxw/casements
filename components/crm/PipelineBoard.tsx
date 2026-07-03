@@ -37,9 +37,11 @@ export default function PipelineBoard({ leads }: { leads: LeadRow[] }) {
                       className="block rounded-md bg-steel-50 p-3 ring-1 ring-brand-100 transition-colors hover:bg-brand-50"
                     >
                       <p className="truncate text-sm font-semibold text-brand-950">{lead.fullName}</p>
-                      <p className="mt-0.5 truncate text-xs text-brand-500">{lead.productCategory}</p>
+                      <p className="mt-0.5 truncate text-xs text-brand-500">
+                        {lead.productCategory === 'general-enquiry' ? 'General enquiry' : lead.productCategory}
+                      </p>
                       <div className="mt-1.5 flex items-center justify-between text-[11px] text-brand-400">
-                        <span>{lead.projectSize}</span>
+                        <span>{lead.projectSize ?? 'Enquiry'}</span>
                         <span>{new Date(lead.createdAt).toLocaleDateString()}</span>
                       </div>
                       {lead.assignedTo?.name && (

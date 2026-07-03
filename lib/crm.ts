@@ -5,9 +5,9 @@ import { autoReplyTemplate, quoteNotificationTemplate, sendEmail, SALES_EMAIL } 
 export interface LeadInput {
   fullName: string;
   email?: string;
-  phone: string;
+  phone?: string;
   productCategory: string;
-  projectSize: 'SMALL' | 'MEDIUM' | 'LARGE' | 'COMMERCIAL';
+  projectSize?: 'SMALL' | 'MEDIUM' | 'LARGE' | 'COMMERCIAL';
   timeline?: string;
   message?: string;
   sourcePage?: string;
@@ -68,7 +68,9 @@ export async function assignLeadToRep(leadId: string, category: string): Promise
 export async function notifyRep(lead: Lead, rep: User | null): Promise<void> {
   await sendEmail({
     to: rep?.email ?? SALES_EMAIL,
-    subject: `New ${lead.projectSize} lead: ${lead.fullName} — ${lead.productCategory}`,
+    subject: lead.productCategory === 'general-enquiry'
+      ? `New enquiry: ${lead.fullName}`
+      : `New ${lead.projectSize} lead: ${lead.fullName} — ${lead.productCategory}`,
     html: quoteNotificationTemplate(lead),
   });
 }

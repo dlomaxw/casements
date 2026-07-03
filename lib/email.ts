@@ -44,21 +44,22 @@ export function contactEmailTemplate(data: { name: string; email: string; messag
 export function quoteNotificationTemplate(lead: {
   id: string;
   fullName: string;
-  phone: string;
+  phone?: string | null;
   email?: string | null;
   productCategory: string;
-  projectSize: string;
+  projectSize?: string | null;
   timeline?: string | null;
   message?: string | null;
 }): string {
   const base = process.env.NEXTAUTH_URL ?? 'https://casements.co.ug';
+  const isEnquiry = lead.productCategory === 'general-enquiry';
   return shell(`
-    <h3 style="margin-top:0">New quote request — action required</h3>
+    <h3 style="margin-top:0">${isEnquiry ? 'New contact enquiry' : 'New quote request'} — action required</h3>
     <p><strong>Client:</strong> ${escapeHtml(lead.fullName)}</p>
-    <p><strong>Phone:</strong> ${escapeHtml(lead.phone)}</p>
+    <p><strong>Phone:</strong> ${escapeHtml(lead.phone ?? '—')}</p>
     <p><strong>Email:</strong> ${escapeHtml(lead.email ?? '—')}</p>
-    <p><strong>Product:</strong> ${escapeHtml(lead.productCategory)}</p>
-    <p><strong>Project size:</strong> ${escapeHtml(lead.projectSize)}</p>
+    <p><strong>Product:</strong> ${escapeHtml(isEnquiry ? 'General enquiry' : lead.productCategory)}</p>
+    <p><strong>Project size:</strong> ${escapeHtml(lead.projectSize ?? '—')}</p>
     <p><strong>Timeline:</strong> ${escapeHtml(lead.timeline ?? '—')}</p>
     <p><strong>Message:</strong></p>
     <p style="white-space:pre-wrap">${escapeHtml(lead.message ?? '—')}</p>

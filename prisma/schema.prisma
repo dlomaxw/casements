@@ -11,9 +11,9 @@ model Lead {
   id              String      @id @default(cuid())
   fullName        String
   email           String?
-  phone           String
-  productCategory String // e.g. "aluminium-doors-and-windows"
-  projectSize     ProjectSize // SMALL | MEDIUM | LARGE | COMMERCIAL
+  phone           String? // optional: general contact enquiries have no phone
+  productCategory String // "general-enquiry" for contact-form messages
+  projectSize     ProjectSize? // null for general contact enquiries
   timeline        String?
   message         String?
   sourcePage      String?

@@ -37,10 +37,12 @@ export default function LeadsTable({ leads }: { leads: LeadRow[] }) {
                 <Link href={`/crm/leads/${lead.id}`} className="font-medium text-brand-700 hover:text-accent-600">
                   {lead.fullName}
                 </Link>
-                <div className="text-xs text-brand-500">{lead.phone}</div>
+                <div className="text-xs text-brand-500">{lead.phone ?? lead.email ?? '—'}</div>
               </td>
-              <td className="px-4 py-3 text-brand-900">{lead.productCategory}</td>
-              <td className="px-4 py-3 text-brand-900">{lead.projectSize}</td>
+              <td className="px-4 py-3 text-brand-900">
+                {lead.productCategory === 'general-enquiry' ? 'General enquiry' : lead.productCategory}
+              </td>
+              <td className="px-4 py-3 text-brand-900">{lead.projectSize ?? '—'}</td>
               <td className="px-4 py-3">
                 <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusStyles[lead.status] ?? 'bg-brand-100 text-brand-700'}`}>
                   {lead.status}

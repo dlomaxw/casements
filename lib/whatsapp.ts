@@ -21,7 +21,7 @@ export async function sendWhatsAppAlert(lead: Lead, rep: User): Promise<void> {
       to: rep.whatsappNumber,
       type: 'text',
       text: {
-        body: `\u{1F514} NEW LEAD [${lead.projectSize.toUpperCase()}]\n${lead.fullName}\n${lead.phone}\n${lead.productCategory}`,
+        body: `\u{1F514} NEW LEAD [${(lead.projectSize ?? 'ENQUIRY').toUpperCase()}]\n${lead.fullName}\n${lead.phone ?? '—'}\n${lead.productCategory}`,
       },
     }),
   });

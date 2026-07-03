@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { contactEmailTemplate, sendEmail, SALES_EMAIL } from '@/lib/email';
+import { assignLeadToRep, createCRMLead, notifyRep } from '@/lib/crm';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 
 const schema = z.object({
@@ -19,6 +20,24 @@ export async function POST(request: Request) {
   }
 
   const data = parsed.data;
+
+  // Capture every contact message as a CRM lead so nothing is ever lost —
+  // even when email delivery isn't configured.
+  try {
+    const lead = await createCRMLead({
+      fullName: data.name,
+      email: data.email,
+      productCategory: 'general-enquiry',
+      message: data.message,
+      sourcePage: request.headers.get('referer') ?? undefined,
+    });
+    const rep = await assignLeadToRep(lead.id, 'general-enquiry');
+    await notifyRep(lead, rep);
+  } catch (err) {
+    // Never fail the visitor's submission because of a CRM/DB hiccup — still email.
+    console.error('[api/contact] Could not save lead:', err);
+  }
+
   await sendEmail({
     to: SALES_EMAIL,
     subject: `New contact from ${data.name}`,
