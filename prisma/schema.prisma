@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id              String      @id @default(cuid())
+  fullName        String
+  email           String?
+  phone           String
+  productCategory String // e.g. "aluminium-doors-and-windows"
+  projectSize     ProjectSize // SMALL | MEDIUM | LARGE | COMMERCIAL
+  timeline        String?
+  message         String?
+  sourcePage      String?
+  status          LeadStatus  @default(NEW)
+  assignedToId    String?
+  assignedTo      User?       @relation(fields: [assignedToId], references: [id])
+  followUpDate    DateTime?
+  notes           String?
+  activities      Activity[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id])
+  type      String // STATUS_CHANGE | NOTE | EMAIL_SENT | CALL_LOGGED
+  note      String?
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id             String  @id @default(cuid())
+  name           String
+  email          String  @unique
+  // Not in the original doc schema, but required for NextAuth credentials login
+  passwordHash   String?
+  whatsappNumber String?
+  role           Role    @default(SALES_REP)
+  leads          Lead[]
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  SITE_ASSESSED
+  QUOTED
+  WON
+  LOST
+}
+
+enum ProjectSize {
+  SMALL
+  MEDIUM
+  LARGE
+  COMMERCIAL
+}
+
+enum Role {
+  ADMIN
+  SALES_REP
+}

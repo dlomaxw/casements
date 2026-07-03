@@ -1,0 +1,160 @@
+export interface ProductCategory {
+  slug: string;
+  title: string;
+  shortTitle: string;
+  description: string;
+  longDescription: string;
+  image: string;
+  imageAlt: string;
+  subItems: string[];
+  gallery: { src: string; alt: string }[];
+  keywords: string[];
+}
+
+export const productCategories: ProductCategory[] = [
+  {
+    slug: 'aluminium-doors-and-windows',
+    title: 'Aluminium Doors & Windows',
+    shortTitle: 'Aluminium',
+    description:
+      'Precision-engineered aluminium doors and windows — bi-fold, sliding, side-hung, pivot and revolving systems built for East African homes and commercial spaces.',
+    longDescription:
+      'Our aluminium doors and windows combine slim, modern profiles with the strength to stand up to decades of daily use. Every unit is fabricated in our Kampala factory to your exact openings, glazed to specification and installed by our own teams — from a single window replacement to full high-rise packages.',
+    image: '/images/products/aluminium-bifold-door.jpg',
+    imageAlt: 'Bi-folding aluminium door installation by Casements Africa',
+    subItems: ['Bi-Fold Doors', 'Sliding Doors & Windows', 'Side-Hung Casements', 'Pivot Doors', 'Revolving Doors', 'Fixed Panels', 'Top-Hung Windows'],
+    gallery: [
+      { src: '/images/products/aluminium-top-hung-window.jpg', alt: 'Top-hung aluminium window' },
+      { src: '/images/products/aluminium-windows.jpg', alt: 'Aluminium windows' },
+      { src: '/images/products/aluminium-revolving-door.jpg', alt: 'Aluminium revolving door' },
+    ],
+    keywords: ['aluminium doors Uganda', 'aluminium windows Kampala', 'double glazed windows Uganda'],
+  },
+  {
+    slug: 'ceiling',
+    title: 'Ceiling Systems',
+    shortTitle: 'Ceiling',
+    description:
+      'Suspended, coffered, acoustic and stretch ceiling systems that bring light, acoustics and architecture together.',
+    longDescription:
+      'From acoustic panels for auditoriums to perforated metal ceilings for modern offices, we design, fabricate and install ceiling systems that manage sound, conceal services and elevate interiors. Our team handles setting-out, framing and finishing as one package.',
+    image: '/images/products/ceiling-acoustic.jpg',
+    imageAlt: 'Acoustic ceiling installation',
+    subItems: ['Suspended Ceilings', 'Coffered Ceilings', 'Stretch Ceiling Systems', 'Acoustic Ceilings', 'Perforated Metal Ceilings'],
+    gallery: [{ src: '/images/products/ceiling-perforated.jpg', alt: 'Perforated ceiling system' }],
+    keywords: ['suspended ceiling Uganda', 'acoustic ceiling Kampala'],
+  },
+  {
+    slug: 'curtain-wall',
+    title: 'Curtain Wall',
+    shortTitle: 'Curtain Wall',
+    description:
+      'Structural glass facades for commercial buildings — unitized, semi-unitized and stick curtain wall systems.',
+    longDescription:
+      'Casements has glazed some of Kampala’s most recognisable towers. We engineer curtain wall systems that handle wind loads, thermal movement and waterproofing — delivered as unitized panels for speed on tall buildings or stick-built systems for maximum design flexibility.',
+    image: '/images/products/curtain-wall-unitized.png',
+    imageAlt: 'Unitized curtain wall on a commercial building',
+    subItems: ['Unitized Curtain Wall', 'Semi-Unitized Curtain Wall', 'Stick Curtain Wall', 'Spider Glazing'],
+    gallery: [
+      { src: '/images/products/curtain-wall-semi-unitized.jpg', alt: 'Semi-unitized curtain wall' },
+      { src: '/images/products/curtain-wall-stick.webp', alt: 'Stick curtain wall system' },
+    ],
+    keywords: ['curtain wall Uganda', 'glass facade Uganda', 'commercial glazing Kampala'],
+  },
+  {
+    slug: 'facade',
+    title: 'Facade',
+    shortTitle: 'Facade',
+    description:
+      'ACP cladding, aluminium fins and sun-shading systems that give buildings a striking, weather-tight envelope.',
+    longDescription:
+      'A building’s facade is its handshake. We clad new builds and re-skin existing structures with aluminium composite panels, solid aluminium boards, decorative fins and brise-soleil sun shading — engineered for Uganda’s climate and installed with certified access equipment.',
+    image: '/images/products/facade.jpg',
+    imageAlt: 'Modern building facade by Casements Africa',
+    subItems: ['ACP Cladding', 'Solid Aluminium Board', 'Aluminium Fins', 'Sun Shading / Brise-Soleil'],
+    gallery: [{ src: '/images/products/facade-acp-board.jpg', alt: 'Aluminium board facade cladding' }],
+    keywords: ['ACP cladding Uganda', 'facade Kampala'],
+  },
+  {
+    slug: 'partitions',
+    title: 'Partitions',
+    shortTitle: 'Partitions',
+    description:
+      'Frameless glass and aluminium office partitions that divide space without losing light.',
+    longDescription:
+      'Reconfigure offices, banking halls and hotels with partition systems that install fast and look permanent. Choose full-height frameless glass for open sightlines, or aluminium-framed systems with integrated doors, blinds and acoustic infill.',
+    image: '/images/products/partition-frameless-glass.jpg',
+    imageAlt: 'Frameless glass partition',
+    subItems: ['Frameless Glass Partitions', 'Aluminium Office Partitions', 'Demountable Partitions'],
+    gallery: [{ src: '/images/products/interior-modern-office.jpg', alt: 'Modern office partitioning' }],
+    keywords: ['glass partitions Uganda', 'office partitions Kampala'],
+  },
+  {
+    slug: 'glass-products',
+    title: 'Glass Products',
+    shortTitle: 'Glass',
+    description:
+      'Double-glazed, laminated, frameless and safety glass — processed and installed to international standards.',
+    longDescription:
+      'We supply and install the full range of architectural glass: double-glazed units for thermal and acoustic comfort, laminated safety glass, sand-blasted and etched decorative glass, skylights and frameless assemblies. All glass is cut, polished and toughened to spec.',
+    image: '/images/products/glass-laminated.jpg',
+    imageAlt: 'Laminated safety glass',
+    subItems: ['Double-Glazed Units', 'Laminated Safety Glass', 'Frameless Glass', 'Sand-Blasted & Etched Glass', 'Glass Skylights'],
+    gallery: [
+      { src: '/images/products/glass-sandblasted.jpg', alt: 'Sand-blasted etched glass' },
+      { src: '/images/products/glass-skylights.jpg', alt: 'Glass skylights' },
+      { src: '/images/products/glass-space.jpg', alt: 'Glass architectural space' },
+    ],
+    keywords: ['glass products Uganda', 'glass doors Uganda', 'frameless glass Kampala'],
+  },
+  {
+    slug: 'interior-design',
+    title: 'Interior Design',
+    shortTitle: 'Interiors',
+    description:
+      'Mixed-material interior finishes — aluminium, glass, steel and wood brought together by one team.',
+    longDescription:
+      'Because we fabricate in aluminium, glass, steel and wood under one roof, we can deliver complete interior packages: reception counters, feature walls, shopfronts, wardrobes and full fit-outs — designed, built and installed without coordination headaches.',
+    image: '/images/products/interior-modern-office.jpg',
+    imageAlt: 'Modern office interior fit-out',
+    subItems: ['Office Fit-Outs', 'Reception Counters & Feature Walls', 'Shopfronts', 'Mini Homes & Modular Spaces'],
+    gallery: [{ src: '/images/products/interior-mini-homes.jpg', alt: 'Mini homes modular interior' }],
+    keywords: ['interior design Kampala', 'office fit-out Uganda'],
+  },
+  {
+    slug: 'railings',
+    title: 'Railings',
+    shortTitle: 'Railings',
+    description:
+      'Stainless steel and frameless glass railings for balconies, staircases and terraces.',
+    longDescription:
+      'Our railings balance safety with sightlines: marine-grade stainless steel posts and handrails, frameless glass balustrades on point fixings or channel systems, and hybrid designs to match any architecture. Every installation is load-tested and finished by hand.',
+    image: '/images/products/railings-stainless-steel.jpg',
+    imageAlt: 'Stainless steel railings',
+    subItems: ['Stainless Steel Railings', 'Frameless Glass Balustrades', 'Staircase Handrails', 'Balcony Railings'],
+    gallery: [],
+    keywords: ['stainless steel railings Uganda', 'glass balustrade Kampala'],
+  },
+  {
+    slug: 'steel-products',
+    title: 'Steel Products',
+    shortTitle: 'Steel',
+    description:
+      'Steel grills, burglar-proofing, gates, roller shutters and Trellidor security systems.',
+    longDescription:
+      'Security you don’t have to hide. We fabricate steel gates, window grills, roller shutters, sliding grilles and the Trellidor range of retractable barriers — powder-coated, hot-dip galvanised or painted to last in any environment.',
+    image: '/images/products/steel-gates.jpg',
+    imageAlt: 'Fabricated steel gates',
+    subItems: ['Steel Gates', 'Burglar-Proofing & Window Grills', 'Roller Shutters', 'Sliding Grilles', 'Trellidor Systems'],
+    gallery: [
+      { src: '/images/products/steel-roller-shutters.jpg', alt: 'Steel roller shutters' },
+      { src: '/images/products/steel-sliding-grilles.jpg', alt: 'Sliding steel grilles' },
+      { src: '/images/products/steel-trellidors.jpg', alt: 'Trellidor security barriers' },
+    ],
+    keywords: ['steel grills Uganda', 'burglar proofing Kampala', 'Trellidor Uganda'],
+  },
+];
+
+export function getProductBySlug(slug: string): ProductCategory | undefined {
+  return productCategories.find((p) => p.slug === slug);
+}

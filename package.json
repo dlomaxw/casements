@@ -1,0 +1,41 @@
+{
+  "name": "casements-website",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3300",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:seed": "node prisma/seed.mjs",
+    "postbuild": "next-sitemap"
+  },
+  "dependencies": {
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "@prisma/client": "^5.14.0",
+    "next-auth": "^4.24.0",
+    "resend": "^3.2.0",
+    "react-hook-form": "^7.51.0",
+    "zod": "^3.23.0",
+    "@next/third-parties": "^14.2.0",
+    "sharp": "^0.33.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.38",
+    "autoprefixer": "^10.4.19",
+    "prisma": "^5.14.0",
+    "next-sitemap": "^4.2.3",
+    "@types/node": "^20.12.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.mjs"
+  }
+}
