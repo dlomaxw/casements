@@ -3,7 +3,8 @@
 import { useState } from 'react';
 
 const field =
-  'w-full rounded-md border border-brand-200 bg-white px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200';
+  'w-full rounded-lg border border-outline-variant bg-white px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20';
+const label = 'mb-1 block font-mono text-xs font-medium uppercase tracking-wide text-on-surface-variant';
 
 export default function PasswordForm({ userId }: { userId: string }) {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -36,25 +37,24 @@ export default function PasswordForm({ userId }: { userId: string }) {
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 rounded-xl bg-white p-6 shadow-sm ring-1 ring-brand-100">
-      <h2 className="font-display font-bold text-brand-950">Change password</h2>
+    <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-outline-variant bg-white p-6">
+      <h2 className="font-work font-semibold text-industrial-blue">Change password</h2>
       <div>
-        <label className="mb-1 block text-sm font-medium text-brand-900">Current password</label>
+        <label className={label}>Current password</label>
         <input required type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className={field} />
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-brand-900">New password</label>
-        <input required minLength={8} type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-          placeholder="Min 8 characters" className={field} />
+        <label className={label}>New password</label>
+        <input required minLength={8} type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 characters" className={field} />
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-brand-900">Confirm new password</label>
+        <label className={label}>Confirm new password</label>
         <input required minLength={8} type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} className={field} />
       </div>
-      {status.err && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{status.err}</p>}
-      {status.ok && <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-800">{status.ok}</p>}
+      {status.err && <p className="rounded-lg bg-error-container px-3 py-2 text-sm text-on-error-container">{status.err}</p>}
+      {status.ok && <p className="rounded-lg bg-primary-container/15 px-3 py-2 text-sm text-primary">{status.ok}</p>}
       <button type="submit" disabled={saving}
-        className="rounded-md bg-accent-500 px-5 py-2.5 text-sm font-semibold text-brand-950 hover:bg-accent-400 disabled:opacity-50">
+        className="rounded-lg bg-primary px-5 py-2.5 font-mono text-xs font-semibold uppercase tracking-wide text-white hover:opacity-90 disabled:opacity-50">
         {saving ? 'Saving…' : 'Change password'}
       </button>
     </form>

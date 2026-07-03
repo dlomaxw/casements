@@ -4,52 +4,67 @@ import type { Lead } from '@prisma/client';
 type LeadRow = Lead & { assignedTo?: { name: string } | null };
 
 const statusStyles: Record<string, string> = {
-  NEW: 'bg-blue-100 text-blue-800',
-  CONTACTED: 'bg-amber-100 text-amber-800',
-  SITE_ASSESSED: 'bg-purple-100 text-purple-800',
-  QUOTED: 'bg-cyan-100 text-cyan-800',
-  WON: 'bg-green-100 text-green-800',
-  LOST: 'bg-red-100 text-red-700',
+  NEW: 'bg-safety-orange/15 text-safety-orange',
+  CONTACTED: 'bg-secondary-container text-on-secondary-container',
+  SITE_ASSESSED: 'bg-tertiary-container/20 text-tertiary',
+  QUOTED: 'bg-primary-container/15 text-primary',
+  WON: 'bg-primary text-white',
+  LOST: 'bg-error-container text-on-error-container',
 };
+
+function initials(name: string) {
+  return name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+}
 
 export default function LeadsTable({ leads }: { leads: LeadRow[] }) {
   if (leads.length === 0) {
-    return <p className="rounded-lg bg-white p-8 text-center text-sm text-brand-500 ring-1 ring-brand-100">No leads yet.</p>;
+    return (
+      <p className="rounded-xl border border-outline-variant bg-white p-8 text-center text-sm text-on-surface-variant">
+        No leads yet.
+      </p>
+    );
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl bg-white shadow-sm ring-1 ring-brand-100">
-      <table className="min-w-full divide-y divide-brand-100 text-sm">
-        <thead className="bg-steel-50 text-left text-xs uppercase tracking-wide text-brand-500">
+    <div className="overflow-x-auto rounded-xl border border-outline-variant bg-white">
+      <table className="w-full border-collapse text-left">
+        <thead className="border-b border-outline-variant bg-surface-container-high">
           <tr>
-            <th className="px-4 py-3 font-semibold">Name</th>
-            <th className="px-4 py-3 font-semibold">Product</th>
-            <th className="px-4 py-3 font-semibold">Size</th>
-            <th className="px-4 py-3 font-semibold">Status</th>
-            <th className="px-4 py-3 font-semibold">Assigned</th>
-            <th className="px-4 py-3 font-semibold">Created</th>
+            <th className="p-4 font-mono text-xs uppercase tracking-wide text-industrial-blue">Lead</th>
+            <th className="p-4 font-mono text-xs uppercase tracking-wide text-industrial-blue">Product</th>
+            <th className="p-4 font-mono text-xs uppercase tracking-wide text-industrial-blue">Size</th>
+            <th className="p-4 font-mono text-xs uppercase tracking-wide text-industrial-blue">Status</th>
+            <th className="p-4 font-mono text-xs uppercase tracking-wide text-industrial-blue">Assigned</th>
+            <th className="p-4 font-mono text-xs uppercase tracking-wide text-industrial-blue">Created</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-brand-100">
+        <tbody>
           {leads.map((lead) => (
-            <tr key={lead.id} className="hover:bg-steel-50">
-              <td className="px-4 py-3">
-                <Link href={`/crm/leads/${lead.id}`} className="font-medium text-brand-700 hover:text-accent-600">
-                  {lead.fullName}
-                </Link>
-                <div className="text-xs text-brand-500">{lead.phone ?? lead.email ?? '—'}</div>
+            <tr key={lead.id} className="zebra-stripe border-b border-outline-variant/30 transition-colors hover:bg-primary/5">
+              <td className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-outline-variant/30 bg-primary-container/20 font-mono text-xs font-bold text-primary">
+                    {initials(lead.fullName)}
+                  </div>
+                  <div>
+                    <Link href={`/crm/leads/${lead.id}`} className="font-semibold text-industrial-blue hover:text-safety-orange">
+                      {lead.fullName}
+                    </Link>
+                    <div className="font-mono text-[11px] text-on-surface-variant">{lead.phone ?? lead.email ?? '—'}</div>
+                  </div>
+                </div>
               </td>
-              <td className="px-4 py-3 text-brand-900">
+              <td className="p-4 text-sm text-on-surface">
                 {lead.productCategory === 'general-enquiry' ? 'General enquiry' : lead.productCategory}
               </td>
-              <td className="px-4 py-3 text-brand-900">{lead.projectSize ?? '—'}</td>
-              <td className="px-4 py-3">
-                <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusStyles[lead.status] ?? 'bg-brand-100 text-brand-700'}`}>
+              <td className="p-4 font-mono text-xs text-on-surface-variant">{lead.projectSize ?? '—'}</td>
+              <td className="p-4">
+                <span className={`rounded px-2.5 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide ${statusStyles[lead.status] ?? 'bg-surface-container-highest text-industrial-blue'}`}>
                   {lead.status}
                 </span>
               </td>
-              <td className="px-4 py-3 text-brand-900">{lead.assignedTo?.name ?? '—'}</td>
-              <td className="px-4 py-3 text-brand-500">{new Date(lead.createdAt).toLocaleDateString()}</td>
+              <td className="p-4 text-sm font-medium text-industrial-blue">{lead.assignedTo?.name ?? '—'}</td>
+              <td className="p-4 font-mono text-xs text-on-surface-variant">{new Date(lead.createdAt).toLocaleDateString()}</td>
             </tr>
           ))}
         </tbody>

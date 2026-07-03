@@ -4,6 +4,7 @@ import { requireSession } from '@/lib/session';
 import { prisma } from '@/lib/db';
 import LeadStatusForm from '@/components/crm/LeadStatusForm';
 import ReassignForm from '@/components/crm/ReassignForm';
+import Icon from '@/components/crm/Icon';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,37 +34,39 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
 
   const detail = (label: string, value?: string | null) => (
     <div>
-      <dt className="text-xs uppercase tracking-wide text-brand-500">{label}</dt>
-      <dd className="mt-0.5 text-sm text-brand-900">{value || '—'}</dd>
+      <dt className="font-mono text-[11px] uppercase tracking-wide text-outline">{label}</dt>
+      <dd className="mt-0.5 text-sm text-on-surface">{value || '—'}</dd>
     </div>
   );
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <Link href="/crm/leads" className="text-sm text-brand-600 hover:text-accent-600">← Back to leads</Link>
+    <div>
+      <Link href="/crm/leads" className="flex items-center gap-1 font-mono text-xs text-on-surface-variant hover:text-safety-orange">
+        <Icon name="arrow_back" className="text-[16px]" /> Back to leads
+      </Link>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-extrabold text-brand-950">{lead.fullName}</h1>
-          <p className="mt-1 text-sm text-brand-500">
-            Created {new Date(lead.createdAt).toLocaleString()} · Status <span className="font-semibold text-brand-700">{lead.status}</span>
+          <h1 className="font-work text-2xl font-semibold text-industrial-blue">{lead.fullName}</h1>
+          <p className="mt-1 font-mono text-xs text-on-surface-variant">
+            Created {new Date(lead.createdAt).toLocaleString()} · Status <span className="font-semibold text-primary">{lead.status}</span>
           </p>
         </div>
         {lead.phone ? (
-          <a href={`tel:${lead.phone}`} className="rounded-md bg-brand-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-800">
-            Call {lead.phone}
+          <a href={`tel:${lead.phone}`} className="flex items-center gap-2 rounded-lg bg-industrial-blue px-5 py-2.5 font-mono text-xs font-semibold uppercase tracking-wide text-white hover:opacity-90">
+            <Icon name="call" className="text-[18px]" /> Call {lead.phone}
           </a>
         ) : lead.email ? (
-          <a href={`mailto:${lead.email}`} className="rounded-md bg-brand-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-800">
-            Email {lead.email}
+          <a href={`mailto:${lead.email}`} className="flex items-center gap-2 rounded-lg bg-industrial-blue px-5 py-2.5 font-mono text-xs font-semibold uppercase tracking-wide text-white hover:opacity-90">
+            <Icon name="mail" className="text-[18px]" /> Email
           </a>
         ) : null}
       </div>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-8">
-          <section className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-brand-100">
-            <h2 className="font-display font-bold text-brand-950">Lead Details</h2>
+          <section className="rounded-xl border border-outline-variant bg-white p-6">
+            <h2 className="font-work font-semibold text-industrial-blue">Lead Details</h2>
             <dl className="mt-4 grid gap-4 sm:grid-cols-2">
               {detail('Phone', lead.phone)}
               {detail('Email', lead.email)}
@@ -75,24 +78,24 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
             </dl>
             {lead.message && (
               <div className="mt-4">
-                <dt className="text-xs uppercase tracking-wide text-brand-500">Message</dt>
-                <dd className="mt-1 whitespace-pre-wrap text-sm text-brand-900">{lead.message}</dd>
+                <dt className="font-mono text-[11px] uppercase tracking-wide text-outline">Message</dt>
+                <dd className="mt-1 whitespace-pre-wrap text-sm text-on-surface">{lead.message}</dd>
               </div>
             )}
           </section>
 
-          <section className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-brand-100">
-            <h2 className="font-display font-bold text-brand-950">Activity Log</h2>
+          <section className="rounded-xl border border-outline-variant bg-white p-6">
+            <h2 className="font-work font-semibold text-industrial-blue">Activity Log</h2>
             {lead.activities.length === 0 ? (
-              <p className="mt-3 text-sm text-brand-500">No activity yet.</p>
+              <p className="mt-3 text-sm text-on-surface-variant">No activity yet.</p>
             ) : (
               <ul className="mt-4 space-y-4">
                 {lead.activities.map((a) => (
                   <li key={a.id} className="flex gap-3">
-                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-accent-500" />
+                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-safety-orange" />
                     <div>
-                      <p className="text-sm text-brand-900">{a.note ?? a.type}</p>
-                      <p className="text-xs text-brand-500">{a.type} · {new Date(a.createdAt).toLocaleString()}</p>
+                      <p className="text-sm text-on-surface">{a.note ?? a.type}</p>
+                      <p className="font-mono text-[11px] text-on-surface-variant">{a.type} · {new Date(a.createdAt).toLocaleString()}</p>
                     </div>
                   </li>
                 ))}

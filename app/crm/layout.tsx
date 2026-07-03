@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import AuthSessionProvider from '@/components/crm/SessionProvider';
 import SignOutButton from '@/components/crm/SignOutButton';
+import CrmSidebar from '@/components/crm/CrmSidebar';
+import Icon from '@/components/crm/Icon';
 
 export const metadata = {
   title: 'CRM',
@@ -15,7 +17,6 @@ export const dynamic = 'force-dynamic';
 export default async function CrmLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
 
-  // New (unactioned) leads in the current user's scope — drives the header badge
   let newLeads = 0;
   if (session) {
     newLeads = await prisma.lead.count({
@@ -26,40 +27,76 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
     });
   }
 
-  // Login page renders its own tree; unauthenticated users hitting other CRM
-  // routes are redirected there by each page via requireSession().
+  // Unauthenticated (login page) renders its own centered tree
+  if (!session) {
+    return (
+      <AuthSessionProvider>
+        <div className="min-h-screen bg-surface font-sans text-on-surface">{children}</div>
+      </AuthSessionProvider>
+    );
+  }
+
+  const navLink = 'font-mono text-sm tracking-wide text-industrial-blue transition-colors hover:text-safety-orange';
+
   return (
     <AuthSessionProvider>
-      <div className="min-h-screen bg-steel-50">
-        {session && (
-          <header className="border-b border-brand-100 bg-white">
-            <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-              <div className="flex items-center gap-6">
-                <Link href="/crm" className="font-display font-bold text-brand-950">Casements CRM</Link>
-                <nav className="hidden items-center gap-4 text-sm sm:flex">
-                  <Link href="/crm" className="text-brand-700 hover:text-accent-600">Dashboard</Link>
-                  <Link href="/crm/leads" className="flex items-center gap-1.5 text-brand-700 hover:text-accent-600">
-                    Leads
-                    {newLeads > 0 && (
-                      <span className="inline-flex min-w-[20px] items-center justify-center rounded-full bg-accent-500 px-1.5 py-0.5 text-xs font-bold text-brand-950">
-                        {newLeads}
-                      </span>
-                    )}
-                  </Link>
-                  {session.user.role === 'ADMIN' && (
-                    <Link href="/crm/users" className="text-brand-700 hover:text-accent-600">Staff</Link>
+      <div className="min-h-screen bg-surface font-sans text-on-surface">
+        {/* Top bar */}
+        <header className="sticky top-0 z-50 w-full border-b border-aluminum-silver bg-surface">
+          <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center justify-between px-4 lg:px-8">
+            <div className="flex items-center gap-8">
+              <Link href="/crm" className="flex items-center gap-2">
+                <span className="font-work text-lg font-extrabold tracking-tight text-industrial-blue">
+                  CASEMENTS AFRICA
+                </span>
+                <span className="hidden rounded bg-primary px-2 py-0.5 font-mono text-[11px] font-semibold text-white sm:inline">
+                  CRM
+                </span>
+              </Link>
+              <nav className="hidden items-center gap-6 lg:flex">
+                <Link href="/crm" className={navLink}>Dashboard</Link>
+                <Link href="/crm/leads" className={`${navLink} flex items-center gap-1.5`}>
+                  Leads
+                  {newLeads > 0 && (
+                    <span className="inline-flex min-w-[20px] items-center justify-center rounded-full bg-safety-orange px-1.5 py-0.5 text-xs font-bold text-white">
+                      {newLeads}
+                    </span>
                   )}
-                  <Link href="/crm/settings" className="text-brand-700 hover:text-accent-600">Settings</Link>
-                </nav>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <span className="hidden text-brand-500 sm:inline">{session.user?.email}</span>
-                <SignOutButton />
-              </div>
+                </Link>
+                {session.user.role === 'ADMIN' && <Link href="/crm/users" className={navLink}>Staff</Link>}
+                <Link href="/crm/settings" className={navLink}>Settings</Link>
+              </nav>
             </div>
-          </header>
-        )}
-        {children}
+            <div className="flex items-center gap-4">
+              <span className="hidden items-center gap-1.5 font-mono text-xs text-on-surface-variant md:flex">
+                <Icon name="account_circle" className="text-[18px]" />
+                {session.user?.email}
+              </span>
+              <SignOutButton />
+            </div>
+          </div>
+        </header>
+
+        <CrmSidebar />
+
+        <main className="min-h-[calc(100vh-64px)] px-4 pb-12 pt-6 md:px-8 lg:ml-64">
+          <div className="mx-auto max-w-[1200px]">{children}</div>
+        </main>
+
+        {/* Footer */}
+        <footer className="w-full border-t-4 border-safety-orange bg-industrial-blue px-4 py-10 lg:ml-64 lg:px-8">
+          <div className="mx-auto flex max-w-[1200px] flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+            <div>
+              <span className="font-work text-lg font-bold text-white">CASEMENTS AFRICA</span>
+              <p className="mt-1 max-w-md font-sans text-sm text-aluminum-silver">
+                Internal CRM · Precision engineering in aluminium, glass, steel &amp; wood since 1954.
+              </p>
+            </div>
+            <p className="font-mono text-xs text-aluminum-silver">
+              © {new Date().getFullYear()} Casements Africa Limited · Kampala, Uganda
+            </p>
+          </div>
+        </footer>
       </div>
     </AuthSessionProvider>
   );

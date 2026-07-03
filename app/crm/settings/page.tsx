@@ -7,10 +7,10 @@ export default async function SettingsPage() {
   const session = await requireSession();
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-10 sm:px-6">
-      <h1 className="font-display text-2xl font-extrabold text-brand-950">Account Settings</h1>
-      <p className="mt-1 text-sm text-brand-500">
-        Signed in as {session.user.email} ({session.user.role === 'ADMIN' ? 'Admin' : 'Sales Rep'})
+    <div className="mx-auto max-w-xl">
+      <h1 className="font-work text-3xl font-semibold tracking-tight text-industrial-blue">Account Settings</h1>
+      <p className="mt-2 font-mono text-sm text-on-surface-variant">
+        {session.user.email} · {session.user.role === 'ADMIN' ? 'Administrator' : 'Sales Representative'}
       </p>
       <div className="mt-8">
         <PasswordForm userId={session.user.id} />

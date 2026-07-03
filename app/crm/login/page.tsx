@@ -25,29 +25,32 @@ export default function CrmLoginPage() {
     }
   };
 
-  const field = 'w-full rounded-md border border-brand-200 bg-white px-4 py-3 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200';
+  const field =
+    'w-full rounded-lg border border-outline-variant bg-white px-4 py-3 text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20';
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
-      <form onSubmit={onSubmit} className="w-full max-w-sm rounded-xl bg-white p-8 shadow-sm ring-1 ring-brand-100">
-        <h1 className="font-display text-2xl font-bold text-brand-950">Casements CRM</h1>
-        <p className="mt-1 text-sm text-brand-500">Sign in to manage your leads.</p>
+      <form onSubmit={onSubmit} className="w-full max-w-sm rounded-xl border border-outline-variant bg-white p-8 shadow-sm">
+        <div className="mb-6">
+          <span className="font-work text-2xl font-extrabold tracking-tight text-industrial-blue">CASEMENTS AFRICA</span>
+          <p className="mt-1 font-mono text-xs uppercase tracking-widest text-safety-orange">CRM Access</p>
+        </div>
 
-        <div className="mt-6 space-y-4">
+        <div className="space-y-4">
           <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-medium text-brand-900">Email</label>
+            <label htmlFor="email" className="mb-1 block font-mono text-xs font-medium uppercase tracking-wide text-on-surface-variant">Email</label>
             <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={field} />
           </div>
           <div>
-            <label htmlFor="password" className="mb-1 block text-sm font-medium text-brand-900">Password</label>
+            <label htmlFor="password" className="mb-1 block font-mono text-xs font-medium uppercase tracking-wide text-on-surface-variant">Password</label>
             <input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className={field} />
           </div>
         </div>
 
-        {error && <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {error && <p className="mt-4 rounded-lg bg-error-container px-3 py-2 text-sm text-on-error-container">{error}</p>}
 
         <button type="submit" disabled={loading}
-          className="mt-6 w-full rounded-md bg-accent-500 px-4 py-3 text-sm font-semibold text-brand-950 hover:bg-accent-400 disabled:opacity-50">
+          className="mt-6 w-full rounded-lg bg-primary px-4 py-3 font-mono text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-50">
           {loading ? 'Signing in…' : 'Sign in'}
         </button>
       </form>
