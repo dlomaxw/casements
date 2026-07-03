@@ -7,7 +7,7 @@ import LeadStatusForm from '@/components/crm/LeadStatusForm';
 export const dynamic = 'force-dynamic';
 
 export default async function LeadDetailPage({ params }: { params: { id: string } }) {
-  await requireSession();
+  const session = await requireSession();
 
   const lead = await prisma.lead.findUnique({
     where: { id: params.id },
@@ -17,6 +17,8 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
     },
   });
   if (!lead) notFound();
+  // §17: reps can only open their own leads
+  if (session.user.role !== 'ADMIN' && lead.assignedToId !== session.user.id) notFound();
 
   const detail = (label: string, value?: string | null) => (
     <div>

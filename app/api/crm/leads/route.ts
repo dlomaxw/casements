@@ -12,6 +12,8 @@ const STATUSES: LeadStatus[] = ['NEW', 'CONTACTED', 'SITE_ASSESSED', 'QUOTED', '
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  // §17: SALES_REP sees only their own leads; ADMIN sees all
+  const scope = session.user.role === 'ADMIN' ? {} : { assignedToId: session.user.id };
 
   const { searchParams } = new URL(request.url);
   const statusParam = searchParams.get('status');
@@ -20,6 +22,7 @@ export async function GET(request: Request) {
   const page = Math.max(1, Number(searchParams.get('page') ?? '1') || 1);
 
   const where = {
+    ...scope,
     ...(status ? { status } : {}),
     ...(q
       ? {

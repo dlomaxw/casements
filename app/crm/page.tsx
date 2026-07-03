@@ -1,21 +1,52 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/session';
 import { getLeadStats, getOverdueFollowUps } from '@/lib/crm';
+import { prisma } from '@/lib/db';
 import StatsWidget from '@/components/crm/StatsWidget';
+import PipelineBoard from '@/components/crm/PipelineBoard';
 
 export const dynamic = 'force-dynamic';
 
 export default async function CrmDashboardPage() {
-  await requireSession();
-  const [stats, overdue] = await Promise.all([getLeadStats(), getOverdueFollowUps()]);
+  const session = await requireSession();
+  const isAdmin = session.user.role === 'ADMIN';
+  // §17: reps see only their own leads; ADMIN sees everything
+  const scopeUserId = isAdmin ? undefined : session.user.id;
+
+  const [stats, overdue, boardLeads] = await Promise.all([
+    getLeadStats(scopeUserId),
+    getOverdueFollowUps(scopeUserId),
+    prisma.lead.findMany({
+      where: scopeUserId ? { assignedToId: scopeUserId } : {},
+      orderBy: { createdAt: 'desc' },
+      take: 60,
+      include: { assignedTo: { select: { name: true } } },
+    }),
+  ]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <h1 className="font-display text-2xl font-extrabold text-brand-950">Dashboard</h1>
-      <p className="mt-1 text-sm text-brand-500">{stats.total} total leads in the pipeline.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="font-display text-2xl font-extrabold text-brand-950">Dashboard</h1>
+          <p className="mt-1 text-sm text-brand-500">
+            {isAdmin ? `${stats.total} total leads in the pipeline.` : `${stats.total} leads assigned to you.`}
+          </p>
+        </div>
+        <Link href="/crm/leads" className="rounded-md bg-brand-900 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-800">
+          View all leads
+        </Link>
+      </div>
 
       <div className="mt-8">
         <StatsWidget stats={stats} />
+      </div>
+
+      <div className="mt-10">
+        <h2 className="font-display text-lg font-bold text-brand-950">Pipeline Board</h2>
+        <div className="mt-3">
+          <PipelineBoard leads={boardLeads} />
+        </div>
       </div>
 
       <div className="mt-10">

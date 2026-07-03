@@ -18,6 +18,9 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     },
   });
   if (!lead) return Response.json({ error: 'Not found' }, { status: 404 });
+  if (session.user.role !== 'ADMIN' && lead.assignedToId !== session.user.id) {
+    return Response.json({ error: 'Not found' }, { status: 404 });
+  }
   return Response.json({ lead });
 }
 
@@ -31,6 +34,13 @@ const patchSchema = z.object({
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+
+  // §17: reps can only update their own leads
+  const existing = await prisma.lead.findUnique({ where: { id: params.id }, select: { assignedToId: true } });
+  if (!existing) return Response.json({ error: 'Not found' }, { status: 404 });
+  if (session.user.role !== 'ADMIN' && existing.assignedToId !== session.user.id) {
+    return Response.json({ error: 'Not found' }, { status: 404 });
+  }
 
   const parsed = patchSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return Response.json({ error: 'Invalid input' }, { status: 400 });

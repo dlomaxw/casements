@@ -34,20 +34,32 @@ export async function createCRMLead(data: LeadInput): Promise<Lead> {
   return lead;
 }
 
-// Assigns the lead to a sales rep for the product category.
-// Falls back to CRM_DEFAULT_REP_ID, then the first SALES_REP in the DB.
-export async function assignLeadToRep(leadId: string, _category: string): Promise<User | null> {
+// Assigns the lead to the sales rep mapped to the product category (rep_product_map).
+// Falls back to CRM_DEFAULT_REP_ID, then the first active SALES_REP in the DB.
+export async function assignLeadToRep(leadId: string, category: string): Promise<User | null> {
   let rep: User | null = null;
 
-  const defaultRepId = process.env.CRM_DEFAULT_REP_ID;
-  if (defaultRepId) {
-    rep = await prisma.user.findUnique({ where: { id: defaultRepId } });
+  const mapping = await prisma.repProductMap.findUnique({
+    where: { category },
+    include: { user: true },
+  });
+  if (mapping?.user.active) rep = mapping.user;
+
+  if (!rep) {
+    const defaultRepId = process.env.CRM_DEFAULT_REP_ID;
+    if (defaultRepId) {
+      rep = await prisma.user.findUnique({ where: { id: defaultRepId } });
+      if (rep && !rep.active) rep = null;
+    }
   }
   if (!rep) {
-    rep = await prisma.user.findFirst({ where: { role: 'SALES_REP' } });
+    rep = await prisma.user.findFirst({ where: { role: 'SALES_REP', active: true } });
   }
   if (rep) {
     await prisma.lead.update({ where: { id: leadId }, data: { assignedToId: rep.id } });
+    await prisma.activity.create({
+      data: { leadId, type: 'STATUS_CHANGE', note: `Assigned to ${rep.name}` },
+    });
   }
   return rep;
 }
@@ -83,22 +95,25 @@ export async function updateLeadStatus(
   return lead;
 }
 
-// Returns counts by status + conversion rate
-export async function getLeadStats(): Promise<CRMStats> {
+// Returns counts by status + conversion rate.
+// Pass userId to scope to one rep's pipeline (SALES_REP view); omit for ADMIN.
+export async function getLeadStats(userId?: string): Promise<CRMStats> {
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startOfWeek = new Date(startOfDay);
   startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
+  const scope = userId ? { assignedToId: userId } : {};
   const [total, today, thisWeek, thisMonth, grouped, categories] = await Promise.all([
-    prisma.lead.count(),
-    prisma.lead.count({ where: { createdAt: { gte: startOfDay } } }),
-    prisma.lead.count({ where: { createdAt: { gte: startOfWeek } } }),
-    prisma.lead.count({ where: { createdAt: { gte: startOfMonth } } }),
-    prisma.lead.groupBy({ by: ['status'], _count: { _all: true } }),
+    prisma.lead.count({ where: scope }),
+    prisma.lead.count({ where: { ...scope, createdAt: { gte: startOfDay } } }),
+    prisma.lead.count({ where: { ...scope, createdAt: { gte: startOfWeek } } }),
+    prisma.lead.count({ where: { ...scope, createdAt: { gte: startOfMonth } } }),
+    prisma.lead.groupBy({ by: ['status'], where: scope, _count: { _all: true } }),
     prisma.lead.groupBy({
       by: ['productCategory'],
+      where: scope,
       _count: { _all: true },
       orderBy: { _count: { productCategory: 'desc' } },
       take: 5,
@@ -122,10 +137,12 @@ export async function getLeadStats(): Promise<CRMStats> {
   };
 }
 
-// Leads where followUpDate <= today AND status not WON/LOST
-export async function getOverdueFollowUps(): Promise<Lead[]> {
+// Leads where followUpDate <= today AND status not WON/LOST.
+// Pass userId to scope to one rep.
+export async function getOverdueFollowUps(userId?: string): Promise<Lead[]> {
   return prisma.lead.findMany({
     where: {
+      ...(userId ? { assignedToId: userId } : {}),
       followUpDate: { lte: new Date() },
       status: { notIn: ['WON', 'LOST'] },
     },

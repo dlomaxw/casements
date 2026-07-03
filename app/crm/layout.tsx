@@ -25,6 +25,10 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
                 <nav className="hidden gap-4 text-sm sm:flex">
                   <Link href="/crm" className="text-brand-700 hover:text-accent-600">Dashboard</Link>
                   <Link href="/crm/leads" className="text-brand-700 hover:text-accent-600">Leads</Link>
+                  {session.user.role === 'ADMIN' && (
+                    <Link href="/crm/users" className="text-brand-700 hover:text-accent-600">Staff</Link>
+                  )}
+                  <Link href="/crm/settings" className="text-brand-700 hover:text-accent-600">Settings</Link>
                 </nav>
               </div>
               <div className="flex items-center gap-3 text-sm">

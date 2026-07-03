@@ -14,7 +14,9 @@ export default async function LeadsPage({
 }: {
   searchParams: { status?: string; q?: string; page?: string };
 }) {
-  await requireSession();
+  const session = await requireSession();
+  // §17: SALES_REP sees only their own leads; ADMIN sees all
+  const scope = session.user.role === 'ADMIN' ? {} : { assignedToId: session.user.id };
 
   const status = STATUSES.includes(searchParams.status as LeadStatus)
     ? (searchParams.status as LeadStatus)
@@ -23,6 +25,7 @@ export default async function LeadsPage({
   const page = Math.max(1, Number(searchParams.page ?? '1') || 1);
 
   const where = {
+    ...scope,
     ...(status ? { status } : {}),
     ...(q
       ? {

@@ -37,14 +37,24 @@ model Activity {
 }
 
 model User {
-  id             String  @id @default(cuid())
+  id             String          @id @default(cuid())
   name           String
-  email          String  @unique
+  email          String          @unique
   // Not in the original doc schema, but required for NextAuth credentials login
   passwordHash   String?
   whatsappNumber String?
-  role           Role    @default(SALES_REP)
+  role           Role            @default(SALES_REP)
+  active         Boolean         @default(true)
   leads          Lead[]
+  productMap     RepProductMap[]
+}
+
+// §9.1 of the docs: assignLeadToRep looks up rep_product_map for the category
+model RepProductMap {
+  id       String @id @default(cuid())
+  category String @unique // product slug, e.g. "aluminium-doors-and-windows"
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
 }
 
 enum LeadStatus {

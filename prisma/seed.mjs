@@ -31,7 +31,21 @@ async function main() {
     },
   });
 
+  // Route all product categories to the default sales rep (rep_product_map)
+  const categories = [
+    'aluminium-doors-and-windows', 'ceiling', 'curtain-wall', 'facade', 'partitions',
+    'glass-products', 'interior-design', 'railings', 'steel-products',
+  ];
+  for (const category of categories) {
+    await prisma.repProductMap.upsert({
+      where: { category },
+      update: {},
+      create: { category, userId: rep.id },
+    });
+  }
+
   console.log('Seeded users:', admin.email, rep.email);
+  console.log('Mapped', categories.length, 'product categories to', rep.email);
   console.log('Set CRM_DEFAULT_REP_ID to:', rep.id);
 }
 

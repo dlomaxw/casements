@@ -7,6 +7,7 @@ export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const stats = await getLeadStats();
+  // §17: reps get their own stats; ADMIN gets the full dashboard
+  const stats = await getLeadStats(session.user.role === 'ADMIN' ? undefined : session.user.id);
   return Response.json({ stats });
 }
