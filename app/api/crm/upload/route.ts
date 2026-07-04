@@ -20,32 +20,28 @@ export async function POST(request: Request) {
   if (file.size > 8 * 1024 * 1024) return Response.json({ error: 'File too large (max 8MB)' }, { status: 400 });
 
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const pathname = `casements/${Date.now()}-${safeName}`;
 
-  let blob;
   try {
-    blob = await put(`casements/${Date.now()}-${safeName}`, file, {
-      access: 'public',
+    // Store is private — upload private and serve via our public proxy route.
+    await put(pathname, file, {
+      access: 'private',
       contentType: file.type || undefined,
-      // Explicit token when provided; otherwise the SDK uses the linked store.
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
   } catch (err) {
     console.error('[upload] Vercel Blob error:', err);
     return Response.json(
-      {
-        error:
-          'Image storage is not fully configured. Connect a public Vercel Blob store to this project (or paste an image URL instead).',
-        debug: err instanceof Error ? err.message : String(err),
-        hasToken: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
-        hasStoreId: Boolean(process.env.BLOB_STORE_ID),
-      },
+      { error: 'Image storage is not reachable. Paste an image URL instead, or check the Blob store connection.' },
       { status: 400 },
     );
   }
 
+  // Public, cache-friendly URL served through /api/media
+  const url = `/api/media/${encodeURI(pathname)}`;
   const media = await prisma.media.create({
     data: {
-      url: blob.url,
+      url,
       filename: file.name,
       contentType: file.type || null,
       uploadedById: session.user.id,
