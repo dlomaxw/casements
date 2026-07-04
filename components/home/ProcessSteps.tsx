@@ -17,13 +17,16 @@ const steps = [
   },
 ];
 
-export default function ProcessSteps() {
+import { getSiteContent } from '@/lib/content';
+
+export default async function ProcessSteps() {
+  const c = await getSiteContent();
   return (
     <section className="bg-brand-950 py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-accent-400">How It Works</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-accent-400">{c('home.process.eyebrow')}</p>
         <h2 className="mt-2 font-display text-3xl font-extrabold text-white sm:text-4xl">
-          Your Vision, Our Process
+          {c('home.process.title')}
         </h2>
 
         <ol className="mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">

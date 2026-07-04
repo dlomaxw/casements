@@ -9,7 +9,9 @@ const socials = [
   { label: 'Instagram', href: site.social.instagram, icon: 'M12 8.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM6.5 4h11A2.5 2.5 0 0120 6.5v11a2.5 2.5 0 01-2.5 2.5h-11A2.5 2.5 0 014 17.5v-11A2.5 2.5 0 016.5 4zm10.75 2a.75.75 0 100 1.5.75.75 0 000-1.5zM12 10a2 2 0 110 4 2 2 0 010-4z' },
 ];
 
-export default function Footer() {
+import type { SiteContact } from './Header';
+
+export default function Footer({ contact }: { contact: SiteContact }) {
   return (
     <footer className="bg-brand-950 text-brand-100">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
@@ -75,13 +77,13 @@ export default function Footer() {
         <div>
           <h3 className="font-display text-sm font-bold uppercase tracking-wider text-white">Contact</h3>
           <ul className="mt-4 space-y-3 text-sm text-brand-200">
-            <li>{site.address}</li>
+            <li>{contact.address}</li>
             <li>
-              <a href={`mailto:${site.salesEmail}`} className="hover:text-accent-400">{site.salesEmail}</a>
+              <a href={`mailto:${contact.email}`} className="hover:text-accent-400">{contact.email}</a>
             </li>
             <li>
-              <a href={site.phoneHref} className="font-semibold text-accent-400 hover:text-accent-500">
-                {site.phone}
+              <a href={contact.phoneHref} className="font-semibold text-accent-400 hover:text-accent-500">
+                {contact.phone}
               </a>
             </li>
           </ul>

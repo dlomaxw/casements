@@ -83,6 +83,15 @@ model Media {
   createdAt    DateTime @default(now())
 }
 
+// Editable website content blocks (developer/marketing CMS).
+// key mirrors lib/content.ts registry, e.g. "home.hero.title".
+model SiteContent {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
 // §9.1 of the docs: assignLeadToRep looks up rep_product_map for the category
 model RepProductMap {
   id       String @id @default(cuid())

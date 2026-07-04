@@ -3,8 +3,15 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { productCategories } from '@/lib/products';
-import { site } from '@/lib/site';
 import MobileNav from './MobileNav';
+
+export interface SiteContact {
+  phone: string;
+  phoneHref: string;
+  email: string;
+  address: string;
+  ribbon: string;
+}
 
 const navLinks = [
   { href: '/about-us', label: 'About Us' },
@@ -15,7 +22,7 @@ const navLinks = [
   { href: '/testimonials', label: 'Testimonials' },
 ];
 
-export default function Header() {
+export default function Header({ contact }: { contact: SiteContact }) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -29,7 +36,7 @@ export default function Header() {
     <header className="sticky top-0 z-50">
       {/* Top ribbon */}
       <div className="bg-brand-950 text-center text-xs font-medium tracking-wide text-accent-400">
-        <p className="px-4 py-1.5">{site.ribbon}</p>
+        <p className="px-4 py-1.5">{contact.ribbon}</p>
       </div>
 
       <div
@@ -89,14 +96,14 @@ export default function Header() {
               ),
             )}
             <a
-              href={site.phoneHref}
+              href={contact.phoneHref}
               className="ml-3 rounded-md bg-accent-500 px-4 py-2 text-sm font-semibold text-brand-950 hover:bg-accent-400"
             >
-              {site.phone}
+              {contact.phone}
             </a>
           </nav>
 
-          <MobileNav />
+          <MobileNav phone={contact.phone} phoneHref={contact.phoneHref} />
         </div>
       </div>
     </header>

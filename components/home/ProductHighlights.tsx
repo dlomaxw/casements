@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { getSiteContent } from '@/lib/content';
 
 const highlights = [
   {
@@ -28,13 +29,14 @@ const highlights = [
   },
 ];
 
-export default function ProductHighlights() {
+export default async function ProductHighlights() {
+  const c = await getSiteContent();
   return (
     <section className="bg-steel-50 py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-500">What We Do</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-500">{c('home.products.eyebrow')}</p>
         <h2 className="mt-2 font-display text-3xl font-extrabold text-brand-950 sm:text-4xl">
-          Materials Mastered, Spaces Transformed
+          {c('home.products.title')}
         </h2>
 
         <div className="mt-12 grid gap-8 md:grid-cols-3">

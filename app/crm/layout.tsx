@@ -69,6 +69,7 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
                     )}
                   </Link>
                 )}
+                {can(role, 'manage_content') && <Link href="/crm/content" className={navLink}>Content</Link>}
                 {can(role, 'manage_blog') && <Link href="/crm/blog" className={navLink}>Blog</Link>}
                 {can(role, 'manage_media') && <Link href="/crm/media" className={navLink}>Media</Link>}
                 {can(role, 'manage_users') && <Link href="/crm/users" className={navLink}>Staff</Link>}

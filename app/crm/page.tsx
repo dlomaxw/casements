@@ -18,7 +18,8 @@ export default async function CrmDashboardPage() {
 
   const quickActions = [
     { show: viewLeads, href: '/crm/leads', icon: 'table_rows', title: 'Leads', desc: 'Manage the sales pipeline' },
-    { show: can(role, 'manage_blog'), href: '/crm/blog', icon: 'article', title: 'Blog & Content', desc: 'Publish posts, images & video' },
+    { show: can(role, 'manage_content'), href: '/crm/content', icon: 'edit_document', title: 'Website Content', desc: 'Edit page text & images' },
+    { show: can(role, 'manage_blog'), href: '/crm/blog', icon: 'article', title: 'Blog', desc: 'Publish posts, images & video' },
     { show: can(role, 'manage_media'), href: '/crm/media', icon: 'image', title: 'Media Library', desc: 'Upload & manage images' },
     { show: can(role, 'manage_users'), href: '/crm/users', icon: 'groups', title: 'Staff', desc: 'Add & manage team members' },
     { show: true, href: '/crm/settings', icon: 'settings', title: 'Settings', desc: 'Profile & preferences' },

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import ConsultationCTA from '@/components/home/ConsultationCTA';
 import { projects } from '@/lib/projects';
+import { getSiteContent } from '@/lib/content';
 
 export const metadata: Metadata = {
   title: 'About Us',
@@ -25,21 +26,20 @@ const process = [
   { title: 'Installation & Final Touches', body: 'On-site installation and coordination to handover.' },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const c = await getSiteContent();
   return (
     <>
       <section className="relative isolate overflow-hidden bg-brand-950">
-        <Image src="/images/about/factory.jpg" alt="Casements Africa factory in Uganda" fill priority sizes="100vw" className="object-cover opacity-30" />
+        <Image src={c('about.hero.image') || '/images/about/factory.jpg'} alt="Casements Africa factory in Uganda" fill priority sizes="100vw" className="object-cover opacity-30" />
         <div className="absolute inset-0 bg-gradient-to-r from-brand-950 via-brand-950/80 to-transparent" aria-hidden />
         <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-accent-400">About Us · 60+ Years of Experience</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-accent-400">{c('about.hero.eyebrow')}</p>
           <h1 className="mt-3 max-w-3xl font-display text-4xl font-extrabold text-white sm:text-5xl">
-            We Engineer Trust, Beauty and Precision
+            {c('about.hero.title')}
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-brand-100">
-            We are Uganda&rsquo;s leading aluminium, glass, steel and wood finishing specialists, transforming
-            blueprints into beautiful, functional realities for homes, offices, hotels, hospitals and commercial
-            spaces across East Africa.
+            {c('about.hero.mission')}
           </p>
         </div>
       </section>

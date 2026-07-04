@@ -3,9 +3,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { productCategories } from '@/lib/products';
-import { site } from '@/lib/site';
 
-export default function MobileNav() {
+export default function MobileNav({ phone, phoneHref }: { phone: string; phoneHref: string }) {
   const [open, setOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
 
@@ -82,10 +81,10 @@ export default function MobileNav() {
             </Link>
 
             <a
-              href={site.phoneHref}
+              href={phoneHref}
               className="mt-3 rounded-md bg-accent-500 px-4 py-3 text-center font-semibold text-brand-950"
             >
-              Call {site.phone}
+              Call {phone}
             </a>
           </nav>
         </div>

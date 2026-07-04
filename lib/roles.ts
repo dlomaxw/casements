@@ -5,14 +5,15 @@ export type Capability =
   | 'manage_users'   // create / edit staff
   | 'manage_blog'    // create / edit blog posts
   | 'manage_media'   // upload / manage images & media
+  | 'manage_content' // edit website page content (text & images)
   | 'view_leads'     // access the CRM lead pipeline
   | 'assign_leads';  // reassign leads to other reps
 
 const CAPS: Record<Role, Capability[]> = {
-  ADMIN: ['admin', 'manage_users', 'manage_blog', 'manage_media', 'view_leads', 'assign_leads'],
-  MANAGER: ['manage_users', 'manage_blog', 'manage_media', 'view_leads', 'assign_leads'],
-  DEVELOPER: ['manage_media', 'manage_blog'],
-  MARKETING: ['manage_blog', 'manage_media'],
+  ADMIN: ['admin', 'manage_users', 'manage_blog', 'manage_media', 'manage_content', 'view_leads', 'assign_leads'],
+  MANAGER: ['manage_users', 'manage_blog', 'manage_media', 'manage_content', 'view_leads', 'assign_leads'],
+  DEVELOPER: ['manage_media', 'manage_blog', 'manage_content'],
+  MARKETING: ['manage_blog', 'manage_media', 'manage_content'],
   SALES_REP: ['view_leads'],
 };
 
