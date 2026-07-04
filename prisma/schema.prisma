@@ -43,8 +43,13 @@ model User {
   // Not in the original doc schema, but required for NextAuth credentials login
   passwordHash   String?
   whatsappNumber String?
+  title          String? // e.g. "Sales Director — Kampala HQ"
   role           Role            @default(SALES_REP)
   active         Boolean         @default(true)
+  // Notification preferences (Settings dashboard)
+  notifyEmail     Boolean @default(true)
+  notifyDesktop   Boolean @default(false)
+  notifyInventory Boolean @default(false)
   leads          Lead[]
   productMap     RepProductMap[]
 }
