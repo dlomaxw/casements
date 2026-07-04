@@ -3,6 +3,7 @@ import type { LeadStatus } from '@prisma/client';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { createCRMLead } from '@/lib/crm';
+import { can } from '@/lib/roles';
 import { z } from 'zod';
 
 const PAGE_SIZE = 20;
@@ -12,8 +13,9 @@ const STATUSES: LeadStatus[] = ['NEW', 'CONTACTED', 'SITE_ASSESSED', 'QUOTED', '
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  // §17: SALES_REP sees only their own leads; ADMIN sees all
-  const scope = session.user.role === 'ADMIN' ? {} : { assignedToId: session.user.id };
+  if (!can(session.user.role, 'view_leads')) return Response.json({ error: 'Forbidden' }, { status: 403 });
+  // §17: SALES_REP sees only their own leads; ADMIN/MANAGER see all
+  const scope = can(session.user.role, 'assign_leads') ? {} : { assignedToId: session.user.id };
 
   const { searchParams } = new URL(request.url);
   const statusParam = searchParams.get('status');

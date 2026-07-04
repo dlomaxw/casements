@@ -2,13 +2,14 @@ import { getServerSession } from 'next-auth';
 import { z } from 'zod';
 import { authOptions, hashPassword } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { assignableRoles, can } from '@/lib/roles';
 
 const patchSchema = z.object({
   name: z.string().min(2).optional(),
   email: z.string().email().optional(),
   title: z.string().nullable().optional(),
   whatsappNumber: z.string().nullable().optional(),
-  role: z.enum(['ADMIN', 'SALES_REP']).optional(),
+  role: z.enum(['ADMIN', 'MANAGER', 'DEVELOPER', 'MARKETING', 'SALES_REP']).optional(),
   active: z.boolean().optional(),
   password: z.string().min(8).optional(), // set/reset password
   currentPassword: z.string().optional(), // required when a user changes their OWN password
@@ -27,7 +28,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   const session = await getServerSession(authOptions);
   if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const isAdmin = session.user.role === 'ADMIN';
+  const isAdmin = can(session.user.role, 'manage_users');
   const isSelf = session.user.id === params.id;
   if (!isAdmin && !isSelf) return Response.json({ error: 'Forbidden' }, { status: 403 });
 
@@ -66,10 +67,15 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   // Fields only an admin may change (role/active/whatsapp on any account)
   const adminOnly: Record<string, unknown> = {};
   if (isAdmin) {
-    if (isSelf && (data.active === false || data.role === 'SALES_REP')) {
+    if (isSelf && (data.active === false || (data.role && data.role !== 'ADMIN'))) {
       return Response.json({ error: 'You cannot deactivate or demote your own account' }, { status: 400 });
     }
-    if (data.role) adminOnly.role = data.role;
+    if (data.role) {
+      if (!assignableRoles(session.user.role).includes(data.role)) {
+        return Response.json({ error: `You are not allowed to assign the ${data.role} role` }, { status: 403 });
+      }
+      adminOnly.role = data.role;
+    }
     if (data.active !== undefined) adminOnly.active = data.active;
     if (data.whatsappNumber !== undefined) adminOnly.whatsappNumber = data.whatsappNumber;
   }

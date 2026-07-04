@@ -5,6 +5,7 @@ import ProfileForm from '@/components/crm/ProfileForm';
 import NotificationsForm from '@/components/crm/NotificationsForm';
 import PasswordForm from '@/components/crm/PasswordForm';
 import Icon from '@/components/crm/Icon';
+import { can, ROLE_LABELS, type Role } from '@/lib/roles';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +29,7 @@ const integrations = [
 
 export default async function SettingsPage() {
   const session = await requireSession();
-  const isAdmin = session.user.role === 'ADMIN';
+  const isAdmin = can(session.user.role, 'manage_users');
 
   const me = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -100,7 +101,7 @@ export default async function SettingsPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="p-4 text-sm text-on-surface">{u.role === 'ADMIN' ? 'Admin' : 'Sales Executive'}</td>
+                  <td className="p-4 text-sm text-on-surface">{ROLE_LABELS[u.role as Role]}</td>
                   <td className="p-4 font-mono text-xs text-on-surface-variant">{u._count.leads}</td>
                   <td className="p-4">
                     <span className={`rounded-full px-2.5 py-1 font-mono text-[11px] font-semibold ${u.active ? 'bg-primary-container/15 text-primary' : 'bg-error-container text-on-error-container'}`}>

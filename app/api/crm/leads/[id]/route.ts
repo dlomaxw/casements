@@ -3,6 +3,7 @@ import type { LeadStatus } from '@prisma/client';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { updateLeadStatus } from '@/lib/crm';
+import { can } from '@/lib/roles';
 import { z } from 'zod';
 
 // GET /api/crm/leads/[id] — single lead with activity log
@@ -18,7 +19,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     },
   });
   if (!lead) return Response.json({ error: 'Not found' }, { status: 404 });
-  if (session.user.role !== 'ADMIN' && lead.assignedToId !== session.user.id) {
+  if (!can(session.user.role, 'assign_leads') && lead.assignedToId !== session.user.id) {
     return Response.json({ error: 'Not found' }, { status: 404 });
   }
   return Response.json({ lead });
@@ -39,7 +40,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   // §17: reps can only update their own leads
   const existing = await prisma.lead.findUnique({ where: { id: params.id }, select: { assignedToId: true } });
   if (!existing) return Response.json({ error: 'Not found' }, { status: 404 });
-  if (session.user.role !== 'ADMIN' && existing.assignedToId !== session.user.id) {
+  if (!can(session.user.role, 'assign_leads') && existing.assignedToId !== session.user.id) {
     return Response.json({ error: 'Not found' }, { status: 404 });
   }
 
@@ -57,8 +58,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   // Reassignment is ADMIN-only and logged to the activity trail
   let reassign: { assignedToId: string | null } | undefined;
   if (assignedToId !== undefined) {
-    if (session.user.role !== 'ADMIN') {
-      return Response.json({ error: 'Only admins can reassign leads' }, { status: 403 });
+    if (!can(session.user.role, 'assign_leads')) {
+      return Response.json({ error: 'You are not allowed to reassign leads' }, { status: 403 });
     }
     if (assignedToId) {
       const rep = await prisma.user.findUnique({ where: { id: assignedToId } });

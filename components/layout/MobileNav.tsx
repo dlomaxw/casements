@@ -71,6 +71,9 @@ export default function MobileNav() {
             <Link href="/projects" onClick={close} className="rounded px-3 py-3 font-medium text-brand-900 hover:bg-brand-50">
               Projects
             </Link>
+            <Link href="/blog" onClick={close} className="rounded px-3 py-3 font-medium text-brand-900 hover:bg-brand-50">
+              Blog
+            </Link>
             <Link href="/csr" onClick={close} className="rounded px-3 py-3 font-medium text-brand-900 hover:bg-brand-50">
               CSR
             </Link>

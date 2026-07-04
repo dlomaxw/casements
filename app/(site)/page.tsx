@@ -4,6 +4,7 @@ import ProductHighlights from '@/components/home/ProductHighlights';
 import ProcessSteps from '@/components/home/ProcessSteps';
 import ConsultationCTA from '@/components/home/ConsultationCTA';
 import TestimonialsSection from '@/components/home/TestimonialsSection';
+import BlogPreview from '@/components/home/BlogPreview';
 import ContactForm from '@/components/ui/ContactForm';
 
 export default function HomePage() {
@@ -15,6 +16,7 @@ export default function HomePage() {
       <ProcessSteps />
       <ConsultationCTA />
       <TestimonialsSection />
+      <BlogPreview />
       <section id="contact" className="bg-steel-50 py-20">
         <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div>

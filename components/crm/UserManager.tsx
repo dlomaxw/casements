@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { productCategories } from '@/lib/products';
+import { ROLE_LABELS, type Role } from '@/lib/roles';
 import Icon from './Icon';
 
 interface StaffUser {
@@ -10,7 +11,7 @@ interface StaffUser {
   name: string;
   email: string;
   whatsappNumber: string | null;
-  role: 'ADMIN' | 'SALES_REP';
+  role: Role;
   active: boolean;
   productMap: { category: string }[];
   _count: { leads: number };
@@ -20,7 +21,15 @@ const field =
   'w-full rounded-lg border border-outline-variant bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20';
 const label = 'mb-1 block font-mono text-xs font-medium uppercase tracking-wide text-on-surface-variant';
 
-export default function UserManager({ users, currentUserId }: { users: StaffUser[]; currentUserId: string }) {
+export default function UserManager({
+  users,
+  currentUserId,
+  assignableRoles,
+}: {
+  users: StaffUser[];
+  currentUserId: string;
+  assignableRoles: Role[];
+}) {
   const router = useRouter();
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -30,7 +39,7 @@ export default function UserManager({ users, currentUserId }: { users: StaffUser
   const [cEmail, setCEmail] = useState('');
   const [cPassword, setCPassword] = useState('');
   const [cWhatsapp, setCWhatsapp] = useState('');
-  const [cRole, setCRole] = useState<'ADMIN' | 'SALES_REP'>('SALES_REP');
+  const [cRole, setCRole] = useState<Role>(assignableRoles[assignableRoles.length - 1] ?? 'SALES_REP');
   const [cCategories, setCCategories] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
@@ -150,8 +159,8 @@ export default function UserManager({ users, currentUserId }: { users: StaffUser
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`rounded px-2.5 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide ${u.role === 'ADMIN' ? 'bg-primary-container/15 text-primary' : 'bg-surface-container-highest text-industrial-blue'}`}>
-                    {u.role === 'ADMIN' ? 'Administrator' : 'Sales Rep'}
+                  <span className={`rounded px-2.5 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide ${u.role === 'ADMIN' ? 'bg-primary text-white' : u.role === 'SALES_REP' ? 'bg-surface-container-highest text-industrial-blue' : 'bg-primary-container/15 text-primary'}`}>
+                    {ROLE_LABELS[u.role]}
                   </span>
                   <span className={`flex items-center gap-1.5 rounded px-2.5 py-1 font-mono text-[11px] font-semibold ${u.active ? 'text-primary' : 'text-error'}`}>
                     <span className={`h-2 w-2 rounded-full ${u.active ? 'bg-primary' : 'bg-error'}`} />
@@ -227,16 +236,19 @@ export default function UserManager({ users, currentUserId }: { users: StaffUser
             <div><label className={label}>WhatsApp (optional)</label><input value={cWhatsapp} onChange={(e) => setCWhatsapp(e.target.value)} placeholder="+256…" className={field} /></div>
             <div>
               <label className={label}>Role</label>
-              <select value={cRole} onChange={(e) => setCRole(e.target.value as 'ADMIN' | 'SALES_REP')} className={field}>
-                <option value="SALES_REP">Sales Rep</option>
-                <option value="ADMIN">Admin</option>
+              <select value={cRole} onChange={(e) => setCRole(e.target.value as Role)} className={field}>
+                {assignableRoles.map((r) => (
+                  <option key={r} value={r}>{ROLE_LABELS[r]}</option>
+                ))}
               </select>
             </div>
           </div>
-          <div>
-            <p className="mb-2 font-mono text-xs font-medium uppercase tracking-wide text-on-surface-variant">Route these categories to this rep</p>
-            {categoryPicker(cCategories, setCCategories)}
-          </div>
+          {cRole === 'SALES_REP' && (
+            <div>
+              <p className="mb-2 font-mono text-xs font-medium uppercase tracking-wide text-on-surface-variant">Route these categories to this rep</p>
+              {categoryPicker(cCategories, setCCategories)}
+            </div>
+          )}
           <div className="flex gap-3">
             <button type="submit" disabled={saving} className="rounded-lg bg-primary px-5 py-2.5 font-mono text-xs font-semibold uppercase tracking-wide text-white hover:opacity-90 disabled:opacity-50">
               {saving ? 'Creating…' : 'Create staff member'}

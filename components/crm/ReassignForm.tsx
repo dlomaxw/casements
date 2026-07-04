@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import type { Role } from '@/lib/roles';
 
 interface Rep {
   id: string;
   name: string;
-  role: 'ADMIN' | 'SALES_REP';
+  role: Role;
 }
 
 const field =
@@ -49,7 +50,7 @@ export default function ReassignForm({
       <select value={assignee} onChange={(e) => setAssignee(e.target.value)} className={field}>
         <option value="">— Unassigned —</option>
         {reps.map((r) => (
-          <option key={r.id} value={r.id}>{r.name}{r.role === 'ADMIN' ? ' (Admin)' : ''}</option>
+          <option key={r.id} value={r.id}>{r.name}{r.role !== 'SALES_REP' ? ` (${r.role.charAt(0) + r.role.slice(1).toLowerCase()})` : ''}</option>
         ))}
       </select>
       <button type="submit" disabled={saving}

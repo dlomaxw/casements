@@ -5,12 +5,14 @@ import { prisma } from '@/lib/db';
 import LeadStatusForm from '@/components/crm/LeadStatusForm';
 import ReassignForm from '@/components/crm/ReassignForm';
 import Icon from '@/components/crm/Icon';
+import { can } from '@/lib/roles';
 
 export const dynamic = 'force-dynamic';
 
 export default async function LeadDetailPage({ params }: { params: { id: string } }) {
   const session = await requireSession();
-  const isAdmin = session.user.role === 'ADMIN';
+  if (!can(session.user.role, 'view_leads')) notFound();
+  const isAdmin = can(session.user.role, 'assign_leads');
 
   const lead = await prisma.lead.findUnique({
     where: { id: params.id },
@@ -26,7 +28,7 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
   // Admins can reassign — load the active team for the picker
   const reps = isAdmin
     ? await prisma.user.findMany({
-        where: { active: true },
+        where: { active: true, role: { in: ['ADMIN', 'MANAGER', 'SALES_REP'] } },
         orderBy: { name: 'asc' },
         select: { id: true, name: true, role: true },
       })

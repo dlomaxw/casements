@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { can } from '@/lib/roles';
 import AuthSessionProvider from '@/components/crm/SessionProvider';
 import SignOutButton from '@/components/crm/SignOutButton';
 import CrmSidebar from '@/components/crm/CrmSidebar';
@@ -17,12 +18,15 @@ export const dynamic = 'force-dynamic';
 export default async function CrmLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
 
+  const role = session?.user.role;
+  const showSidebar = can(role, 'view_leads');
+
   let newLeads = 0;
-  if (session) {
+  if (session && showSidebar) {
     newLeads = await prisma.lead.count({
       where: {
         status: 'NEW',
-        ...(session.user.role === 'ADMIN' ? {} : { assignedToId: session.user.id }),
+        ...(role === 'ADMIN' || role === 'MANAGER' ? {} : { assignedToId: session.user.id }),
       },
     });
   }
@@ -55,15 +59,19 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
               </Link>
               <nav className="hidden items-center gap-6 lg:flex">
                 <Link href="/crm" className={navLink}>Dashboard</Link>
-                <Link href="/crm/leads" className={`${navLink} flex items-center gap-1.5`}>
-                  Leads
-                  {newLeads > 0 && (
-                    <span className="inline-flex min-w-[20px] items-center justify-center rounded-full bg-safety-orange px-1.5 py-0.5 text-xs font-bold text-white">
-                      {newLeads}
-                    </span>
-                  )}
-                </Link>
-                {session.user.role === 'ADMIN' && <Link href="/crm/users" className={navLink}>Staff</Link>}
+                {can(role, 'view_leads') && (
+                  <Link href="/crm/leads" className={`${navLink} flex items-center gap-1.5`}>
+                    Leads
+                    {newLeads > 0 && (
+                      <span className="inline-flex min-w-[20px] items-center justify-center rounded-full bg-safety-orange px-1.5 py-0.5 text-xs font-bold text-white">
+                        {newLeads}
+                      </span>
+                    )}
+                  </Link>
+                )}
+                {can(role, 'manage_blog') && <Link href="/crm/blog" className={navLink}>Blog</Link>}
+                {can(role, 'manage_media') && <Link href="/crm/media" className={navLink}>Media</Link>}
+                {can(role, 'manage_users') && <Link href="/crm/users" className={navLink}>Staff</Link>}
                 <Link href="/crm/settings" className={navLink}>Settings</Link>
               </nav>
             </div>
@@ -77,14 +85,14 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        <CrmSidebar />
+        {showSidebar && <CrmSidebar />}
 
-        <main className="min-h-[calc(100vh-64px)] px-4 pb-12 pt-6 md:px-8 lg:ml-64">
+        <main className={`min-h-[calc(100vh-64px)] px-4 pb-12 pt-6 md:px-8 ${showSidebar ? 'lg:ml-64' : ''}`}>
           <div className="mx-auto max-w-[1200px]">{children}</div>
         </main>
 
         {/* Footer */}
-        <footer className="w-full border-t-4 border-safety-orange bg-industrial-blue px-4 py-10 lg:ml-64 lg:px-8">
+        <footer className={`w-full border-t-4 border-safety-orange bg-industrial-blue px-4 py-10 lg:px-8 ${showSidebar ? 'lg:ml-64' : ''}`}>
           <div className="mx-auto flex max-w-[1200px] flex-col items-start justify-between gap-4 md:flex-row md:items-center">
             <div>
               <span className="font-work text-lg font-bold text-white">CASEMENTS AFRICA</span>

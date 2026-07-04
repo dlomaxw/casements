@@ -52,6 +52,35 @@ model User {
   notifyInventory Boolean @default(false)
   leads          Lead[]
   productMap     RepProductMap[]
+  posts          Post[]
+  media          Media[]
+}
+
+model Post {
+  id          String     @id @default(cuid())
+  title       String
+  slug        String     @unique
+  excerpt     String?
+  body        String // markdown / plain text
+  coverImage  String? // image URL
+  videoUrl    String? // YouTube / Vimeo / other embed link
+  category    String     @default("News")
+  status      PostStatus @default(DRAFT)
+  authorId    String?
+  author      User?      @relation(fields: [authorId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  publishedAt DateTime?
+}
+
+model Media {
+  id           String   @id @default(cuid())
+  url          String
+  filename     String
+  contentType  String?
+  uploadedById String?
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id])
+  createdAt    DateTime @default(now())
 }
 
 // §9.1 of the docs: assignLeadToRep looks up rep_product_map for the category
@@ -80,5 +109,13 @@ enum ProjectSize {
 
 enum Role {
   ADMIN
+  MANAGER
+  DEVELOPER
+  MARKETING
   SALES_REP
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
 }

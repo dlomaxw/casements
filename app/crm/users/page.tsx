@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { requireSession } from '@/lib/session';
 import { prisma } from '@/lib/db';
+import { assignableRoles, can } from '@/lib/roles';
 import UserManager from '@/components/crm/UserManager';
 import Icon from '@/components/crm/Icon';
 
@@ -29,7 +30,8 @@ const roleCards = [
 
 export default async function UsersPage() {
   const session = await requireSession();
-  if (session.user.role !== 'ADMIN') redirect('/crm');
+  if (!can(session.user.role, 'manage_users')) redirect('/crm');
+  const canAssign = assignableRoles(session.user.role);
 
   const users = await prisma.user.findMany({
     orderBy: { name: 'asc' },
@@ -84,7 +86,7 @@ export default async function UsersPage() {
         </div>
       </div>
 
-      <UserManager users={users} currentUserId={session.user.id} />
+      <UserManager users={users} currentUserId={session.user.id} assignableRoles={canAssign} />
 
       {/* Role definitions */}
       <div className="mt-12">

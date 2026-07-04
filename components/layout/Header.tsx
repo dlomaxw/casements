@@ -10,6 +10,7 @@ const navLinks = [
   { href: '/about-us', label: 'About Us' },
   { href: '/products', label: 'Products', dropdown: true },
   { href: '/projects', label: 'Projects' },
+  { href: '/blog', label: 'Blog' },
   { href: '/csr', label: 'CSR' },
   { href: '/testimonials', label: 'Testimonials' },
 ];

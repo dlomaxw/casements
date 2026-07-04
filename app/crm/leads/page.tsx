@@ -1,8 +1,10 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import type { LeadStatus } from '@prisma/client';
 import { requireSession } from '@/lib/session';
 import { prisma } from '@/lib/db';
 import { getProductBySlug } from '@/lib/products';
+import { can } from '@/lib/roles';
 import LeadsTable from '@/components/crm/LeadsTable';
 import Icon from '@/components/crm/Icon';
 
@@ -17,7 +19,8 @@ export default async function LeadsPage({
   searchParams: { status?: string; q?: string; page?: string; category?: string };
 }) {
   const session = await requireSession();
-  const scope = session.user.role === 'ADMIN' ? {} : { assignedToId: session.user.id };
+  if (!can(session.user.role, 'view_leads')) redirect('/crm');
+  const scope = can(session.user.role, 'assign_leads') ? {} : { assignedToId: session.user.id };
 
   const status = STATUSES.includes(searchParams.status as LeadStatus) ? (searchParams.status as LeadStatus) : undefined;
   const category = searchParams.category?.trim() || undefined;
