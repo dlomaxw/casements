@@ -35,6 +35,9 @@ export async function POST(request: Request) {
       {
         error:
           'Image storage is not fully configured. Connect a public Vercel Blob store to this project (or paste an image URL instead).',
+        debug: err instanceof Error ? err.message : String(err),
+        hasToken: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
+        hasStoreId: Boolean(process.env.BLOB_STORE_ID),
       },
       { status: 400 },
     );
