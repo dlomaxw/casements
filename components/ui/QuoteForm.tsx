@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { productCategories } from '@/lib/products';
 import Button from './Button';
 
 interface QuoteValues {
@@ -15,7 +14,9 @@ interface QuoteValues {
   message?: string;
 }
 
-export default function QuoteForm({ defaultCategory }: { defaultCategory?: string }) {
+interface Category { slug: string; title: string }
+
+export default function QuoteForm({ defaultCategory, categories }: { defaultCategory?: string; categories: Category[] }) {
   const {
     register,
     handleSubmit,
@@ -78,7 +79,7 @@ export default function QuoteForm({ defaultCategory }: { defaultCategory?: strin
           <select id="productCategory" className={field}
             {...register('productCategory', { required: 'Please choose a category' })}>
             <option value="">Select…</option>
-            {productCategories.map((p) => (
+            {categories.map((p) => (
               <option key={p.slug} value={p.slug}>{p.title}</option>
             ))}
           </select>

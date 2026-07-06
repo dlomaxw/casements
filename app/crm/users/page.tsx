@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { requireSession } from '@/lib/session';
 import { prisma } from '@/lib/db';
 import { assignableRoles, can } from '@/lib/roles';
+import { getProductNav } from '@/lib/products-db';
 import UserManager from '@/components/crm/UserManager';
 import Icon from '@/components/crm/Icon';
 
@@ -32,6 +33,7 @@ export default async function UsersPage() {
   const session = await requireSession();
   if (!can(session.user.role, 'manage_users')) redirect('/crm');
   const canAssign = assignableRoles(session.user.role);
+  const categories = await getProductNav();
 
   const users = await prisma.user.findMany({
     orderBy: { name: 'asc' },
@@ -86,7 +88,7 @@ export default async function UsersPage() {
         </div>
       </div>
 
-      <UserManager users={users} currentUserId={session.user.id} assignableRoles={canAssign} />
+      <UserManager users={users} currentUserId={session.user.id} assignableRoles={canAssign} categories={categories.map((c) => ({ slug: c.slug, shortTitle: c.shortTitle }))} />
 
       {/* Role definitions */}
       <div className="mt-12">

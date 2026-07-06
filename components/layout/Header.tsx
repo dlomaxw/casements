@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { productCategories } from '@/lib/products';
 import MobileNav from './MobileNav';
 
 export interface SiteContact {
@@ -13,6 +12,8 @@ export interface SiteContact {
   ribbon: string;
 }
 
+export interface ProductNavItem { slug: string; title: string; shortTitle?: string }
+
 const navLinks = [
   { href: '/about-us', label: 'About Us' },
   { href: '/products', label: 'Products', dropdown: true },
@@ -22,7 +23,7 @@ const navLinks = [
   { href: '/testimonials', label: 'Testimonials' },
 ];
 
-export default function Header({ contact }: { contact: SiteContact }) {
+export default function Header({ contact, products }: { contact: SiteContact; products: ProductNavItem[] }) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -73,8 +74,8 @@ export default function Header({ contact }: { contact: SiteContact }) {
                       <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
                   </Link>
-                  <div className="invisible absolute left-0 top-full w-72 rounded-lg border border-brand-100 bg-white p-2 opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
-                    {productCategories.map((p) => (
+                  <div className="invisible absolute left-0 top-full max-h-[70vh] w-72 overflow-y-auto rounded-lg border border-brand-100 bg-white p-2 opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
+                    {products.map((p) => (
                       <Link
                         key={p.slug}
                         href={`/products/${p.slug}`}
@@ -103,7 +104,7 @@ export default function Header({ contact }: { contact: SiteContact }) {
             </a>
           </nav>
 
-          <MobileNav phone={contact.phone} phoneHref={contact.phoneHref} />
+          <MobileNav phone={contact.phone} phoneHref={contact.phoneHref} products={products} />
         </div>
       </div>
     </header>

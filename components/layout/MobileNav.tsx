@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { productCategories } from '@/lib/products';
+import type { ProductNavItem } from './Header';
 
-export default function MobileNav({ phone, phoneHref }: { phone: string; phoneHref: string }) {
+export default function MobileNav({ phone, phoneHref, products }: { phone: string; phoneHref: string; products: ProductNavItem[] }) {
   const [open, setOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
 
@@ -54,7 +54,7 @@ export default function MobileNav({ phone, phoneHref }: { phone: string; phoneHr
                 <Link href="/products" onClick={close} className="block rounded px-3 py-2 text-sm font-semibold text-brand-700 hover:bg-brand-50">
                   All Products
                 </Link>
-                {productCategories.map((p) => (
+                {products.map((p) => (
                   <Link
                     key={p.slug}
                     href={`/products/${p.slug}`}

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { can } from '@/lib/roles';
+import { getProductNav } from '@/lib/products-db';
 import AuthSessionProvider from '@/components/crm/SessionProvider';
 import SignOutButton from '@/components/crm/SignOutButton';
 import CrmSidebar from '@/components/crm/CrmSidebar';
@@ -20,6 +21,7 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
 
   const role = session?.user.role;
   const showSidebar = can(role, 'view_leads');
+  const productNav = showSidebar ? await getProductNav() : [];
 
   let newLeads = 0;
   if (session && showSidebar) {
@@ -69,6 +71,7 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
                     )}
                   </Link>
                 )}
+                {can(role, 'manage_content') && <Link href="/crm/products" className={navLink}>Products</Link>}
                 {can(role, 'manage_content') && <Link href="/crm/content" className={navLink}>Content</Link>}
                 {can(role, 'manage_blog') && <Link href="/crm/blog" className={navLink}>Blog</Link>}
                 {can(role, 'manage_media') && <Link href="/crm/media" className={navLink}>Media</Link>}
@@ -86,7 +89,7 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        {showSidebar && <CrmSidebar />}
+        {showSidebar && <CrmSidebar products={productNav} />}
 
         <main className={`min-h-[calc(100vh-64px)] px-4 pb-12 pt-6 md:px-8 ${showSidebar ? 'lg:ml-64' : ''}`}>
           <div className="mx-auto max-w-[1200px]">{children}</div>

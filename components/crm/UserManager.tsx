@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { productCategories } from '@/lib/products';
 import { ROLE_LABELS, type Role } from '@/lib/roles';
 import Icon from './Icon';
+
+interface CategoryOption { slug: string; shortTitle: string }
 
 interface StaffUser {
   id: string;
@@ -25,10 +26,12 @@ export default function UserManager({
   users,
   currentUserId,
   assignableRoles,
+  categories,
 }: {
   users: StaffUser[];
   currentUserId: string;
   assignableRoles: Role[];
+  categories: CategoryOption[];
 }) {
   const router = useRouter();
   const [error, setError] = useState('');
@@ -103,7 +106,7 @@ export default function UserManager({
 
   const categoryPicker = (selected: string[], set: (v: string[]) => void) => (
     <div className="flex flex-wrap gap-1.5">
-      {productCategories.map((p) => {
+      {categories.map((p) => {
         const on = selected.includes(p.slug);
         return (
           <button key={p.slug} type="button" onClick={() => toggleCat(selected, set, p.slug)}
@@ -199,7 +202,7 @@ export default function UserManager({
                     ) : (
                       u.productMap.map((m) => (
                         <span key={m.category} className="rounded-full border border-outline-variant bg-surface-container-low px-3 py-1 font-mono text-[11px] text-on-surface-variant">
-                          {productCategories.find((p) => p.slug === m.category)?.shortTitle ?? m.category}
+                          {categories.find((p) => p.slug === m.category)?.shortTitle ?? m.category}
                         </span>
                       ))
                     )}

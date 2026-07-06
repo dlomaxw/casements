@@ -4,19 +4,22 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Icon from './Icon';
 
-const categories: { slug: string; label: string; icon: string }[] = [
-  { slug: 'aluminium-doors-and-windows', label: 'Aluminium', icon: 'architecture' },
-  { slug: 'ceiling', label: 'Ceiling', icon: 'grid_view' },
-  { slug: 'curtain-wall', label: 'Curtain Wall', icon: 'layers' },
-  { slug: 'facade', label: 'Facade', icon: 'domain' },
-  { slug: 'partitions', label: 'Partitions', icon: 'splitscreen' },
-  { slug: 'glass-products', label: 'Glass', icon: 'window' },
-  { slug: 'interior-design', label: 'Interior Design', icon: 'format_paint' },
-  { slug: 'railings', label: 'Railings', icon: 'fence' },
-  { slug: 'steel-products', label: 'Steel', icon: 'construction' },
-];
+// Known category → icon map; new products fall back to a generic icon.
+const ICONS: Record<string, string> = {
+  'aluminium-doors-and-windows': 'architecture',
+  ceiling: 'grid_view',
+  'curtain-wall': 'layers',
+  facade: 'domain',
+  partitions: 'splitscreen',
+  'glass-products': 'window',
+  'interior-design': 'format_paint',
+  railings: 'fence',
+  'steel-products': 'construction',
+};
 
-export default function CrmSidebar() {
+interface ProductNavItem { slug: string; shortTitle?: string; title: string }
+
+export default function CrmSidebar({ products }: { products: ProductNavItem[] }) {
   const pathname = usePathname();
   const params = useSearchParams();
   const activeCategory = params.get('category');
@@ -41,18 +44,18 @@ export default function CrmSidebar() {
           <span className="font-mono text-sm font-medium tracking-wide">All Leads</span>
         </Link>
 
-        {categories.map((c) => {
-          const active = activeCategory === c.slug;
+        {products.map((p) => {
+          const active = activeCategory === p.slug;
           return (
             <Link
-              key={c.slug}
-              href={`/crm/leads?category=${c.slug}`}
+              key={p.slug}
+              href={`/crm/leads?category=${p.slug}`}
               className={`group mx-2 my-1 flex items-center rounded-lg p-3 transition-all hover:translate-x-1 ${
                 active ? 'bg-safety-orange text-white shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high'
               }`}
             >
-              <Icon name={c.icon} className={`mr-3 ${active ? '' : 'group-hover:text-primary'}`} />
-              <span className="font-mono text-sm font-medium tracking-wide">{c.label}</span>
+              <Icon name={ICONS[p.slug] ?? 'category'} className={`mr-3 ${active ? '' : 'group-hover:text-primary'}`} />
+              <span className="font-mono text-sm font-medium tracking-wide">{p.shortTitle ?? p.title}</span>
             </Link>
           );
         })}

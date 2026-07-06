@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import ProductCard from '@/components/products/ProductCard';
 import ConsultationCTA from '@/components/home/ConsultationCTA';
-import { getSiteContent, resolveProducts } from '@/lib/content';
+import { getSiteContent } from '@/lib/content';
+import { getProducts } from '@/lib/products-db';
 
 export const metadata: Metadata = {
   title: 'Products',
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function ProductsPage() {
   const c = await getSiteContent();
-  const products = resolveProducts(c);
+  const products = await getProducts();
   return (
     <>
       <section className="bg-brand-950 py-20">

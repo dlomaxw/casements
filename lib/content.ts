@@ -1,6 +1,5 @@
 import { cache } from 'react';
 import { prisma } from '@/lib/db';
-import { productCategories, type ProductCategory } from '@/lib/products';
 import { projects as defaultProjects, type Project } from '@/lib/projects';
 import { testimonials as defaultTestimonials } from '@/lib/testimonials';
 
@@ -70,14 +69,8 @@ const MANUAL_BLOCKS: ContentBlock[] = [
   { key: 'csr.pillar.2.body', page: 'CSR', label: 'Pillar 3 body', type: 'textarea', default: 'We support the communities we work in, contributing to safe, durable public and educational spaces.' },
 ];
 
-// ---- Per-item blocks generated from the product / project / testimonial data ----
-const productBlocks: ContentBlock[] = productCategories.flatMap((p) => [
-  { key: `product.${p.slug}.title`, page: `Product · ${p.shortTitle}`, label: 'Title', type: 'text', default: p.title },
-  { key: `product.${p.slug}.description`, page: `Product · ${p.shortTitle}`, label: 'Card / index description', type: 'textarea', default: p.description },
-  { key: `product.${p.slug}.long`, page: `Product · ${p.shortTitle}`, label: 'Overview (detail page)', type: 'textarea', default: p.longDescription },
-  { key: `product.${p.slug}.image`, page: `Product · ${p.shortTitle}`, label: 'Main image', type: 'image', default: p.image },
-]);
-
+// ---- Per-item blocks generated from the project / testimonial data ----
+// (Products have their own full editor at /crm/products.)
 const projectBlocks: ContentBlock[] = defaultProjects.flatMap((pr, i) => [
   { key: `project.${i}.name`, page: 'Projects (list)', label: `#${i + 1} Name`, type: 'text', default: pr.name },
   { key: `project.${i}.location`, page: 'Projects (list)', label: `#${i + 1} Location`, type: 'text', default: pr.location },
@@ -94,7 +87,6 @@ const testimonialBlocks: ContentBlock[] = defaultTestimonials.flatMap((t, i) => 
 
 export const CONTENT_BLOCKS: ContentBlock[] = [
   ...MANUAL_BLOCKS,
-  ...productBlocks,
   ...projectBlocks,
   ...testimonialBlocks,
 ];
@@ -123,28 +115,6 @@ export async function getContentValues(): Promise<Record<string, string>> {
 }
 
 // ---- Resolver helpers that apply overrides to the collections ----
-export function resolveProducts(c: ContentResolver): ProductCategory[] {
-  return productCategories.map((p) => ({
-    ...p,
-    title: c(`product.${p.slug}.title`),
-    description: c(`product.${p.slug}.description`),
-    longDescription: c(`product.${p.slug}.long`),
-    image: c(`product.${p.slug}.image`),
-  }));
-}
-
-export function resolveProduct(c: ContentResolver, slug: string): ProductCategory | undefined {
-  const p = productCategories.find((x) => x.slug === slug);
-  if (!p) return undefined;
-  return {
-    ...p,
-    title: c(`product.${p.slug}.title`),
-    description: c(`product.${p.slug}.description`),
-    longDescription: c(`product.${p.slug}.long`),
-    image: c(`product.${p.slug}.image`),
-  };
-}
-
 export function resolveProjects(c: ContentResolver): Project[] {
   return defaultProjects.map((pr, i) => ({
     name: c(`project.${i}.name`),
