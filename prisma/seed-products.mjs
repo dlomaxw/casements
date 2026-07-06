@@ -10,6 +10,12 @@ const prisma = new PrismaClient();
 // instead we duplicate the data here to keep the seed self-contained.
 const products = JSON.parse(readFileSync(new URL('./products-seed.json', import.meta.url), 'utf8'));
 
+const TYPES = {
+  'aluminium-doors-and-windows': 'Aluminium', ceiling: 'Ceiling', 'curtain-wall': 'Curtain Wall',
+  facade: 'Facade', partitions: 'Partitions', 'glass-products': 'Glass',
+  'interior-design': 'Interior Design', railings: 'Railings', 'steel-products': 'Steel',
+};
+
 async function main() {
   let i = 0;
   for (const p of products) {
@@ -20,6 +26,7 @@ async function main() {
         slug: p.slug,
         title: p.title,
         shortTitle: p.shortTitle,
+        type: TYPES[p.slug] ?? 'Other',
         description: p.description,
         longDescription: p.longDescription,
         image: p.image,

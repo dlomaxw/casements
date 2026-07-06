@@ -36,6 +36,7 @@ export default async function ProductsPage() {
               description={p.description}
               image={p.image}
               imageAlt={p.imageAlt}
+              type={p.type}
               href={`/products/${p.slug}`}
             />
           ))}

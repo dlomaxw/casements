@@ -42,7 +42,10 @@ export default async function ProductsAdminPage() {
               {p.videoUrl && <Icon name="smart_display" className="absolute right-2 top-2 text-safety-orange" filled />}
             </div>
             <div className="p-4">
-              <p className="font-work font-bold text-industrial-blue group-hover:text-safety-orange">{p.title}</p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-work font-bold text-industrial-blue group-hover:text-safety-orange">{p.title}</p>
+                <span className="shrink-0 rounded bg-primary-container/15 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-primary">{p.type}</span>
+              </div>
               <p className="mt-1 line-clamp-2 text-xs text-on-surface-variant">{p.description}</p>
               <div className="mt-2 flex gap-3 font-mono text-[11px] text-outline">
                 <span>{p.subItems.length} features</span>

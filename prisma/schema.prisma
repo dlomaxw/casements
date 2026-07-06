@@ -98,6 +98,7 @@ model Product {
   slug            String   @unique
   title           String
   shortTitle      String
+  type            String   @default("Other") // material / category, e.g. "Aluminium"
   description     String // card / index blurb
   longDescription String // detail-page overview
   image           String // main image

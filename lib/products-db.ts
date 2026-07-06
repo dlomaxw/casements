@@ -1,6 +1,21 @@
 import { cache } from 'react';
 import { prisma } from '@/lib/db';
 
+// Selectable product types (material / service category)
+export const PRODUCT_TYPES = [
+  'Aluminium',
+  'Glass',
+  'Steel',
+  'Wood',
+  'Ceiling',
+  'Curtain Wall',
+  'Facade',
+  'Partitions',
+  'Railings',
+  'Interior Design',
+  'Other',
+] as const;
+
 export interface GalleryItem {
   src: string;
   alt: string;
@@ -11,6 +26,7 @@ export interface ProductRecord {
   slug: string;
   title: string;
   shortTitle: string;
+  type: string;
   description: string;
   longDescription: string;
   image: string;
@@ -30,6 +46,7 @@ function shape(p: any): ProductRecord {
     slug: p.slug,
     title: p.title,
     shortTitle: p.shortTitle,
+    type: p.type ?? 'Other',
     description: p.description,
     longDescription: p.longDescription,
     image: p.image,

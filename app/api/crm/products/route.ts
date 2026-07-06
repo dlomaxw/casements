@@ -18,6 +18,7 @@ const gallerySchema = z.array(z.object({ src: z.string(), alt: z.string() }));
 const createSchema = z.object({
   title: z.string().min(2),
   shortTitle: z.string().min(1).optional(),
+  type: z.string().optional(),
   description: z.string().min(1),
   longDescription: z.string().min(1),
   image: z.string().min(1),
@@ -57,6 +58,7 @@ export async function POST(request: Request) {
       slug: await uniqueProductSlug(d.title),
       title: d.title,
       shortTitle: d.shortTitle || d.title,
+      type: d.type || 'Other',
       description: d.description,
       longDescription: d.longDescription,
       image: d.image,

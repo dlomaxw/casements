@@ -9,6 +9,7 @@ const gallerySchema = z.array(z.object({ src: z.string(), alt: z.string() }));
 const patchSchema = z.object({
   title: z.string().min(2).optional(),
   shortTitle: z.string().min(1).optional(),
+  type: z.string().optional(),
   description: z.string().min(1).optional(),
   longDescription: z.string().min(1).optional(),
   image: z.string().min(1).optional(),
@@ -42,6 +43,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     data: {
       ...(d.title ? { title: d.title } : {}),
       ...(d.shortTitle ? { shortTitle: d.shortTitle } : {}),
+      ...(d.type ? { type: d.type } : {}),
       ...(d.description ? { description: d.description } : {}),
       ...(d.longDescription ? { longDescription: d.longDescription } : {}),
       ...(d.image ? { image: d.image } : {}),

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { PRODUCT_TYPES } from '@/lib/products-db';
 import ImageUploadField from './ImageUploadField';
 import Icon from './Icon';
 
@@ -10,6 +11,7 @@ interface ProductData {
   id?: string;
   title: string;
   shortTitle: string;
+  type: string;
   description: string;
   longDescription: string;
   image: string;
@@ -31,6 +33,7 @@ export default function ProductEditor({ initial }: { initial?: Partial<ProductDa
   const [p, setP] = useState<ProductData>({
     title: initial?.title ?? '',
     shortTitle: initial?.shortTitle ?? '',
+    type: initial?.type ?? 'Aluminium',
     description: initial?.description ?? '',
     longDescription: initial?.longDescription ?? '',
     image: initial?.image ?? '',
@@ -89,6 +92,12 @@ export default function ProductEditor({ initial }: { initial?: Partial<ProductDa
           <div className="grid gap-4 sm:grid-cols-2">
             <div><label className={label}>Title</label><input value={p.title} onChange={(e) => set('title', e.target.value)} className={field} placeholder="Aluminium Doors & Windows" /></div>
             <div><label className={label}>Short title <span className="text-outline">(nav/sidebar)</span></label><input value={p.shortTitle} onChange={(e) => set('shortTitle', e.target.value)} className={field} placeholder="Aluminium" /></div>
+            <div>
+              <label className={label}>Product Type</label>
+              <select value={p.type} onChange={(e) => set('type', e.target.value)} className={field}>
+                {PRODUCT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
           </div>
           <div><label className={label}>Card / index description</label><textarea value={p.description} onChange={(e) => set('description', e.target.value)} rows={3} className={field} /></div>
           <div><label className={label}>Overview (detail page)</label><textarea value={p.longDescription} onChange={(e) => set('longDescription', e.target.value)} rows={6} className={field} /></div>

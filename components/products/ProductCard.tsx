@@ -7,9 +7,10 @@ interface ProductCardProps {
   image: string;
   href: string;
   imageAlt: string;
+  type?: string;
 }
 
-export default function ProductCard({ title, description, image, href, imageAlt }: ProductCardProps) {
+export default function ProductCard({ title, description, image, href, imageAlt, type }: ProductCardProps) {
   return (
     <Link
       href={href}
@@ -23,6 +24,11 @@ export default function ProductCard({ title, description, image, href, imageAlt 
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
+        {type && (
+          <span className="absolute left-3 top-3 rounded bg-brand-950/80 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-accent-400 backdrop-blur">
+            {type}
+          </span>
+        )}
       </div>
       <div className="flex flex-1 flex-col p-6">
         <h3 className="font-display text-lg font-bold text-brand-950">{title}</h3>
