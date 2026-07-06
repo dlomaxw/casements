@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import ConsultationCTA from '@/components/home/ConsultationCTA';
-import { projects } from '@/lib/projects';
-import { getSiteContent } from '@/lib/content';
+import { getSiteContent, resolveProjects } from '@/lib/content';
 
 export const metadata: Metadata = {
   title: 'About Us',
@@ -28,6 +27,7 @@ const process = [
 
 export default async function AboutPage() {
   const c = await getSiteContent();
+  const projects = resolveProjects(c);
   return (
     <>
       <section className="relative isolate overflow-hidden bg-brand-950">
@@ -92,8 +92,8 @@ export default async function AboutPage() {
             Landmarks We&rsquo;ve Helped Build
           </h2>
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((p) => (
-              <article key={p.name} className="overflow-hidden rounded-xl bg-steel-50 ring-1 ring-brand-100">
+            {projects.map((p, i) => (
+              <article key={i} className="overflow-hidden rounded-xl bg-steel-50 ring-1 ring-brand-100">
                 <div className="relative h-48">
                   <Image src={p.image} alt={p.name} fill sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover" />
                 </div>

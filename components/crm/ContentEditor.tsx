@@ -47,14 +47,21 @@ export default function ContentEditor({
 
   // Group blocks by page
   const pages = Array.from(new Set(blocks.map((b) => b.page)));
+  const dirtyByPage = (page: string) => blocks.filter((b) => b.page === page && draft[b.key] !== values[b.key]).length;
 
   return (
-    <div className="space-y-8 pb-24">
-      {pages.map((page) => (
-        <section key={page} className="overflow-hidden rounded-xl border border-outline-variant bg-white">
-          <div className="border-b border-outline-variant bg-surface-container-low px-6 py-4">
-            <h2 className="font-work font-semibold text-industrial-blue">{page}</h2>
-          </div>
+    <div className="space-y-3 pb-24">
+      {pages.map((page, idx) => {
+        const pageDirty = dirtyByPage(page);
+        return (
+        <details key={page} open={idx === 0} className="group overflow-hidden rounded-xl border border-outline-variant bg-white">
+          <summary className="flex cursor-pointer list-none items-center justify-between border-b border-transparent bg-surface-container-low px-6 py-4 group-open:border-outline-variant">
+            <h2 className="flex items-center gap-2 font-work font-semibold text-industrial-blue">
+              <Icon name="chevron_right" className="transition-transform group-open:rotate-90" />
+              {page}
+              {pageDirty > 0 && <span className="rounded-full bg-safety-orange/20 px-2 py-0.5 text-[10px] font-bold text-safety-orange">{pageDirty} edited</span>}
+            </h2>
+          </summary>
           <div className="grid gap-5 p-6 md:grid-cols-2">
             {blocks.filter((b) => b.page === page).map((b) => {
               const changed = draft[b.key] !== values[b.key];
@@ -75,8 +82,9 @@ export default function ContentEditor({
               );
             })}
           </div>
-        </section>
-      ))}
+        </details>
+        );
+      })}
 
       {/* Sticky save bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-outline-variant bg-white/95 backdrop-blur lg:left-64">

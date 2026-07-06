@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import ProductHero from '@/components/products/ProductHero';
 import QuoteForm from '@/components/ui/QuoteForm';
 import { getProductBySlug, productCategories } from '@/lib/products';
+import { getSiteContent, resolveProduct } from '@/lib/content';
 
 export function generateStaticParams() {
   return productCategories.map((p) => ({ slug: p.slug }));
@@ -19,8 +20,9 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   };
 }
 
-export default function ProductPage({ params }: { params: { slug: string } }) {
-  const product = getProductBySlug(params.slug);
+export default async function ProductPage({ params }: { params: { slug: string } }) {
+  const c = await getSiteContent();
+  const product = resolveProduct(c, params.slug);
   if (!product) notFound();
 
   return (

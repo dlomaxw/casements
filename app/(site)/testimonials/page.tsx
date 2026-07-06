@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import ContactForm from '@/components/ui/ContactForm';
-import { testimonials } from '@/lib/testimonials';
+import { getSiteContent, resolveTestimonials } from '@/lib/content';
 
 export const metadata: Metadata = {
   title: 'Testimonials',
@@ -19,18 +19,19 @@ function Stars() {
   );
 }
 
-export default function TestimonialsPage() {
+export default async function TestimonialsPage() {
+  const c = await getSiteContent();
+  const testimonials = resolveTestimonials(c);
   return (
     <>
       <section className="bg-brand-950 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-accent-400">Testimonials</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-accent-400">{c('testimonials.hero.eyebrow')}</p>
           <h1 className="mt-3 font-display text-4xl font-extrabold text-white sm:text-5xl">
-            Rated 5.0 by Our Clients
+            {c('testimonials.hero.title')}
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-brand-100">
-            We would love your feedback. If we&rsquo;ve worked together, post a review to our profile —
-            and read what others have said below.
+            {c('testimonials.hero.subtitle')}
           </p>
         </div>
       </section>
@@ -38,8 +39,8 @@ export default function TestimonialsPage() {
       <section className="bg-steel-50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-6 md:grid-cols-2">
-            {testimonials.map((t) => (
-              <figure key={t.name} className="rounded-xl bg-white p-8 shadow-sm ring-1 ring-brand-100">
+            {testimonials.map((t, i) => (
+              <figure key={i} className="rounded-xl bg-white p-8 shadow-sm ring-1 ring-brand-100">
                 <Stars />
                 <blockquote className="mt-4 text-brand-900">&ldquo;{t.quote}&rdquo;</blockquote>
                 <figcaption className="mt-4 text-sm font-semibold text-brand-600">

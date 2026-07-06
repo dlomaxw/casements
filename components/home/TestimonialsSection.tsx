@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { testimonials } from '@/lib/testimonials';
+import { getSiteContent, resolveTestimonials } from '@/lib/content';
 
 function Stars() {
   return (
@@ -13,7 +13,9 @@ function Stars() {
   );
 }
 
-export default function TestimonialsSection() {
+export default async function TestimonialsSection() {
+  const c = await getSiteContent();
+  const testimonials = resolveTestimonials(c);
   return (
     <section className="bg-white py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -30,8 +32,8 @@ export default function TestimonialsSection() {
         </div>
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">
-          {testimonials.slice(0, 2).map((t) => (
-            <figure key={t.name} className="rounded-xl bg-steel-50 p-8 ring-1 ring-brand-100">
+          {testimonials.slice(0, 2).map((t, i) => (
+            <figure key={i} className="rounded-xl bg-steel-50 p-8 ring-1 ring-brand-100">
               <Stars />
               <blockquote className="mt-4 text-brand-900">&ldquo;{t.quote}&rdquo;</blockquote>
               <figcaption className="mt-4 text-sm font-semibold text-brand-600">
