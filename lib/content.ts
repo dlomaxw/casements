@@ -1,6 +1,5 @@
 import { cache } from 'react';
 import { prisma } from '@/lib/db';
-import { projects as defaultProjects, type Project } from '@/lib/projects';
 import { testimonials as defaultTestimonials } from '@/lib/testimonials';
 
 export type BlockType = 'text' | 'textarea' | 'image';
@@ -69,16 +68,8 @@ const MANUAL_BLOCKS: ContentBlock[] = [
   { key: 'csr.pillar.2.body', page: 'CSR', label: 'Pillar 3 body', type: 'textarea', default: 'We support the communities we work in, contributing to safe, durable public and educational spaces.' },
 ];
 
-// ---- Per-item blocks generated from the project / testimonial data ----
-// (Products have their own full editor at /crm/products.)
-const projectBlocks: ContentBlock[] = defaultProjects.flatMap((pr, i) => [
-  { key: `project.${i}.name`, page: 'Projects (list)', label: `#${i + 1} Name`, type: 'text', default: pr.name },
-  { key: `project.${i}.location`, page: 'Projects (list)', label: `#${i + 1} Location`, type: 'text', default: pr.location },
-  { key: `project.${i}.completion`, page: 'Projects (list)', label: `#${i + 1} Completion`, type: 'text', default: pr.completion },
-  { key: `project.${i}.scope`, page: 'Projects (list)', label: `#${i + 1} Scope`, type: 'textarea', default: pr.scope },
-  { key: `project.${i}.image`, page: 'Projects (list)', label: `#${i + 1} Image`, type: 'image', default: pr.image },
-]);
-
+// ---- Per-item blocks generated from the testimonial data ----
+// (Products and Projects have their own full editors at /crm/products and /crm/projects.)
 const testimonialBlocks: ContentBlock[] = defaultTestimonials.flatMap((t, i) => [
   { key: `testimonial.${i}.quote`, page: 'Testimonials (reviews)', label: `#${i + 1} Quote`, type: 'textarea', default: t.quote },
   { key: `testimonial.${i}.name`, page: 'Testimonials (reviews)', label: `#${i + 1} Name`, type: 'text', default: t.name },
@@ -87,7 +78,6 @@ const testimonialBlocks: ContentBlock[] = defaultTestimonials.flatMap((t, i) => 
 
 export const CONTENT_BLOCKS: ContentBlock[] = [
   ...MANUAL_BLOCKS,
-  ...projectBlocks,
   ...testimonialBlocks,
 ];
 
@@ -115,16 +105,6 @@ export async function getContentValues(): Promise<Record<string, string>> {
 }
 
 // ---- Resolver helpers that apply overrides to the collections ----
-export function resolveProjects(c: ContentResolver): Project[] {
-  return defaultProjects.map((pr, i) => ({
-    name: c(`project.${i}.name`),
-    location: c(`project.${i}.location`),
-    completion: c(`project.${i}.completion`),
-    scope: c(`project.${i}.scope`),
-    image: c(`project.${i}.image`),
-  }));
-}
-
 export function resolveTestimonials(c: ContentResolver) {
   return defaultTestimonials.map((t, i) => ({
     quote: c(`testimonial.${i}.quote`),

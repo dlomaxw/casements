@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import ConsultationCTA from '@/components/home/ConsultationCTA';
-import { getSiteContent, resolveProjects } from '@/lib/content';
+import { getSiteContent } from '@/lib/content';
+import { getProjects } from '@/lib/projects-db';
 
 export const metadata: Metadata = {
   title: 'About Us',
@@ -27,7 +28,7 @@ const process = [
 
 export default async function AboutPage() {
   const c = await getSiteContent();
-  const projects = resolveProjects(c);
+  const projects = await getProjects();
   return (
     <>
       <section className="relative isolate overflow-hidden bg-brand-950">

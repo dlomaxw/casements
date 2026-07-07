@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import ConsultationCTA from '@/components/home/ConsultationCTA';
-import { getSiteContent, resolveProjects } from '@/lib/content';
+import { getSiteContent } from '@/lib/content';
+import { getProjects } from '@/lib/projects-db';
 
 export const metadata: Metadata = {
   title: 'Projects',
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function ProjectsPage() {
   const c = await getSiteContent();
-  const projects = resolveProjects(c);
+  const projects = await getProjects();
   return (
     <>
       <section className="bg-brand-950 py-20">
