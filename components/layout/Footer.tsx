@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { site } from '@/lib/site';
 
 const socials = [
@@ -16,14 +17,15 @@ export default function Footer({ contact, products }: { contact: SiteContact; pr
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
         {/* Brand */}
         <div>
-          <div className="flex items-center gap-2">
-            <span className="flex h-10 w-10 items-center justify-center rounded bg-white/10 font-display text-lg font-bold text-accent-400">
-              CA
-            </span>
-            <span className="font-display text-lg font-bold text-white">
-              Casements Africa Limited
-            </span>
-          </div>
+          <Link href="/" className="inline-flex rounded-lg bg-white p-3" aria-label="Casements (A) Ltd — home">
+            <Image
+              src="/images/casements-logo.png"
+              alt="Casements (A) Ltd — Aluminium, Glass, Steel, Wood since 1965"
+              width={160}
+              height={160}
+              className="h-20 w-auto object-contain"
+            />
+          </Link>
           <p className="mt-4 text-sm leading-relaxed text-brand-200">
             Uganda&rsquo;s leading aluminium, glass, steel and wood finishing specialists —
             60+ years of engineering trust, beauty and precision.

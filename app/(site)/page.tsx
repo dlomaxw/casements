@@ -6,12 +6,15 @@ import ConsultationCTA from '@/components/home/ConsultationCTA';
 import TestimonialsSection from '@/components/home/TestimonialsSection';
 import BlogPreview from '@/components/home/BlogPreview';
 import ContactForm from '@/components/ui/ContactForm';
-import { getSiteContent } from '@/lib/content';
+import RegisterInterestModal from '@/components/ui/RegisterInterestModal';
+import { getSiteContent, telHref } from '@/lib/content';
 
 export default async function HomePage() {
   const c = await getSiteContent();
+  const phone = c('site.phone');
   return (
     <>
+      <RegisterInterestModal phone={phone} phoneHref={telHref(phone)} email={c('site.email')} />
       <HeroBanner />
       <ServicesStrip />
       <ProductHighlights />

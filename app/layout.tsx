@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   },
   twitter: { card: 'summary_large_image', site: '@casementsug' },
   robots: { index: true, follow: true },
+  icons: {
+    icon: '/images/casements-logo.png',
+    apple: '/images/casements-logo.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

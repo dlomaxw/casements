@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import MobileNav from './MobileNav';
 
@@ -46,18 +47,15 @@ export default function Header({ contact, products }: { contact: SiteContact; pr
         }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="flex h-10 w-10 items-center justify-center rounded bg-brand-900 font-display text-lg font-bold text-accent-400">
-              CA
-            </span>
-            <span className="leading-tight">
-              <span className="block font-display text-lg font-bold text-brand-950">
-                Casements Africa
-              </span>
-              <span className="block text-[11px] uppercase tracking-[0.2em] text-brand-500">
-                Limited
-              </span>
-            </span>
+          <Link href="/" className="flex items-center" aria-label="Casements (A) Ltd — home">
+            <Image
+              src="/images/casements-logo.png"
+              alt="Casements (A) Ltd — Aluminium, Glass, Steel, Wood since 1965"
+              width={200}
+              height={200}
+              priority
+              className="h-14 w-auto object-contain sm:h-16"
+            />
           </Link>
 
           {/* Desktop nav */}
