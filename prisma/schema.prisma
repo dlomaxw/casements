@@ -135,6 +135,7 @@ model Product {
   videoUrl        String? // YouTube / Vimeo link
   subItems        String[] // feature list
   gallery         Json? // [{ src, alt }]
+  faqs            Json? // [{ question, answer }] — rendered on-page + FAQPage schema
   keywords        String[]
   order           Int      @default(0)
   published       Boolean  @default(true)

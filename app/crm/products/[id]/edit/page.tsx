@@ -5,7 +5,7 @@ import { prisma } from '@/lib/db';
 import { can } from '@/lib/roles';
 import ProductEditor from '@/components/crm/ProductEditor';
 import Icon from '@/components/crm/Icon';
-import type { GalleryItem } from '@/lib/products-db';
+import type { FaqItem, GalleryItem } from '@/lib/products-db';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,6 +42,7 @@ export default async function EditProductPage({ params }: { params: { id: string
           videoUrl: product.videoUrl ?? '',
           subItems: product.subItems,
           gallery: Array.isArray(product.gallery) ? (product.gallery as unknown as GalleryItem[]) : [],
+          faqs: Array.isArray(product.faqs) ? (product.faqs as unknown as FaqItem[]) : [],
           keywords: product.keywords,
           published: product.published,
         }}

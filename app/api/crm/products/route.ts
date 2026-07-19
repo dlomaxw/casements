@@ -14,6 +14,7 @@ export async function GET() {
 }
 
 const gallerySchema = z.array(z.object({ src: z.string(), alt: z.string() }));
+const faqSchema = z.array(z.object({ question: z.string(), answer: z.string() }));
 
 const createSchema = z.object({
   title: z.string().min(2),
@@ -26,6 +27,7 @@ const createSchema = z.object({
   videoUrl: z.string().url().optional().or(z.literal('')),
   subItems: z.array(z.string()).optional(),
   gallery: gallerySchema.optional(),
+  faqs: faqSchema.optional(),
   keywords: z.array(z.string()).optional(),
   published: z.boolean().optional(),
 });
@@ -66,6 +68,7 @@ export async function POST(request: Request) {
       videoUrl: d.videoUrl || null,
       subItems: d.subItems ?? [],
       gallery: d.gallery ?? [],
+      faqs: d.faqs ?? [],
       keywords: d.keywords ?? [],
       order: (max._max.order ?? 0) + 1,
       published: d.published ?? true,

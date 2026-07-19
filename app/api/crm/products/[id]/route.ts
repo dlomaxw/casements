@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db';
 import { can } from '@/lib/roles';
 
 const gallerySchema = z.array(z.object({ src: z.string(), alt: z.string() }));
+const faqSchema = z.array(z.object({ question: z.string(), answer: z.string() }));
 
 const patchSchema = z.object({
   title: z.string().min(2).optional(),
@@ -17,6 +18,7 @@ const patchSchema = z.object({
   videoUrl: z.string().url().nullable().optional().or(z.literal('')),
   subItems: z.array(z.string()).optional(),
   gallery: gallerySchema.optional(),
+  faqs: faqSchema.optional(),
   keywords: z.array(z.string()).optional(),
   published: z.boolean().optional(),
   order: z.number().optional(),
@@ -51,6 +53,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       ...(d.videoUrl !== undefined ? { videoUrl: d.videoUrl || null } : {}),
       ...(d.subItems ? { subItems: d.subItems } : {}),
       ...(d.gallery ? { gallery: d.gallery } : {}),
+      ...(d.faqs ? { faqs: d.faqs } : {}),
       ...(d.keywords ? { keywords: d.keywords } : {}),
       ...(d.published !== undefined ? { published: d.published } : {}),
       ...(d.order !== undefined ? { order: d.order } : {}),

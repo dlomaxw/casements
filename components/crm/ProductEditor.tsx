@@ -7,6 +7,7 @@ import ImageUploadField from './ImageUploadField';
 import Icon from './Icon';
 
 interface GalleryItem { src: string; alt: string }
+interface FaqItem { question: string; answer: string }
 interface ProductData {
   id?: string;
   title: string;
@@ -19,6 +20,7 @@ interface ProductData {
   videoUrl: string;
   subItems: string[];
   gallery: GalleryItem[];
+  faqs: FaqItem[];
   keywords: string[];
   published: boolean;
 }
@@ -41,6 +43,7 @@ export default function ProductEditor({ initial }: { initial?: Partial<ProductDa
     videoUrl: initial?.videoUrl ?? '',
     subItems: initial?.subItems ?? [],
     gallery: initial?.gallery ?? [],
+    faqs: initial?.faqs ?? [],
     keywords: initial?.keywords ?? [],
     published: initial?.published ?? true,
   });
@@ -84,6 +87,11 @@ export default function ProductEditor({ initial }: { initial?: Partial<ProductDa
   const setGal = (i: number, patch: Partial<GalleryItem>) => set('gallery', p.gallery.map((g, idx) => (idx === i ? { ...g, ...patch } : g)));
   const addGal = () => set('gallery', [...p.gallery, { src: '', alt: '' }]);
   const delGal = (i: number) => set('gallery', p.gallery.filter((_, idx) => idx !== i));
+
+  // --- FAQs ---
+  const setFaq = (i: number, patch: Partial<FaqItem>) => set('faqs', p.faqs.map((f, idx) => (idx === i ? { ...f, ...patch } : f)));
+  const addFaq = () => set('faqs', [...p.faqs, { question: '', answer: '' }]);
+  const delFaq = (i: number) => set('faqs', p.faqs.filter((_, idx) => idx !== i));
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -140,6 +148,33 @@ export default function ProductEditor({ initial }: { initial?: Partial<ProductDa
                 </div>
                 <ImageUploadField label="Image" value={g.src} onChange={(v) => setGal(i, { src: v })} />
                 <div className="mt-2"><label className={label}>Caption / alt</label><input value={g.alt} onChange={(e) => setGal(i, { alt: e.target.value })} className={field} /></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* FAQs */}
+        <div className="rounded-xl border border-outline-variant bg-white p-6">
+          <div className="mb-1 flex items-center justify-between">
+            <h3 className="font-work font-semibold text-industrial-blue">Frequently asked questions</h3>
+            <button type="button" onClick={addFaq} className="flex items-center gap-1 rounded-lg border border-outline-variant px-3 py-1.5 font-mono text-[11px] font-medium text-industrial-blue hover:border-safety-orange">
+              <Icon name="add" className="text-[16px]" /> Add question
+            </button>
+          </div>
+          <p className="mb-4 font-mono text-[11px] text-on-surface-variant">
+            Shown on the product page and sent to Google as FAQ rich-results data. Answer honestly —
+            questions like &ldquo;how much do aluminium windows cost?&rdquo; win search traffic.
+          </p>
+          <div className="space-y-4">
+            {p.faqs.length === 0 && <p className="font-mono text-[11px] text-outline">No FAQs yet.</p>}
+            {p.faqs.map((f, i) => (
+              <div key={i} className="rounded-lg border border-outline-variant/60 p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="font-mono text-[11px] text-on-surface-variant">Question {i + 1}</span>
+                  <button type="button" onClick={() => delFaq(i)} className="text-error hover:opacity-80"><Icon name="delete" className="text-[18px]" /></button>
+                </div>
+                <input value={f.question} onChange={(e) => setFaq(i, { question: e.target.value })} className={field} placeholder="e.g. How long does installation take?" />
+                <textarea value={f.answer} onChange={(e) => setFaq(i, { answer: e.target.value })} rows={3} className={`${field} mt-2`} placeholder="Write a clear, factual answer…" />
               </div>
             ))}
           </div>

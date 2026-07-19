@@ -7,7 +7,7 @@ import { getProductBySlugDb } from '@/lib/products-db';
 import { getProductNav } from '@/lib/products-db';
 import { toEmbedUrl } from '@/lib/blog';
 import JsonLd from '@/components/seo/JsonLd';
-import { breadcrumbSchema, productServiceSchema } from '@/lib/schema';
+import { breadcrumbSchema, faqPageSchema, productServiceSchema } from '@/lib/schema';
 import { canonical } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
@@ -47,6 +47,8 @@ export default async function ProductPage({ params }: { params: { slug: string }
           { name: product.title, path: `/products/${product.slug}` },
         ])}
       />
+      {/* Only emitted when the FAQs are actually rendered below */}
+      {product.faqs.length > 0 && <JsonLd data={faqPageSchema(product.faqs)} />}
       <ProductHero
         title={product.title}
         description={product.description}
@@ -81,6 +83,25 @@ export default async function ProductPage({ params }: { params: { slug: string }
                 <h3 className="mt-12 font-display text-lg font-bold text-brand-950">Watch</h3>
                 <div className="mt-4 aspect-video overflow-hidden rounded-lg ring-1 ring-brand-100">
                   <iframe src={embed} title={product.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="h-full w-full" />
+                </div>
+              </>
+            )}
+
+            {product.faqs.length > 0 && (
+              <>
+                <h3 className="mt-12 font-display text-lg font-bold text-brand-950">Frequently Asked Questions</h3>
+                <div className="mt-4 divide-y divide-brand-100 rounded-lg ring-1 ring-brand-100">
+                  {product.faqs.map((f, i) => (
+                    <details key={i} className="group p-5" open={i === 0}>
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-brand-950">
+                        {f.question}
+                        <svg className="h-5 w-5 shrink-0 text-accent-500 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                      </summary>
+                      <p className="mt-3 whitespace-pre-wrap leading-relaxed text-brand-800/80">{f.answer}</p>
+                    </details>
+                  ))}
                 </div>
               </>
             )}

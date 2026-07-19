@@ -21,6 +21,11 @@ export interface GalleryItem {
   alt: string;
 }
 
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
 export interface ProductRecord {
   id: string;
   slug: string;
@@ -34,6 +39,7 @@ export interface ProductRecord {
   videoUrl: string | null;
   subItems: string[];
   gallery: GalleryItem[];
+  faqs: FaqItem[];
   keywords: string[];
   order: number;
   published: boolean;
@@ -54,6 +60,7 @@ function shape(p: any): ProductRecord {
     videoUrl: p.videoUrl ?? null,
     subItems: p.subItems ?? [],
     gallery: Array.isArray(p.gallery) ? (p.gallery as GalleryItem[]) : [],
+    faqs: Array.isArray(p.faqs) ? (p.faqs as FaqItem[]) : [],
     keywords: p.keywords ?? [],
     order: p.order ?? 0,
     published: p.published,

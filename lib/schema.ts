@@ -104,6 +104,20 @@ export function productServiceSchema(p: {
   };
 }
 
+// Google requires FAQ content to be visible on the page — this is only emitted
+// alongside the rendered FAQ section, never as hidden markup.
+export function faqPageSchema(faqs: { question: string; answer: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.answer },
+    })),
+  };
+}
+
 export function blogPostingSchema(p: {
   slug: string;
   title: string;
