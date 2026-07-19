@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
-import { GoogleAnalytics } from '@next/third-parties/google';
+import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 import './globals.css';
+
+// Google Tag Manager container (public identifier, safe to commit)
+const GTM_ID = 'GTM-KR7G24KQ';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://casements.co.ug'),
@@ -32,6 +35,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        {/* Loads the GTM container script (next/script hoists it into <head>) */}
+        <GoogleTagManager gtmId={GTM_ID} />
+        {/* GTM fallback for browsers without JavaScript — must sit immediately after <body> */}
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+            title="Google Tag Manager"
+          />
+        </noscript>
         {children}
         {gaId && <GoogleAnalytics gaId={gaId} />}
       </body>
