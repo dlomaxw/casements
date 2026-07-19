@@ -3,6 +3,7 @@ import { requireSession } from '@/lib/session';
 import { getLeadStats, getOverdueFollowUps } from '@/lib/crm';
 import { prisma } from '@/lib/db';
 import { can, ROLE_LABELS, type Role } from '@/lib/roles';
+import { getTrafficSummary } from '@/lib/analytics';
 import StatsWidget from '@/components/crm/StatsWidget';
 import PipelineBoard from '@/components/crm/PipelineBoard';
 import Icon from '@/components/crm/Icon';
@@ -18,6 +19,7 @@ export default async function CrmDashboardPage() {
 
   const quickActions = [
     { show: viewLeads, href: '/crm/leads', icon: 'table_rows', title: 'Leads', desc: 'Manage the sales pipeline' },
+    { show: can(role, 'view_analytics'), href: '/crm/analytics', icon: 'monitoring', title: 'Analytics', desc: 'Visits & most-viewed pages' },
     { show: can(role, 'manage_content'), href: '/crm/products', icon: 'inventory_2', title: 'Products', desc: 'Add & edit product catalogue' },
     { show: can(role, 'manage_content'), href: '/crm/projects', icon: 'apartment', title: 'Projects', desc: 'Add & edit portfolio projects' },
     { show: can(role, 'manage_content'), href: '/crm/content', icon: 'edit_document', title: 'Website Content', desc: 'Edit page text & images' },
@@ -26,6 +28,8 @@ export default async function CrmDashboardPage() {
     { show: can(role, 'manage_users'), href: '/crm/users', icon: 'groups', title: 'Staff', desc: 'Add & manage team members' },
     { show: true, href: '/crm/settings', icon: 'settings', title: 'Settings', desc: 'Profile & preferences' },
   ].filter((a) => a.show);
+
+  const traffic = can(role, 'view_analytics') ? await getTrafficSummary() : null;
 
   const [stats, overdue, boardLeads] = viewLeads
     ? await Promise.all([
@@ -67,6 +71,31 @@ export default async function CrmDashboardPage() {
           </Link>
         ))}
       </div>
+
+      {/* Website traffic snapshot */}
+      {traffic && (
+        <div className="mt-10">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="flex items-center gap-2 font-work text-lg font-semibold text-industrial-blue">
+              <Icon name="monitoring" className="text-safety-orange" /> Website Traffic
+            </h2>
+            <Link href="/crm/analytics" className="font-mono text-xs text-primary hover:underline">Full report →</Link>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {[
+              { t: 'Today', v: traffic.todayViews, u: traffic.todayVisitors, n: 'since midnight' },
+              { t: 'This week', v: traffic.weekViews, u: traffic.weekVisitors, n: 'last 7 days' },
+              { t: 'This month', v: traffic.monthViews, u: traffic.monthVisitors, n: 'last 30 days' },
+            ].map((s) => (
+              <div key={s.t} className="rounded-xl border border-outline-variant bg-white p-6">
+                <span className="font-mono text-xs uppercase tracking-widest text-on-surface-variant">{s.t}</span>
+                <p className="mt-3 font-work text-3xl font-bold text-industrial-blue">{s.v.toLocaleString()}</p>
+                <p className="mt-1 font-mono text-[11px] text-on-surface-variant">{s.u.toLocaleString()} unique · {s.n}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Lead sections (only for roles with pipeline access) */}
       {viewLeads && stats && (

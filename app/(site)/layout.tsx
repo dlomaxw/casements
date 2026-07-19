@@ -1,5 +1,7 @@
+import { Suspense } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import Analytics from '@/components/layout/Analytics';
 import { getSiteContent, telHref } from '@/lib/content';
 import { getProductNav } from '@/lib/products-db';
 
@@ -18,6 +20,9 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   };
   return (
     <>
+      <Suspense fallback={null}>
+        <Analytics />
+      </Suspense>
       <Header contact={contact} products={products} />
       <main>{children}</main>
       <Footer contact={contact} products={products} />

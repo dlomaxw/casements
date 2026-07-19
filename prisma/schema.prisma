@@ -92,6 +92,21 @@ model SiteContent {
   updatedAt DateTime @updatedAt
 }
 
+// Anonymous page-view analytics (self-hosted). No IPs stored — `visitor` is a
+// daily-rotating salted hash so repeat views can be de-duplicated without PII.
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  referrer  String?
+  visitor   String
+  country   String?
+  device    String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([path])
+}
+
 // Project portfolio — managed from /crm/projects (replaces the hardcoded list).
 model ProjectItem {
   id         String   @id @default(cuid())
