@@ -2,8 +2,9 @@ import type { MetadataRoute } from 'next';
 import { prisma } from '@/lib/db';
 import { SITE_URL } from '@/lib/seo';
 
-// Regenerate hourly so newly published products/posts appear without a redeploy.
-export const revalidate = 3600;
+// Always generated fresh: crawlers fetch this rarely, so a live DB read is
+// cheap and guarantees newly published products/posts are discoverable at once.
+export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: { path: string; priority: number; freq: 'daily' | 'weekly' | 'monthly' }[] = [
