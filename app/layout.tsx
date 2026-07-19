@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
+import { SITE_URL } from '@/lib/seo';
 import './globals.css';
 
 // Google Tag Manager container (public identifier, safe to commit)
 const GTM_ID = 'GTM-KR7G24KQ';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://casements.co.ug'),
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: '/' },
   title: {
     template: '%s | Casements Africa Limited',
     default: 'Casements Africa Limited | Aluminium, Steel, Glass & Wood',

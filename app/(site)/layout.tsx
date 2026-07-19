@@ -4,6 +4,8 @@ import Footer from '@/components/layout/Footer';
 import Analytics from '@/components/layout/Analytics';
 import { getSiteContent, telHref } from '@/lib/content';
 import { getProductNav } from '@/lib/products-db';
+import JsonLd from '@/components/seo/JsonLd';
+import { localBusinessSchema, organizationSchema, websiteSchema } from '@/lib/schema';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +22,10 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   };
   return (
     <>
+      {/* Sitewide structured data */}
+      <JsonLd data={organizationSchema(contact)} />
+      <JsonLd data={localBusinessSchema(contact)} />
+      <JsonLd data={websiteSchema()} />
       <Suspense fallback={null}>
         <Analytics />
       </Suspense>

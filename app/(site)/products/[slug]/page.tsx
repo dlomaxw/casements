@@ -6,16 +6,28 @@ import QuoteForm from '@/components/ui/QuoteForm';
 import { getProductBySlugDb } from '@/lib/products-db';
 import { getProductNav } from '@/lib/products-db';
 import { toEmbedUrl } from '@/lib/blog';
+import JsonLd from '@/components/seo/JsonLd';
+import { breadcrumbSchema, productServiceSchema } from '@/lib/schema';
+import { canonical } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const product = await getProductBySlugDb(params.slug);
   if (!product) return { title: 'Product Not Found' };
+  const url = canonical(`/products/${params.slug}`);
   return {
     title: product.title,
     description: product.description,
     keywords: product.keywords,
+    alternates: { canonical: url },
+    openGraph: {
+      title: product.title,
+      description: product.description,
+      url,
+      type: 'website',
+      images: product.image ? [{ url: product.image }] : undefined,
+    },
   };
 }
 
@@ -27,6 +39,14 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
   return (
     <>
+      <JsonLd data={productServiceSchema(product)} />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: 'Home', path: '/' },
+          { name: 'Products', path: '/products' },
+          { name: product.title, path: `/products/${product.slug}` },
+        ])}
+      />
       <ProductHero
         title={product.title}
         description={product.description}

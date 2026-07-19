@@ -4,16 +4,28 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import { toEmbedUrl } from '@/lib/blog';
+import JsonLd from '@/components/seo/JsonLd';
+import { blogPostingSchema, breadcrumbSchema } from '@/lib/schema';
+import { canonical } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const post = await prisma.post.findUnique({ where: { slug: params.slug } });
   if (!post || post.status !== 'PUBLISHED') return { title: 'Post Not Found' };
+  const url = canonical(`/blog/${params.slug}`);
   return {
     title: post.title,
     description: post.excerpt ?? undefined,
-    openGraph: post.coverImage ? { images: [{ url: post.coverImage }] } : undefined,
+    alternates: { canonical: url },
+    openGraph: {
+      title: post.title,
+      description: post.excerpt ?? undefined,
+      url,
+      type: 'article',
+      publishedTime: post.publishedAt?.toISOString(),
+      images: post.coverImage ? [{ url: post.coverImage }] : undefined,
+    },
   };
 }
 
@@ -28,6 +40,24 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
   return (
     <article className="bg-white">
+      <JsonLd
+        data={blogPostingSchema({
+          slug: post.slug,
+          title: post.title,
+          excerpt: post.excerpt,
+          coverImage: post.coverImage,
+          publishedAt: post.publishedAt,
+          updatedAt: post.updatedAt,
+          author: post.author?.name,
+        })}
+      />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: 'Home', path: '/' },
+          { name: 'Blog', path: '/blog' },
+          { name: post.title, path: `/blog/${post.slug}` },
+        ])}
+      />
       <div className="bg-brand-950 py-16">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <Link href="/blog" className="text-sm text-accent-400 hover:underline">← All posts</Link>
