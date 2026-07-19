@@ -21,6 +21,10 @@ export const metadata: Metadata = {
     icon: '/images/casements-logo.png',
     apple: '/images/casements-logo.png',
   },
+  // Google Search Console ownership verification
+  verification: {
+    google: 'LL-Ed6dKicPrtejxQz84POk5jXrZvhcwteaRbCeXVPc',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
