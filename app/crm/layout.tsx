@@ -81,6 +81,17 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
                 {can(role, 'manage_media') && <Link href="/crm/media" className={navLink}>Media</Link>}
                 {can(role, 'manage_users') && <Link href="/crm/users" className={navLink}>Staff</Link>}
                 <Link href="/crm/settings" className={navLink}>Settings</Link>
+                {can(role, 'view_leads') && (
+                  <a
+                    href="http://favourwings.com/quotations/quotation_system/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 rounded-lg bg-safety-orange px-3 py-1.5 font-mono text-xs font-semibold text-steel-950 transition-opacity hover:opacity-90"
+                  >
+                    <Icon name="request_quote" className="text-[16px]" />
+                    Quotation System
+                  </a>
+                )}
               </nav>
             </div>
             <div className="flex items-center gap-4">

@@ -10,7 +10,7 @@ export default async function HeroBanner() {
     <section className="relative isolate overflow-hidden bg-steel-50">
       {/* Architectural backdrop */}
       <div className="absolute inset-0 opacity-40" aria-hidden>
-        <Image src="/images/hero/img10.jpg" alt="" fill priority sizes="100vw" className="object-cover" />
+        <Image src={c('home.hero.image') || '/images/hero/img10.jpg'} alt="" fill priority sizes="100vw" className="object-cover" />
       </div>
       <div className="absolute inset-0 bg-gradient-to-b from-white/85 via-white/60 to-white" aria-hidden />
 
@@ -21,9 +21,9 @@ export default async function HeroBanner() {
             {c('home.hero.eyebrow')}
           </p>
           <h1 className="mt-6 font-display text-4xl font-black leading-[1.06] tracking-tight text-steel-950 sm:text-5xl lg:text-6xl">
-            Built to Last,
+            {c('home.hero.title')}
             <br />
-            <span className="text-brand-500">Delivered as Promised</span>
+            <span className="text-brand-500">{c('home.hero.title_accent')}</span>
           </h1>
           <p className="mt-6 max-w-lg text-base leading-relaxed text-steel-800/80 sm:text-lg">
             {c('home.hero.subtitle')}
@@ -49,7 +49,7 @@ export default async function HeroBanner() {
         <div className="relative hidden h-[26rem] items-center justify-center lg:flex">
           <div className="relative mx-auto h-[22rem] w-[22rem]">
             <div className="absolute inset-0 overflow-hidden rounded-[2rem] border border-brand-100 bg-white shadow-2xl shadow-black/20">
-              <Image src="/images/hero/img9.jpg" alt="Aluminium and glass fabrication by Casements" fill sizes="360px" className="object-cover" />
+              <Image src={c('home.hero.image2') || '/images/hero/img9.jpg'} alt="Aluminium and glass fabrication by Casements" fill sizes="360px" className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
             </div>
 
@@ -59,7 +59,7 @@ export default async function HeroBanner() {
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M12 3l7 4v5c0 4.4-3 8.3-7 9-4-0.7-7-4.6-7-9V7l7-4z" /><path d="M9 12l2 2 4-4" /></svg>
               </div>
               <div className="leading-tight">
-                <p className="text-xs font-semibold text-steel-900">Guaranteed Since 1965</p>
+                <p className="text-xs font-semibold text-steel-900">{c('home.hero.badge')}</p>
                 <p className="text-[11px] text-steel-800/60">Genuine materials only</p>
               </div>
             </div>

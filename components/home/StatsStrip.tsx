@@ -1,13 +1,12 @@
-const YEARS = new Date().getFullYear() - 1965;
+import { getSiteContent } from '@/lib/content';
 
-const stats = [
-  { value: `${YEARS}+`, label: 'Years of Experience' },
-  { value: 'ISO', label: 'Certified' },
-  { value: '500+', label: 'Projects Delivered' },
-  { value: '100%', label: 'Genuine Materials' },
-];
+export default async function StatsStrip() {
+  const c = await getSiteContent();
+  const stats = [1, 2, 3, 4].map((i) => ({
+    value: c(`home.stat${i}.value`),
+    label: c(`home.stat${i}.label`),
+  }));
 
-export default function StatsStrip() {
   return (
     <div className="relative z-10 -mt-14 sm:-mt-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

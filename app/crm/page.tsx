@@ -19,6 +19,7 @@ export default async function CrmDashboardPage() {
 
   const quickActions = [
     { show: viewLeads, href: '/crm/leads', icon: 'table_rows', title: 'Leads', desc: 'Manage the sales pipeline' },
+    { show: viewLeads, href: 'http://favourwings.com/quotations/quotation_system/', external: true, icon: 'request_quote', title: 'Quotation System', desc: 'Create client quotations' },
     { show: can(role, 'view_analytics'), href: '/crm/analytics', icon: 'monitoring', title: 'Analytics', desc: 'Visits & most-viewed pages' },
     { show: can(role, 'manage_content'), href: '/crm/products', icon: 'inventory_2', title: 'Products', desc: 'Add & edit product catalogue' },
     { show: can(role, 'manage_content'), href: '/crm/projects', icon: 'apartment', title: 'Projects', desc: 'Add & edit portfolio projects' },
@@ -59,6 +60,7 @@ export default async function CrmDashboardPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {quickActions.map((a) => (
           <Link key={a.href} href={a.href}
+            {...('external' in a && a.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
             className="group flex items-start gap-4 rounded-xl border border-outline-variant bg-white p-5 transition-colors hover:border-safety-orange">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary-container/15 text-primary">
               <Icon name={a.icon} />
