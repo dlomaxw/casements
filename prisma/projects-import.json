@@ -1,0 +1,386 @@
+[
+  {
+    "slug": "mt-sion-church-bukalango",
+    "title": "Mt. Sion Church",
+    "location": "Bukalango",
+    "completionDate": "Ongoing",
+    "status": "ongoing",
+    "scope": [
+      "Frosted Glass",
+      "Aluminium Windows & Doors"
+    ],
+    "image": "/images/projects/mt-sion-church-bukalango/img1.png"
+  },
+  {
+    "slug": "casements-complex",
+    "title": "Casements Building (Casements Complex)",
+    "location": "Industrial Area, Kampala",
+    "completionDate": "Ongoing",
+    "status": "ongoing",
+    "scope": [
+      "Aluminium Windows & Doors",
+      "Curtain Wall",
+      "ACP Cladding",
+      "Stainless Steel Railing",
+      "Partitioning",
+      "Steel Structure"
+    ],
+    "image": "/images/projects/casements-complex/img1.png"
+  },
+  {
+    "slug": "mantrac-head-offices",
+    "title": "MANTRAC Head Offices",
+    "location": "7th Street, Industrial Area, Kampala",
+    "completionDate": "2004",
+    "year": 2025,
+    "scope": [
+      "Aluminium Windows & Doors",
+      "ACP",
+      "Curtain Wall"
+    ],
+    "image": "/images/projects/mantrac-head-offices/img1.webp"
+  },
+  {
+    "slug": "updf-national-referral-hospital-mbuya",
+    "title": "UPDF National Referral Hospital",
+    "location": "Mbuya, Kampala",
+    "completionDate": "2024",
+    "year": 2024,
+    "scope": [
+      "Aluminum Windows & Doors",
+      "Curtain Wall",
+      "ACP Cladding",
+      "Frameless Glass",
+      "Railing"
+    ],
+    "image": "/images/projects/updf-national-referral-hospital-mbuya/img1.jpeg"
+  },
+  {
+    "slug": "speke-resort-munyonyo",
+    "title": "Speke Resort",
+    "location": "Munyonyo",
+    "completionDate": "2002",
+    "year": 2024,
+    "scope": [
+      "Aluminium Windows & Doors"
+    ],
+    "image": "/images/projects/speke-resort-munyonyo/img1.jpg"
+  },
+  {
+    "slug": "mega-standard-supermarket-lweza",
+    "title": "Mega Standard Supermarket",
+    "location": "Lweza",
+    "completionDate": "2024",
+    "year": 2024,
+    "scope": [
+      "Aluminum Windows & Doors",
+      "Curtain Wall",
+      "ACP Cladding",
+      "Frameless Glass",
+      "Railing"
+    ],
+    "image": "/images/projects/mega-standard-supermarket-lweza/img1.webp"
+  },
+  {
+    "slug": "classic-hotel-kakumiro",
+    "title": "Classic Hotel",
+    "location": "Kakumiro",
+    "completionDate": "2025",
+    "year": 2024,
+    "scope": [
+      "Aluminium Windows & Doors"
+    ],
+    "image": "/images/projects/classic-hotel-kakumiro/img2.jpg"
+  },
+  {
+    "slug": "course-view-tower",
+    "title": "Course View Tower",
+    "location": "Plot 21, Yusuf Lule Road, Nakasero, Kampala",
+    "completionDate": "December 2010",
+    "year": 2010,
+    "scope": [
+      "ACP Cladding",
+      "Aluminium Fins",
+      "Shop-Fronts",
+      "Sky Light",
+      "Frameless Partitioning with Doors",
+      "Entrance Canopy",
+      "Automatic Doors",
+      "Shading System"
+    ],
+    "image": "/images/projects/course-view-tower/img1.png"
+  },
+  {
+    "slug": "crested-towers",
+    "title": "Crested Towers",
+    "location": "Plot 21, Kintu Road, Kampala",
+    "client": "National Housing",
+    "completionDate": "November 2003",
+    "year": 2003,
+    "scope": [
+      "Aluminum Doors & Windows",
+      "Curtain Walling",
+      "ACP Cladding",
+      "Sun Shading"
+    ],
+    "image": "/images/projects/crested-towers/img1.png"
+  },
+  {
+    "slug": "imperial-resort-beach-hotel-entebbe",
+    "title": "Imperial Resort Beach Hotel",
+    "location": "Entebbe",
+    "scope": [
+      "ACP Cladding Reinstallation"
+    ],
+    "image": "/images/projects/imperial-resort-beach-hotel-entebbe/img1.jpg"
+  },
+  {
+    "slug": "the-voice-mall-bwebajja",
+    "title": "The Voice Mall",
+    "location": "Bwebajja",
+    "completionDate": "2022",
+    "year": 2022,
+    "scope": [
+      "Aluminium Windows & Doors",
+      "Curtain Walling",
+      "ACP Cladding"
+    ],
+    "image": "/images/projects/the-voice-mall-bwebajja/img1.webp"
+  },
+  {
+    "slug": "uganda-police-uniports",
+    "title": "Uganda Police Uniports",
+    "location": "Northern & Central Uganda",
+    "completionDate": "2022",
+    "year": 2022,
+    "scope": [
+      "Fabrication and Installation of 1,300 Oval Uniports with Partitions"
+    ],
+    "image": "/images/projects/uganda-police-uniports/img1.png"
+  },
+  {
+    "slug": "petroleum-house",
+    "title": "Petroleum House",
+    "location": "Kampala",
+    "client": "Ministry of Energy and Mineral Development",
+    "scope": [
+      "Exterior Remodelling",
+      "Aluminium Windows & Doors",
+      "Curtain Walling",
+      "ACP Cladding"
+    ],
+    "image": "/images/projects/petroleum-house/img1.jpg"
+  },
+  {
+    "slug": "roze-court-apartments-kololo",
+    "title": "Roze Court Apartments",
+    "location": "Kololo, Kampala",
+    "completionDate": "2017",
+    "year": 2017,
+    "scope": [
+      "Aluminium Windows & Doors",
+      "Curtain Walling",
+      "Glass Railings"
+    ],
+    "image": "/images/projects/roze-court-apartments-kololo/img1.jpg"
+  },
+  {
+    "slug": "gems-cambridge-international-school",
+    "title": "Gems Cambridge International School",
+    "location": "Butabika, Kampala",
+    "completionDate": "2014",
+    "year": 2014,
+    "scope": [
+      "Aluminium Windows & Doors",
+      "Frameless Doors",
+      "Partitions",
+      "Steel Railing"
+    ],
+    "image": "/images/projects/gems-cambridge-international-school/img1.png"
+  },
+  {
+    "slug": "toyota-u-limited-namanve",
+    "title": "Toyota (U) Limited",
+    "location": "Namanve",
+    "completionDate": "2016",
+    "year": 2016,
+    "scope": [
+      "Steel Windows & Doors",
+      "Steel Louvers",
+      "Water Channel Gratings",
+      "Dock Levellers"
+    ],
+    "image": "/images/projects/toyota-u-limited-namanve/img1.jpeg"
+  },
+  {
+    "slug": "york-terrace-kololo",
+    "title": "York Terrace",
+    "location": "Kololo",
+    "completionDate": "2016",
+    "year": 2016,
+    "scope": [
+      "Aluminium Windows & Doors"
+    ],
+    "image": "/images/projects/york-terrace-kololo/img1.png"
+  },
+  {
+    "slug": "office-building-hill-road-kololo",
+    "title": "Office Building",
+    "location": "Plot 1, Hill Road, Kololo",
+    "completionDate": "2008",
+    "year": 2008,
+    "scope": [
+      "Aluminium Windows & Doors",
+      "Frameless Doors",
+      "Partitions",
+      "Skylights"
+    ],
+    "image": "/images/projects/office-building-hill-road-kololo/img1.png"
+  },
+  {
+    "slug": "tata-showroom",
+    "title": "TATA Showroom",
+    "location": "Plot 52, Lugogo Bypass, Kampala",
+    "completionDate": "2012",
+    "year": 2012,
+    "scope": [
+      "Aluminium Windows & Doors",
+      "ACP",
+      "Spider Glazing",
+      "Partitions",
+      "Skylights",
+      "Sun Shading"
+    ],
+    "image": "/images/projects/tata-showroom/img1.png"
+  },
+  {
+    "slug": "muganzirwaza-mall",
+    "title": "Muganzirwaza Mall",
+    "location": "Katwe, Kampala",
+    "completionDate": "2012",
+    "year": 2012,
+    "scope": [
+      "Aluminium Windows & Doors",
+      "Curtain Wall"
+    ],
+    "image": "/images/projects/muganzirwaza-mall/img1.jpg"
+  },
+  {
+    "slug": "mtk-building",
+    "title": "MTK Building",
+    "location": "Nasser Road, Kampala",
+    "completionDate": "2016",
+    "year": 2016,
+    "scope": [
+      "ACP Cladding",
+      "Curtain Wall"
+    ],
+    "image": "/images/projects/mtk-building/img1.jpg"
+  },
+  {
+    "slug": "proposed-residential-apartments-baker-road",
+    "title": "Proposed Residential Apartments",
+    "location": "Baker Road, Kampala",
+    "client": "PSL",
+    "completionDate": "2016",
+    "year": 2016,
+    "scope": [
+      "Aluminum Windows & Doors",
+      "Curtain Wall",
+      "ACP Cladding",
+      "Frameless Glass",
+      "Railing"
+    ],
+    "image": "/images/projects/proposed-residential-apartments-baker-road/img1.png"
+  },
+  {
+    "slug": "proposed-residence-ntinda",
+    "title": "Proposed Residence",
+    "location": "Ntinda, Kampala",
+    "completionDate": "June 2016",
+    "year": 2016,
+    "scope": [
+      "Heavy Duty C.A.L. Series Luxury Aluminum Windows & Doors from Europe"
+    ],
+    "image": "/images/projects/proposed-residence-ntinda/img1.png"
+  },
+  {
+    "slug": "proposed-showroom-old-port-bell-road",
+    "title": "Proposed Showroom",
+    "location": "Old Port Bell Road, Kampala",
+    "completionDate": "2012",
+    "year": 2012,
+    "scope": [
+      "Aluminum Windows & Doors",
+      "Curtain Walling",
+      "ACP Cladding",
+      "Aluminum Shop Front"
+    ],
+    "image": "/images/projects/proposed-showroom-old-port-bell-road/img1.png"
+  },
+  {
+    "slug": "office-of-the-auditor-general",
+    "title": "Office of the Auditor General",
+    "location": "Nakasero, Kampala",
+    "completionDate": "December 2014",
+    "year": 2014,
+    "scope": [
+      "Aluminum Windows & Doors",
+      "Aluminum Partitioning",
+      "Suspended Ceiling",
+      "Curtain Walling & Automatic Electric Door"
+    ],
+    "image": "/images/projects/office-of-the-auditor-general/img1.jpg"
+  },
+  {
+    "slug": "bmk-house",
+    "title": "BMK House",
+    "location": "Wampewo Avenue, Kampala",
+    "completionDate": "2017",
+    "year": 2017,
+    "scope": [
+      "Aluminum Windows & Doors",
+      "Curtain Walling",
+      "ACP Cladding",
+      "Stainless Steel Railing",
+      "Partitioning & Steel Structure"
+    ],
+    "image": "/images/projects/bmk-house/img1.png"
+  },
+  {
+    "slug": "proposed-office-building-kira-road",
+    "title": "Proposed Office Building",
+    "location": "Plot 38, Kira Road, Kampala",
+    "completionDate": "2017",
+    "year": 2017,
+    "scope": [
+      "Aluminum Windows & Doors",
+      "Curtain Wall"
+    ],
+    "image": "/images/projects/proposed-office-building-kira-road/img1.png"
+  },
+  {
+    "slug": "royal-palms-leo-courts",
+    "title": "Royal Palms Housing Estate (Leo Courts)",
+    "location": "Butabika, Kampala",
+    "completionDate": "2017",
+    "year": 2017,
+    "scope": [
+      "Aluminum Windows & Doors",
+      "Curtain Walling"
+    ],
+    "image": "/images/projects/royal-palms-leo-courts/img1.png"
+  },
+  {
+    "slug": "royal-palms-taurus-courts",
+    "title": "Royal Palms Housing Estate (Taurus Courts)",
+    "location": "Butabika, Kampala",
+    "completionDate": "2012",
+    "year": 2012,
+    "scope": [
+      "Aluminum Windows & Doors",
+      "Curtain Walling"
+    ],
+    "image": "/images/projects/royal-palms-taurus-courts/img1.png"
+  }
+]

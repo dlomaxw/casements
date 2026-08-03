@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import MobileNav from './MobileNav';
+import { useQuoteModal } from '@/components/shared/QuoteModal';
 
 export interface SiteContact {
   phone: string;
@@ -27,6 +28,7 @@ const navLinks = [
 export default function Header({ contact, products }: { contact: SiteContact; products: ProductNavItem[] }) {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const { open: openQuote } = useQuoteModal();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -102,9 +104,9 @@ export default function Header({ contact, products }: { contact: SiteContact; pr
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.24 11.4 11.4 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.4 11.4 0 00.57 3.6 1 1 0 01-.25 1L6.6 10.8z" /></svg>
               <span className="hidden xl:inline">{contact.phone}</span>
             </a>
-            <Link href="/#contact" className="rounded-full bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-600">
+            <button type="button" onClick={() => openQuote()} className="rounded-full bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-600">
               Get a Quote
-            </Link>
+            </button>
           </div>
 
           <MobileNav phone={contact.phone} phoneHref={contact.phoneHref} products={products} scrolled={scrolled} />

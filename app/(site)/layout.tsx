@@ -7,6 +7,8 @@ import { getSiteContent, telHref } from '@/lib/content';
 import { getProductNav } from '@/lib/products-db';
 import JsonLd from '@/components/seo/JsonLd';
 import { localBusinessSchema, organizationSchema, websiteSchema } from '@/lib/schema';
+import QuoteModalProvider from '@/components/shared/QuoteModal';
+import Chatbot from '@/components/shared/Chatbot';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,10 +32,13 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <Suspense fallback={null}>
         <Analytics />
       </Suspense>
-      <Header contact={contact} products={products} />
-      <main>{children}</main>
-      <Footer contact={contact} products={products} />
-      <WhatsAppButton phone={contact.phone} />
+      <QuoteModalProvider categories={products.map((p) => ({ slug: p.slug, title: p.title }))}>
+        <Header contact={contact} products={products} />
+        <main>{children}</main>
+        <Footer contact={contact} products={products} />
+        <WhatsAppButton phone={contact.phone} />
+        <Chatbot />
+      </QuoteModalProvider>
     </>
   );
 }

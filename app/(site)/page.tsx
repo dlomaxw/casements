@@ -2,7 +2,9 @@ import HeroBanner from '@/components/home/HeroBanner';
 import StatsStrip from '@/components/home/StatsStrip';
 import ServicesStrip from '@/components/home/ServicesStrip';
 import ProductHighlights from '@/components/home/ProductHighlights';
+import WhyChooseUs from '@/components/home/WhyChooseUs';
 import ProcessSteps from '@/components/home/ProcessSteps';
+import FeaturedProjects from '@/components/home/FeaturedProjects';
 import ConsultationCTA from '@/components/home/ConsultationCTA';
 import TestimonialsSection from '@/components/home/TestimonialsSection';
 import BlogPreview from '@/components/home/BlogPreview';
@@ -20,7 +22,9 @@ export default async function HomePage() {
       <StatsStrip />
       <ServicesStrip />
       <ProductHighlights />
+      <WhyChooseUs />
       <ProcessSteps />
+      <FeaturedProjects />
       <ConsultationCTA />
       <TestimonialsSection />
       <BlogPreview />
