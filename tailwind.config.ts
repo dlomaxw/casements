@@ -37,12 +37,12 @@ const config: Config = {
           950: '#101010',  // brand-black
         },
 
-        // "Industrial Precision" design system — CRM / admin dashboard
-        'industrial-blue': '#1a2c3d',
-        'safety-orange': '#f39c12',
+        // CRM / admin dashboard — aligned to the Casements green/yellow brand
+        'industrial-blue': '#101010',   // near-black headings (matches public steel-950)
+        'safety-orange': '#f5b800',     // brand yellow accent
         'aluminum-silver': '#bdc3c7',
-        primary: '#005018',
-        'primary-container': '#006b23',
+        primary: '#1f7a3d',             // brand green
+        'primary-container': '#14572c', // brand green dark
         'on-primary': '#ffffff',
         'on-primary-container': '#8ee991',
         secondary: '#705d00',
@@ -69,8 +69,8 @@ const config: Config = {
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         display: ['"DM Sans"', 'Inter', 'ui-sans-serif', 'sans-serif'],
-        // Industrial Precision typography
-        work: ['"Work Sans"', 'Inter', 'ui-sans-serif', 'sans-serif'],
+        // CRM headings now use DM Sans (matches the public brand); mono for labels
+        work: ['"DM Sans"', 'Inter', 'ui-sans-serif', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       borderRadius: {

@@ -52,8 +52,10 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
           <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center justify-between px-4 lg:px-8">
             <div className="flex items-center gap-8">
               <Link href="/crm" className="flex items-center gap-2">
-                <span className="font-work text-lg font-extrabold tracking-tight text-industrial-blue">
-                  CASEMENTS AFRICA
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/casements-mark.png" alt="" className="h-9 w-9 object-contain" />
+                <span className="hidden font-work text-lg font-extrabold tracking-tight text-industrial-blue sm:inline">
+                  Casements
                 </span>
                 <span className="hidden rounded bg-primary px-2 py-0.5 font-mono text-[11px] font-semibold text-white sm:inline">
                   CRM
