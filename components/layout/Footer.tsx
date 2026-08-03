@@ -17,13 +17,13 @@ export default function Footer({ contact, products }: { contact: SiteContact; pr
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
         {/* Brand */}
         <div>
-          <Link href="/" className="inline-flex rounded-lg bg-white p-3" aria-label="Casements (A) Ltd — home">
+          <Link href="/" className="inline-flex rounded-xl bg-white p-4" aria-label="Casements (A) Ltd — home">
             <Image
-              src="/images/casements-logo.png"
+              src="/images/casements-logo-lockup.png"
               alt="Casements (A) Ltd — Aluminium, Glass, Steel, Wood since 1965"
-              width={160}
-              height={160}
-              className="h-20 w-auto object-contain"
+              width={180}
+              height={140}
+              className="h-24 w-auto object-contain"
             />
           </Link>
           <p className="mt-4 text-sm leading-relaxed text-brand-200">

@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Analytics from '@/components/layout/Analytics';
+import WhatsAppButton from '@/components/layout/WhatsAppButton';
 import { getSiteContent, telHref } from '@/lib/content';
 import { getProductNav } from '@/lib/products-db';
 import JsonLd from '@/components/seo/JsonLd';
@@ -32,6 +33,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <Header contact={contact} products={products} />
       <main>{children}</main>
       <Footer contact={contact} products={products} />
+      <WhatsAppButton phone={contact.phone} />
     </>
   );
 }

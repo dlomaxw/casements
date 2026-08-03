@@ -12,3 +12,7 @@ public/robots.txt
 prisma/dev.db
 
 .vercel
+
+
+# Reference-only Vite design source (assets already ported into public/)
+casements/

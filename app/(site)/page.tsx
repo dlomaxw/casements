@@ -1,4 +1,5 @@
 import HeroBanner from '@/components/home/HeroBanner';
+import StatsStrip from '@/components/home/StatsStrip';
 import ServicesStrip from '@/components/home/ServicesStrip';
 import ProductHighlights from '@/components/home/ProductHighlights';
 import ProcessSteps from '@/components/home/ProcessSteps';
@@ -16,6 +17,7 @@ export default async function HomePage() {
     <>
       <RegisterInterestModal phone={phone} phoneHref={telHref(phone)} email={c('site.email')} />
       <HeroBanner />
+      <StatsStrip />
       <ServicesStrip />
       <ProductHighlights />
       <ProcessSteps />

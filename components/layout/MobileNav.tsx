@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import type { ProductNavItem } from './Header';
 
-export default function MobileNav({ phone, phoneHref, products }: { phone: string; phoneHref: string; products: ProductNavItem[] }) {
+export default function MobileNav({ phone, phoneHref, products, scrolled = false }: { phone: string; phoneHref: string; products: ProductNavItem[]; scrolled?: boolean }) {
   const [open, setOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
 
@@ -14,13 +14,15 @@ export default function MobileNav({ phone, phoneHref, products }: { phone: strin
   };
 
   return (
-    <div className="md:hidden">
+    <div className="justify-self-end lg:hidden">
       <button
         type="button"
         aria-label={open ? 'Close menu' : 'Open menu'}
         aria-expanded={open}
         onClick={() => setOpen(!open)}
-        className="flex h-10 w-10 items-center justify-center rounded text-brand-950"
+        className={`flex h-11 w-11 items-center justify-center rounded-full text-steel-900 transition-colors ${
+          !scrolled ? 'border border-brand-100 bg-white/90 shadow-sm backdrop-blur-md' : ''
+        }`}
       >
         <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}

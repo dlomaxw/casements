@@ -8,31 +8,33 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Public marketing site palette (unchanged)
+        // Public marketing site — Casements green/yellow brand.
+        // `brand` = green ramp (was blue); `accent` = brand yellow.
         brand: {
-          50: '#f2f7fb',
-          100: '#e2edf5',
-          200: '#c0dcec',
-          300: '#8fc2dd',
-          400: '#57a3c9',
-          500: '#3287b1',
-          600: '#236c95',
-          700: '#1e577a',
-          800: '#1d4a66',
-          900: '#1d3f56',
-          950: '#132a3c',
+          50: '#e8f4ec',   // brand-green-light
+          100: '#cbe6d5',
+          200: '#a3d4b5',
+          300: '#72bd92',
+          400: '#3f9d68',
+          500: '#1f7a3d',  // brand-green (primary)
+          600: '#1a6a35',
+          700: '#14572c',  // brand-green-dark
+          800: '#123f22',
+          900: '#0f2f1b',
+          950: '#0a1f12',  // near-black green (dark sections)
         },
         accent: {
-          400: '#f5b942',
-          500: '#f0a821',
-          600: '#d98e0f',
+          400: '#ffc933',
+          500: '#f5b800',  // brand-yellow
+          600: '#d99f00',
         },
+        // Warm neutral "steel" surfaces (light backgrounds)
         steel: {
-          50: '#f6f7f8',
-          100: '#eceef0',
-          800: '#2d3743',
-          900: '#1f2833',
-          950: '#141b23',
+          50: '#f7f8f6',
+          100: '#eef0ec',
+          800: '#2a2f29',
+          900: '#1a1e19',
+          950: '#101010',  // brand-black
         },
 
         // "Industrial Precision" design system — CRM / admin dashboard
@@ -66,7 +68,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['"Plus Jakarta Sans"', 'Inter', 'ui-sans-serif', 'sans-serif'],
+        display: ['"DM Sans"', 'Inter', 'ui-sans-serif', 'sans-serif'],
         // Industrial Precision typography
         work: ['"Work Sans"', 'Inter', 'ui-sans-serif', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],

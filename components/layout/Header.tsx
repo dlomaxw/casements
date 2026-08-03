@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import MobileNav from './MobileNav';
 
@@ -16,69 +17,61 @@ export interface SiteContact {
 export interface ProductNavItem { slug: string; title: string; shortTitle?: string }
 
 const navLinks = [
-  { href: '/about-us', label: 'About Us' },
+  { href: '/about-us', label: 'About' },
   { href: '/products', label: 'Products', dropdown: true },
   { href: '/projects', label: 'Projects' },
-  { href: '/blog', label: 'Blog' },
   { href: '/csr', label: 'CSR' },
-  { href: '/testimonials', label: 'Testimonials' },
+  { href: '/blog', label: 'Blog' },
 ];
 
 export default function Header({ contact, products }: { contact: SiteContact; products: ProductNavItem[] }) {
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
+    const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  return (
-    <header className="sticky top-0 z-50">
-      {/* Top ribbon */}
-      <div className="bg-brand-950 text-center text-xs font-medium tracking-wide text-accent-400">
-        <p className="px-4 py-1.5">{contact.ribbon}</p>
-      </div>
+  const isActive = (href: string) => pathname === href || (href !== '/' && pathname.startsWith(href));
 
-      <div
-        className={`transition-colors duration-300 ${
-          scrolled ? 'bg-white/95 shadow-md backdrop-blur' : 'bg-white'
-        }`}
-      >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center" aria-label="Casements (A) Ltd — home">
-            <Image
-              src="/images/casements-logo.png"
-              alt="Casements (A) Ltd — Aluminium, Glass, Steel, Wood since 1965"
-              width={200}
-              height={200}
-              priority
-              className="h-14 w-auto object-contain sm:h-16"
-            />
+  return (
+    <header className="sticky top-0 z-50 w-full py-4">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div
+          className={`grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded-full transition-all duration-300 lg:grid-cols-[1fr_auto_1fr] ${
+            scrolled ? 'bg-white/90 px-3 py-2 shadow-md shadow-black/[0.06] backdrop-blur-md' : 'bg-transparent'
+          }`}
+        >
+          {/* Logo */}
+          <Link href="/" className="shrink-0 justify-self-start">
+            <Image src="/images/casements-mark.png" alt="Casements (A) LTD" width={56} height={56} className="h-12 w-12 object-contain sm:h-14 sm:w-14" priority />
           </Link>
 
-          {/* Desktop nav */}
-          <nav className="hidden items-center gap-1 md:flex" aria-label="Main navigation">
+          {/* Desktop nav pill */}
+          <nav
+            className={`col-start-2 row-start-1 hidden items-center gap-1 justify-self-center rounded-full transition-colors duration-300 lg:flex ${
+              !scrolled ? 'border border-brand-100 bg-white/90 p-1.5 shadow-sm shadow-black/[0.04] backdrop-blur-md' : ''
+            }`}
+            aria-label="Main navigation"
+          >
             {navLinks.map((link) =>
               link.dropdown ? (
                 <div key={link.href} className="group relative">
                   <Link
                     href={link.href}
-                    className="flex items-center gap-1 rounded px-3 py-2 text-sm font-medium text-brand-900 hover:text-brand-600"
+                    className={`flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium tracking-wide transition-colors ${
+                      isActive(link.href) ? 'bg-brand-500 text-white shadow-sm' : 'text-steel-800/70 hover:text-steel-900'
+                    }`}
                   >
                     {link.label}
-                    <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" aria-hidden>
-                      <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
+                    <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" aria-hidden><path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
                   </Link>
-                  <div className="invisible absolute left-0 top-full max-h-[70vh] w-72 overflow-y-auto rounded-lg border border-brand-100 bg-white p-2 opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
+                  <div className="invisible absolute left-1/2 top-full max-h-[70vh] w-72 -translate-x-1/2 overflow-y-auto rounded-2xl border border-brand-100 bg-white p-2 opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
                     {products.map((p) => (
-                      <Link
-                        key={p.slug}
-                        href={`/products/${p.slug}`}
-                        className="block rounded px-3 py-2 text-sm text-brand-900 hover:bg-brand-50 hover:text-brand-600"
-                      >
+                      <Link key={p.slug} href={`/products/${p.slug}`} className="block rounded-xl px-3 py-2 text-sm text-steel-800 hover:bg-brand-50 hover:text-brand-600">
                         {p.title}
                       </Link>
                     ))}
@@ -88,21 +81,33 @@ export default function Header({ contact, products }: { contact: SiteContact; pr
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="rounded px-3 py-2 text-sm font-medium text-brand-900 hover:text-brand-600"
+                  className={`rounded-full px-4 py-2 text-sm font-medium tracking-wide transition-colors ${
+                    isActive(link.href) ? 'bg-brand-500 text-white shadow-sm' : 'text-steel-800/70 hover:text-steel-900'
+                  }`}
                 >
                   {link.label}
                 </Link>
               ),
             )}
-            <a
-              href={contact.phoneHref}
-              className="ml-3 rounded-md bg-accent-500 px-4 py-2 text-sm font-semibold text-brand-950 hover:bg-accent-400"
-            >
-              {contact.phone}
-            </a>
           </nav>
 
-          <MobileNav phone={contact.phone} phoneHref={contact.phoneHref} products={products} />
+          {/* Actions */}
+          <div className="hidden items-center gap-3 justify-self-end lg:flex">
+            <a
+              href={contact.phoneHref}
+              className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium text-steel-800/80 transition-colors hover:text-brand-600 ${
+                !scrolled ? 'border border-brand-100 bg-white/90 shadow-sm shadow-black/[0.04] backdrop-blur-md' : ''
+              }`}
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.24 11.4 11.4 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.4 11.4 0 00.57 3.6 1 1 0 01-.25 1L6.6 10.8z" /></svg>
+              <span className="hidden xl:inline">{contact.phone}</span>
+            </a>
+            <Link href="/#contact" className="rounded-full bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-600">
+              Get a Quote
+            </Link>
+          </div>
+
+          <MobileNav phone={contact.phone} phoneHref={contact.phoneHref} products={products} scrolled={scrolled} />
         </div>
       </div>
     </header>
