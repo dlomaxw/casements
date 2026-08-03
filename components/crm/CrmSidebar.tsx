@@ -61,7 +61,16 @@ export default function CrmSidebar({ products }: { products: ProductNavItem[] })
         })}
       </nav>
 
-      <div className="mx-2 mb-4 rounded-xl border border-outline-variant/20 bg-surface-container-high/50 p-4">
+      <div className="mx-2 mb-4 space-y-2 rounded-xl border border-outline-variant/20 bg-surface-container-high/50 p-4">
+        <a
+          href="http://favourwings.com/quotations/quotation_system/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-safety-orange py-3 font-mono text-sm font-semibold text-steel-950 transition-all hover:opacity-90"
+        >
+          <Icon name="request_quote" className="text-[18px]" />
+          Quotation System
+        </a>
         <Link
           href="/products"
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-industrial-blue py-3 font-mono text-sm font-medium text-white transition-all hover:opacity-90"
