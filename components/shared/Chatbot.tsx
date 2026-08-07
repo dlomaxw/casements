@@ -94,7 +94,7 @@ export default function Chatbot() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? 'Close chat' : 'Open chat'}
-        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-brand-500 text-white shadow-lg shadow-brand-500/30 transition-transform hover:scale-105 active:scale-95"
+        className="fixed bottom-6 left-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-brand-500 text-white shadow-lg shadow-brand-500/30 transition-transform hover:scale-105 active:scale-95"
       >
         {open ? (
           <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
@@ -104,7 +104,7 @@ export default function Chatbot() {
       </button>
 
       {open && (
-        <div className="fixed bottom-24 right-6 z-40 flex h-[28rem] w-[calc(100vw-3rem)] max-w-sm flex-col overflow-hidden rounded-3xl border border-brand-100 bg-white shadow-2xl">
+        <div className="fixed bottom-24 left-6 z-40 flex h-[28rem] w-[calc(100vw-3rem)] max-w-sm flex-col overflow-hidden rounded-3xl border border-brand-100 bg-white shadow-2xl">
           <div className="flex items-center gap-3 bg-brand-500 px-5 py-4 text-white">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20">
               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" /></svg>
