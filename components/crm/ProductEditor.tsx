@@ -18,6 +18,7 @@ interface ProductData {
   image: string;
   imageAlt: string;
   videoUrl: string;
+  brochureUrl: string;
   subItems: string[];
   gallery: GalleryItem[];
   faqs: FaqItem[];
@@ -41,6 +42,7 @@ export default function ProductEditor({ initial }: { initial?: Partial<ProductDa
     image: initial?.image ?? '',
     imageAlt: initial?.imageAlt ?? '',
     videoUrl: initial?.videoUrl ?? '',
+    brochureUrl: initial?.brochureUrl ?? '',
     subItems: initial?.subItems ?? [],
     gallery: initial?.gallery ?? [],
     faqs: initial?.faqs ?? [],
@@ -187,6 +189,7 @@ export default function ProductEditor({ initial }: { initial?: Partial<ProductDa
           <ImageUploadField label="Main image" value={p.image} onChange={(v) => set('image', v)} />
           <div><label className={label}>Main image alt</label><input value={p.imageAlt} onChange={(e) => set('imageAlt', e.target.value)} className={field} /></div>
           <div><label className={label}>Video link <span className="text-outline">(YouTube/Vimeo)</span></label><input value={p.videoUrl} onChange={(e) => set('videoUrl', e.target.value)} className={field} placeholder="https://youtube.com/watch?v=…" /></div>
+          <div><label className={label}>Brochure link <span className="text-outline">(PDF / Google Drive)</span></label><input value={p.brochureUrl} onChange={(e) => set('brochureUrl', e.target.value)} className={field} placeholder="https://drive.google.com/file/d/…" /></div>
           <div><label className={label}>SEO keywords <span className="text-outline">(comma-separated)</span></label>
             <input value={p.keywords.join(', ')} onChange={(e) => set('keywords', e.target.value.split(',').map((k) => k.trim()).filter(Boolean))} className={field} />
           </div>

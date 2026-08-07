@@ -40,6 +40,7 @@ export default async function EditProductPage({ params }: { params: { id: string
           image: product.image,
           imageAlt: product.imageAlt ?? '',
           videoUrl: product.videoUrl ?? '',
+          brochureUrl: product.brochureUrl ?? '',
           subItems: product.subItems,
           gallery: Array.isArray(product.gallery) ? (product.gallery as unknown as GalleryItem[]) : [],
           faqs: Array.isArray(product.faqs) ? (product.faqs as unknown as FaqItem[]) : [],

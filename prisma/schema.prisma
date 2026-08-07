@@ -133,6 +133,7 @@ model Product {
   image           String // main image
   imageAlt        String?
   videoUrl        String? // YouTube / Vimeo link
+  brochureUrl     String? // downloadable product brochure (PDF / Drive link)
   subItems        String[] // feature list
   gallery         Json? // [{ src, alt }]
   faqs            Json? // [{ question, answer }] — rendered on-page + FAQPage schema

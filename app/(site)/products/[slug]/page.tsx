@@ -62,6 +62,20 @@ export default async function ProductPage({ params }: { params: { slug: string }
             <h2 className="font-display text-2xl font-bold text-brand-950">Overview</h2>
             <p className="mt-4 whitespace-pre-wrap leading-relaxed text-brand-800/80">{product.longDescription}</p>
 
+            {product.brochureUrl && (
+              <a
+                href={product.brochureUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-flex items-center gap-2.5 rounded-full bg-brand-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-600"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><path d="M7 10l5 5 5-5" /><path d="M12 15V3" />
+                </svg>
+                Download Brochure
+              </a>
+            )}
+
             {product.subItems.length > 0 && (
               <>
                 <h3 className="mt-10 font-display text-lg font-bold text-brand-950">What we offer</h3>

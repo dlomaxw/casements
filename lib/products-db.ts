@@ -37,6 +37,7 @@ export interface ProductRecord {
   image: string;
   imageAlt: string;
   videoUrl: string | null;
+  brochureUrl: string | null;
   subItems: string[];
   gallery: GalleryItem[];
   faqs: FaqItem[];
@@ -58,6 +59,7 @@ function shape(p: any): ProductRecord {
     image: p.image,
     imageAlt: p.imageAlt ?? p.title,
     videoUrl: p.videoUrl ?? null,
+    brochureUrl: p.brochureUrl ?? null,
     subItems: p.subItems ?? [],
     gallery: Array.isArray(p.gallery) ? (p.gallery as GalleryItem[]) : [],
     faqs: Array.isArray(p.faqs) ? (p.faqs as FaqItem[]) : [],
