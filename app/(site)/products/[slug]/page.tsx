@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import ProductHero from '@/components/products/ProductHero';
+import ProductGallery from '@/components/products/ProductGallery';
 import QuoteForm from '@/components/ui/QuoteForm';
 import { getProductBySlugDb } from '@/lib/products-db';
 import { getProductNav } from '@/lib/products-db';
@@ -123,13 +124,8 @@ export default async function ProductPage({ params }: { params: { slug: string }
             {product.gallery.length > 0 && (
               <>
                 <h3 className="mt-12 font-display text-lg font-bold text-brand-950">Gallery</h3>
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  {product.gallery.map((g) => (
-                    <div key={g.src} className="relative h-56 overflow-hidden rounded-lg ring-1 ring-brand-100">
-                      <Image src={g.src} alt={g.alt} fill sizes="(min-width: 640px) 50vw, 100vw" className="object-cover" />
-                    </div>
-                  ))}
-                </div>
+                <p className="mt-1 text-sm text-steel-800/60">Click any image to view it larger.</p>
+                <ProductGallery items={product.gallery} />
               </>
             )}
           </div>
