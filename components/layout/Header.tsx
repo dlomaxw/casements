@@ -49,7 +49,14 @@ export default function Header({ contact, products }: { contact: SiteContact; pr
         >
           {/* Logo */}
           <Link href="/" className="shrink-0 justify-self-start">
-            <Image src="/images/casements-mark.png" alt="Casements (A) LTD" width={56} height={56} className="h-12 w-12 object-contain sm:h-14 sm:w-14" priority />
+            <Image
+              src="/images/casements-logo-lockup.png"
+              alt="Casements (A) LTD — Aluminium, Glass, Steel, Wood since 1965"
+              width={120}
+              height={108}
+              className="h-16 w-auto object-contain sm:h-20"
+              priority
+            />
           </Link>
 
           {/* Desktop nav pill */}

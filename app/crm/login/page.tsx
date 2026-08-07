@@ -33,9 +33,8 @@ export default function CrmLoginPage() {
       <form onSubmit={onSubmit} className="w-full max-w-sm rounded-xl border border-outline-variant bg-white p-8 shadow-sm">
         <div className="mb-6 flex flex-col items-center text-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/casements-mark.png" alt="Casements (A) LTD" className="h-16 w-16 object-contain" />
-          <span className="mt-3 font-work text-2xl font-extrabold tracking-tight text-industrial-blue">Casements (A) LTD</span>
-          <p className="mt-1 font-mono text-xs uppercase tracking-widest text-safety-orange">CRM Access</p>
+          <img src="/images/casements-logo-lockup.png" alt="Casements (A) LTD" className="h-28 w-auto object-contain" />
+          <p className="mt-3 font-mono text-xs uppercase tracking-widest text-safety-orange">CRM Access</p>
         </div>
 
         <div className="space-y-4">
