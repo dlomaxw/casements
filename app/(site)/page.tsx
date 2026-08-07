@@ -3,6 +3,7 @@ import StatsStrip from '@/components/home/StatsStrip';
 import ServicesStrip from '@/components/home/ServicesStrip';
 import ProductHighlights from '@/components/home/ProductHighlights';
 import WhyChooseUs from '@/components/home/WhyChooseUs';
+import VideoSection from '@/components/home/VideoSection';
 import ProcessSteps from '@/components/home/ProcessSteps';
 import FeaturedProjects from '@/components/home/FeaturedProjects';
 import ConsultationCTA from '@/components/home/ConsultationCTA';
@@ -23,6 +24,7 @@ export default async function HomePage() {
       <ServicesStrip />
       <ProductHighlights />
       <WhyChooseUs />
+      <VideoSection />
       <ProcessSteps />
       <FeaturedProjects />
       <ConsultationCTA />

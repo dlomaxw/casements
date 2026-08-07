@@ -32,6 +32,9 @@ export default function MobileNav({ phone, phoneHref, products, scrolled = false
       {open && (
         <div className="absolute inset-x-0 top-full max-h-[80vh] overflow-y-auto border-t border-brand-100 bg-white shadow-xl">
           <nav className="flex flex-col p-4" aria-label="Mobile navigation">
+            <Link href="/" onClick={close} className="rounded px-3 py-3 font-medium text-brand-900 hover:bg-brand-50">
+              Home
+            </Link>
             <Link href="/about-us" onClick={close} className="rounded px-3 py-3 font-medium text-brand-900 hover:bg-brand-50">
               About Us
             </Link>
@@ -80,6 +83,9 @@ export default function MobileNav({ phone, phoneHref, products, scrolled = false
             </Link>
             <Link href="/testimonials" onClick={close} className="rounded px-3 py-3 font-medium text-brand-900 hover:bg-brand-50">
               Testimonials
+            </Link>
+            <Link href="/contact" onClick={close} className="rounded px-3 py-3 font-medium text-brand-900 hover:bg-brand-50">
+              Contact
             </Link>
 
             <a

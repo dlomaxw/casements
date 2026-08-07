@@ -18,11 +18,13 @@ export interface SiteContact {
 export interface ProductNavItem { slug: string; title: string; shortTitle?: string }
 
 const navLinks = [
-  { href: '/about-us', label: 'About' },
+  { href: '/', label: 'Home' },
+  { href: '/about-us', label: 'About Us' },
   { href: '/products', label: 'Products', dropdown: true },
   { href: '/projects', label: 'Projects' },
   { href: '/csr', label: 'CSR' },
   { href: '/blog', label: 'Blog' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 export default function Header({ contact, products }: { contact: SiteContact; products: ProductNavItem[] }) {
@@ -37,7 +39,7 @@ export default function Header({ contact, products }: { contact: SiteContact; pr
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const isActive = (href: string) => pathname === href || (href !== '/' && pathname.startsWith(href));
+  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href));
 
   return (
     <header className="sticky top-0 z-50 w-full py-4">

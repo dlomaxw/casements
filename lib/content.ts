@@ -19,6 +19,15 @@ const MANUAL_BLOCKS: ContentBlock[] = [
   { key: 'site.email', page: 'Global', label: 'Sales email', type: 'text', default: 'sales@casements.co.ug' },
   { key: 'site.address', page: 'Global', label: 'Office address', type: 'text', default: 'Plot 86, 5th Street, Industrial Area, Kampala, Uganda' },
   { key: 'site.ribbon', page: 'Global', label: 'Top ribbon text', type: 'text', default: '60+ Years of Experience! | Built to Last, Delivered as Promised!' },
+  { key: 'site.phone2', page: 'Global', label: 'Second phone (optional)', type: 'text', default: '+256 785 451 064' },
+  { key: 'site.phone3', page: 'Global', label: 'Third phone (optional)', type: 'text', default: '+256 755 841 364' },
+  { key: 'site.tollfree', page: 'Global', label: 'Toll-free number (optional)', type: 'text', default: '0800 100 401' },
+  { key: 'site.hours', page: 'Global', label: 'Opening hours', type: 'text', default: 'Mon–Fri 8:00–5:30 · Sat 8:00–1:00' },
+
+  // Contact page
+  { key: 'contact.hero.eyebrow', page: 'Contact', label: 'Contact eyebrow', type: 'text', default: 'Contact Us' },
+  { key: 'contact.hero.title', page: 'Contact', label: 'Contact heading', type: 'text', default: "Let's Talk About Your Project" },
+  { key: 'contact.hero.subtitle', page: 'Contact', label: 'Contact subtitle', type: 'textarea', default: 'Visit our Industrial Area workshop, call the sales team, or send us a message — we typically reply within one business day.' },
 
   // Home — hero
   { key: 'home.hero.eyebrow', page: 'Home', label: 'Hero eyebrow', type: 'text', default: 'Aluminium · Glass · Steel · Wood' },
@@ -53,6 +62,17 @@ const MANUAL_BLOCKS: ContentBlock[] = [
   { key: 'home.process.title', page: 'Home', label: 'Process section heading', type: 'text', default: 'Your Vision, Our Process' },
   { key: 'home.cta.title', page: 'Home', label: 'Consultation CTA heading', type: 'text', default: 'Call For Free Consultation' },
   { key: 'home.cta.subtitle', page: 'Home', label: 'Consultation CTA subtitle', type: 'text', default: 'Talk to a sales engineer today — no obligation, honest advice.' },
+  // Home — video showcase
+  { key: 'home.video.eyebrow', page: 'Home', label: 'Video section eyebrow', type: 'text', default: 'Inside Casements' },
+  { key: 'home.video.title', page: 'Home', label: 'Video section heading', type: 'text', default: 'See Our Workshop in Action' },
+  { key: 'home.video.subtitle', page: 'Home', label: 'Video section subtitle', type: 'textarea', default: 'Take a look inside our Kampala factory and see how we fabricate, finish and install every project.' },
+  { key: 'home.video1.url', page: 'Home', label: 'Video 1 — YouTube link', type: 'text', default: 'https://youtu.be/ryzOBNT5x3w' },
+  { key: 'home.video1.title', page: 'Home', label: 'Video 1 — caption', type: 'text', default: 'Our Workshop' },
+  { key: 'home.video2.url', page: 'Home', label: 'Video 2 — YouTube link', type: 'text', default: 'https://youtu.be/6g_faTz0CRU' },
+  { key: 'home.video2.title', page: 'Home', label: 'Video 2 — caption', type: 'text', default: 'Fabrication & Finishing' },
+  { key: 'home.video3.url', page: 'Home', label: 'Video 3 — YouTube link', type: 'text', default: 'https://youtu.be/oQQSeZ7SN6w' },
+  { key: 'home.video3.title', page: 'Home', label: 'Video 3 — caption', type: 'text', default: 'Visit Our Location' },
+
   { key: 'home.contact.eyebrow', page: 'Home', label: 'Contact section eyebrow', type: 'text', default: 'Get In Touch' },
   { key: 'home.contact.heading', page: 'Home', label: 'Contact section heading', type: 'text', default: "Let's Build Something That Lasts" },
   { key: 'home.contact.body', page: 'Home', label: 'Contact section body', type: 'textarea', default: 'Send us a message and our team will get back to you — usually within one business day. For a quote on a specific product, use the quote form on any product page.' },
