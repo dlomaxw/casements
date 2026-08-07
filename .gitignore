@@ -16,3 +16,13 @@ prisma/dev.db
 
 # Reference-only Vite design source (assets already ported into public/)
 casements/
+
+# Bulky source photo drops — optimized copies live in public/images/product-gallery/
+public/images/products/Aluminium Doors -Windows/
+public/images/products/Ceiling Systems/
+public/images/products/Partitions/
+public/images/products/Partitions (2)/
+public/images/products/curtain wall/
+public/images/products/facade/
+public/images/products/glass/
+public/images/products/interior-exterior design/
