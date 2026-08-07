@@ -23,8 +23,11 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', site: '@casementsug' },
   robots: { index: true, follow: true },
   icons: {
-    icon: '/images/casements-logo.png',
-    apple: '/images/casements-logo.png',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/images/casements-icon.png', type: 'image/png', sizes: '512x512' },
+    ],
+    apple: '/apple-touch-icon.png',
   },
   // Google Search Console ownership verification
   verification: {
