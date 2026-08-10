@@ -1,17 +1,13 @@
 import { getSiteContent } from '@/lib/content';
+import { getHomeVideos, youtubeId } from '@/lib/videos-db';
 import VideoCard from './VideoCard';
-
-// Pull the 11-char YouTube id out of a watch / youtu.be / embed URL.
-function videoId(url: string): string | null {
-  const m = url?.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube-nocookie\.com\/embed\/)([\w-]{11})/);
-  return m ? m[1] : null;
-}
 
 export default async function VideoSection() {
   const c = await getSiteContent();
+  const rows = await getHomeVideos();
 
-  const videos = [1, 2, 3]
-    .map((i) => ({ id: videoId(c(`home.video${i}.url`)), title: c(`home.video${i}.title`) }))
+  const videos = rows
+    .map((v) => ({ id: youtubeId(v.url), title: v.title }))
     .filter((v): v is { id: string; title: string } => Boolean(v.id));
 
   if (videos.length === 0) return null;
@@ -25,7 +21,7 @@ export default async function VideoSection() {
           <p className="mt-4 text-brand-100/80">{c('home.video.subtitle')}</p>
         </div>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {videos.map((v) => (
             <VideoCard key={v.id} videoId={v.id} title={v.title} />
           ))}

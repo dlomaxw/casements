@@ -17,66 +17,85 @@ const ICONS: Record<string, string> = {
   'steel-products': 'construction',
 };
 
-interface ProductNavItem { slug: string; shortTitle?: string; title: string }
+const QUOTATION_URL = 'http://favourwings.com/quotations/quotation_system/';
 
-export default function CrmSidebar({ products }: { products: ProductNavItem[] }) {
+interface ProductNavItem { slug: string; shortTitle?: string; title: string }
+export interface MainNavItem { href: string; icon: string; label: string; external?: boolean }
+
+export default function CrmSidebar({ products, mainNav }: { products: ProductNavItem[]; mainNav: MainNavItem[] }) {
   const pathname = usePathname();
   const params = useSearchParams();
   const activeCategory = params.get('category');
 
+  const rowBase = 'mx-2 my-0.5 flex items-center rounded-lg px-3 py-2.5 transition-all';
+  const rowIdle = 'text-on-surface-variant hover:bg-surface-container-high hover:translate-x-1';
+  const rowActive = 'bg-primary-container/20 font-semibold text-primary';
+
   return (
-    <aside className="hidden lg:flex flex-col fixed left-0 top-16 h-[calc(100vh-64px)] z-40 w-64 bg-surface-container-lowest border-r border-aluminum-silver">
-      <div className="p-6 border-b border-outline-variant/30">
-        <h2 className="font-work text-lg font-bold text-industrial-blue">Lead Categories</h2>
-        <p className="mt-1 text-xs font-medium text-on-surface-variant">Filter the pipeline by product</p>
-      </div>
-
+    <aside className="fixed left-0 top-16 z-40 hidden h-[calc(100vh-64px)] w-64 flex-col border-r border-aluminum-silver bg-surface-container-lowest lg:flex">
       <nav className="flex-1 overflow-y-auto py-4">
-        <Link
-          href="/crm/leads"
-          className={`mx-2 my-1 flex items-center rounded-lg p-3 transition-all hover:translate-x-1 ${
-            pathname === '/crm/leads' && !activeCategory
-              ? 'bg-safety-orange text-white shadow-sm'
-              : 'text-on-surface-variant hover:bg-surface-container-high'
-          }`}
-        >
-          <Icon name="inbox" className="mr-3" />
-          <span className="font-mono text-sm font-medium tracking-wide">All Leads</span>
-        </Link>
-
-        {products.map((p) => {
-          const active = activeCategory === p.slug;
+        {mainNav.map((item) => {
+          // "/crm" must match exactly; every other entry matches its subtree.
+          const active = !item.external && (item.href === '/crm' ? pathname === '/crm' : pathname.startsWith(item.href));
           return (
             <Link
-              key={p.slug}
-              href={`/crm/leads?category=${p.slug}`}
-              className={`group mx-2 my-1 flex items-center rounded-lg p-3 transition-all hover:translate-x-1 ${
-                active ? 'bg-safety-orange text-white shadow-sm' : 'text-on-surface-variant hover:bg-surface-container-high'
-              }`}
+              key={item.href}
+              href={item.href}
+              {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              className={`${rowBase} ${active ? rowActive : rowIdle}`}
             >
-              <Icon name={ICONS[p.slug] ?? 'category'} className={`mr-3 ${active ? '' : 'group-hover:text-primary'}`} />
-              <span className="font-mono text-sm font-medium tracking-wide">{p.shortTitle ?? p.title}</span>
+              <Icon name={item.icon} className="mr-3 text-[20px]" />
+              <span className="font-sans text-sm">{item.label}</span>
             </Link>
           );
         })}
+
+        {products.length > 0 && (
+          <>
+            <p className="mt-6 px-5 pb-2 font-mono text-[11px] font-semibold uppercase tracking-widest text-on-surface-variant/70">
+              Lead Categories
+            </p>
+            <Link
+              href="/crm/leads"
+              className={`${rowBase} ${pathname === '/crm/leads' && !activeCategory ? 'bg-safety-orange text-white shadow-sm' : rowIdle}`}
+            >
+              <Icon name="inbox" className="mr-3 text-[20px]" />
+              <span className="font-mono text-sm tracking-wide">All Leads</span>
+            </Link>
+
+            {products.map((p) => {
+              const active = activeCategory === p.slug;
+              return (
+                <Link
+                  key={p.slug}
+                  href={`/crm/leads?category=${p.slug}`}
+                  className={`${rowBase} ${active ? 'bg-safety-orange text-white shadow-sm' : rowIdle}`}
+                >
+                  <Icon name={ICONS[p.slug] ?? 'category'} className="mr-3 text-[20px]" />
+                  <span className="font-mono text-sm tracking-wide">{p.shortTitle ?? p.title}</span>
+                </Link>
+              );
+            })}
+          </>
+        )}
       </nav>
 
-      <div className="mx-2 mb-4 space-y-2 rounded-xl border border-outline-variant/20 bg-surface-container-high/50 p-4">
+      <div className="mx-2 mb-4 space-y-2 border-t border-outline-variant/30 pt-4">
         <a
-          href="http://favourwings.com/quotations/quotation_system/"
+          href={QUOTATION_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-safety-orange py-3 font-mono text-sm font-semibold text-steel-950 transition-all hover:opacity-90"
+          className="flex w-full items-center gap-3 rounded-lg bg-safety-orange/15 px-3 py-3 font-mono text-sm font-semibold text-industrial-blue transition-all hover:bg-safety-orange/25"
         >
-          <Icon name="request_quote" className="text-[18px]" />
+          <Icon name="request_quote" className="text-[20px] text-safety-orange" />
           Quotation System
         </a>
         <Link
-          href="/products"
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-industrial-blue py-3 font-mono text-sm font-medium text-white transition-all hover:opacity-90"
+          href="/"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-3 font-mono text-sm text-on-surface-variant transition-all hover:bg-surface-container-high"
         >
-          <Icon name="public" className="text-[18px]" />
-          View Public Site
+          <Icon name="open_in_new" className="text-[20px]" />
+          View public site
         </Link>
       </div>
     </aside>

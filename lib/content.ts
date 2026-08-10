@@ -66,12 +66,7 @@ const MANUAL_BLOCKS: ContentBlock[] = [
   { key: 'home.video.eyebrow', page: 'Home', label: 'Video section eyebrow', type: 'text', default: 'Inside Casements' },
   { key: 'home.video.title', page: 'Home', label: 'Video section heading', type: 'text', default: 'See Our Workshop in Action' },
   { key: 'home.video.subtitle', page: 'Home', label: 'Video section subtitle', type: 'textarea', default: 'Take a look inside our Kampala factory and see how we fabricate, finish and install every project.' },
-  { key: 'home.video1.url', page: 'Home', label: 'Video 1 — YouTube link', type: 'text', default: 'https://youtu.be/ryzOBNT5x3w' },
-  { key: 'home.video1.title', page: 'Home', label: 'Video 1 — caption', type: 'text', default: 'Our Workshop' },
-  { key: 'home.video2.url', page: 'Home', label: 'Video 2 — YouTube link', type: 'text', default: 'https://youtu.be/6g_faTz0CRU' },
-  { key: 'home.video2.title', page: 'Home', label: 'Video 2 — caption', type: 'text', default: 'Fabrication & Finishing' },
-  { key: 'home.video3.url', page: 'Home', label: 'Video 3 — YouTube link', type: 'text', default: 'https://youtu.be/oQQSeZ7SN6w' },
-  { key: 'home.video3.title', page: 'Home', label: 'Video 3 — caption', type: 'text', default: 'Visit Our Location' },
+  // The videos themselves live in the HomeVideo table — managed at /crm/videos.
 
   { key: 'home.contact.eyebrow', page: 'Home', label: 'Contact section eyebrow', type: 'text', default: 'Get In Touch' },
   { key: 'home.contact.heading', page: 'Home', label: 'Contact section heading', type: 'text', default: "Let's Build Something That Lasts" },

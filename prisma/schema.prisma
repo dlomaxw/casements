@@ -121,6 +121,17 @@ model ProjectItem {
   updatedAt  DateTime @updatedAt
 }
 
+// YouTube videos shown in the home-page showcase — managed from /crm/videos.
+model HomeVideo {
+  id        String   @id @default(cuid())
+  title     String // caption shown under the player
+  url       String // any YouTube watch / youtu.be / embed link
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 // Product catalogue — managed from /crm/products (replaces the hardcoded list).
 model Product {
   id              String   @id @default(cuid())
