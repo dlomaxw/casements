@@ -3,13 +3,14 @@
  *   fabrimart.ug · furniture.ug · italaluminium.com · aluminiumug.com
  *   giantuganda.co.ug · euraluminltd.com
  *
- * These are the terms competitors put in their headings, navigation and product
- * names that we were not using anywhere on the site. They are attached to page
- * metadata and reused in visible copy where the term genuinely describes work we
- * do — never stuffed into hidden markup.
+ * RULE: every term here must map to something we actually fabricate — check it
+ * against the product's `subItems` before adding. Competitor terms for services
+ * we don't offer (gates other than steel gates, garage doors, shower doors,
+ * mosquito nets, louvers, wardrobes, furniture) are deliberately absent: they
+ * pull in enquiries we have to turn away and dilute the pages that do convert.
  *
- * Spelling variants matter here: Ugandan searchers and our competitors use
- * "curtain walling", "burglar proofing", "balustrade" and "aluminium" (never
+ * Spelling variants matter: Ugandan searchers and our competitors write
+ * "curtain walling", "burglar proofing", "balustrades" and "aluminium" (never
  * "aluminum"), so both forms are carried where the variant is common.
  */
 
@@ -29,36 +30,37 @@ export const CORE_KEYWORDS = [
 
 // Per-product-slug keyword sets. Keys match Product.slug.
 export const PRODUCT_KEYWORDS: Record<string, string[]> = {
+  // subItems: Bi-Fold Doors, Sliding Doors & Windows, Side-Hung Casements,
+  // Pivot Doors, Revolving Doors, Fixed Panels, Top-Hung Windows
   'aluminium-doors-and-windows': [
     'aluminium doors Uganda',
     'aluminium windows Kampala',
     'casement windows Uganda',
+    'side hung windows Uganda',
     'sliding windows Uganda',
     'sliding doors Kampala',
-    'tilt and turn windows Uganda',
-    'awning windows Uganda',
     'top hung windows Kampala',
     'projected windows Uganda',
-    'side hung windows Uganda',
+    'awning windows Uganda', // synonym of top-hung
+    'bi-fold doors Uganda',
+    'sliding folding doors Uganda', // synonym of bi-fold
     'pivot doors Uganda',
-    'swing doors Kampala',
-    'sliding folding doors Uganda',
-    'french doors Uganda',
+    'revolving doors Kampala',
     'double glazed windows Uganda',
     'powder coated aluminium windows Kampala',
-    'thermal break windows Uganda',
-    'shop fronts Uganda',
     'aluminium window prices Uganda',
   ],
+  // subItems: Suspended, Coffered, Stretch, Acoustic, Perforated Metal Ceilings
   ceiling: [
     'suspended ceiling Uganda',
     'acoustic ceiling Kampala',
-    'gypsum ceiling Uganda',
-    'aluminium ceiling Uganda',
-    'ceiling installation Kampala',
-    'false ceiling Uganda',
+    'false ceiling Uganda', // synonym of suspended
     'stretch ceiling Kampala',
+    'coffered ceiling Uganda',
+    'perforated metal ceiling Uganda',
+    'ceiling installation Kampala',
   ],
+  // subItems: Unitized, Semi-Unitized, Stick Curtain Wall, Spider Glazing
   'curtain-wall': [
     'curtain wall Uganda',
     'curtain walling Kampala',
@@ -67,20 +69,22 @@ export const PRODUCT_KEYWORDS: Record<string, string[]> = {
     'commercial glazing Kampala',
     'spider glazing Uganda',
     'unitised curtain wall Uganda',
+    'stick curtain wall Kampala',
     'glass curtain wall prices Uganda',
   ],
+  // subItems: ACP Cladding, Solid Aluminium Board, Aluminium Fins, Sun Shading
   facade: [
     'ACP cladding Uganda',
     'aluminium composite panel Kampala',
     'facade Kampala',
     'wall cladding Uganda',
-    'building facade contractors Uganda',
     'aluminium cladding Kampala',
-    'sky dome Uganda',
-    'glass canopy Kampala',
-    'louvers Uganda',
-    'aluminium louvres Kampala',
+    'building facade contractors Uganda',
+    'aluminium fins Uganda',
+    'brise soleil Kampala',
+    'sun shading aluminium Uganda',
   ],
+  // subItems: Frameless Glass, Aluminium Office, Demountable Partitions
   partitions: [
     'glass partitions Uganda',
     'office partitions Kampala',
@@ -88,55 +92,56 @@ export const PRODUCT_KEYWORDS: Record<string, string[]> = {
     'frameless glass partitions Kampala',
     'demountable partitions Uganda',
     'office fit out partitions Uganda',
-    'toilet cubicles Uganda',
   ],
+  // subItems: Double-Glazed Units, Laminated Safety Glass, Frameless Glass,
+  // Sand-Blasted & Etched Glass, Glass Skylights
   'glass-products': [
     'glass products Uganda',
     'glass doors Uganda',
     'frameless glass Kampala',
-    'shower doors Uganda',
-    'shower cubicles Kampala',
-    'tempered glass Uganda',
-    'toughened glass Kampala',
-    'laminated glass Uganda',
-    'mirrors Uganda',
+    'laminated safety glass Uganda',
+    'double glazed units Kampala',
+    'sandblasted glass Uganda',
+    'etched glass Kampala',
+    'glass skylights Uganda',
     'glass installation Kampala',
   ],
+  // subItems: Office Fit-Outs, Reception Counters & Feature Walls, Shopfronts,
+  // Mini Homes & Modular Spaces
   'interior-design': [
     'interior design Kampala',
     'office fit-out Uganda',
     'interior fit out contractors Uganda',
-    'wooden doors Uganda',
-    'panel doors Kampala',
-    'wardrobes Uganda',
-    'kitchen fittings Kampala',
-    'office furniture fit out Uganda',
+    'shopfronts Uganda',
+    'shop fronts Kampala',
+    'reception counters Uganda',
+    'feature walls Kampala',
+    'modular spaces Uganda',
   ],
+  // subItems: Stainless Steel Railings, Frameless Glass Balustrades,
+  // Staircase Handrails, Balcony Railings
   railings: [
     'stainless steel railings Uganda',
     'glass balustrade Kampala',
     'balustrades Uganda',
     'handrails Uganda',
     'staircase railings Kampala',
+    'staircase handrails Uganda',
     'balcony railings Uganda',
-    'modern rails Uganda',
-    'CNC laser cut railings Kampala',
     'stainless steel handrail prices Uganda',
   ],
+  // subItems: Steel Gates, Burglar-Proofing & Window Grills, Roller Shutters,
+  // Sliding Grilles, Trellidor Systems
   'steel-products': [
     'steel grills Uganda',
     'burglar proofing Kampala',
     'burglarproof Uganda',
-    'security doors Uganda',
-    'steel doors Kampala',
-    'wrought iron gates Uganda',
-    'sliding gates Kampala',
-    'swing gates Uganda',
-    'garage doors Uganda',
-    'fence grill Kampala',
-    'steel windows Uganda',
+    'window grills Uganda',
+    'steel gates Uganda',
+    'roller shutters Kampala',
+    'sliding grilles Uganda',
     'Trellidor Uganda',
-    'mosquito nets for windows Uganda',
+    'steel fabrication Uganda',
   ],
 };
 

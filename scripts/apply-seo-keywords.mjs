@@ -1,76 +1,74 @@
-// Applies the competitor-audit keyword sets (lib/seo-keywords.ts) to the
-// Product rows. Additive and idempotent: existing keywords are kept, researched
-// terms are merged in, duplicates dropped.
+// Sets each Product's keywords to the audited set in lib/seo-keywords.ts.
+//
+// This REPLACES rather than merges, so terms pruned from the audit (services we
+// don't actually offer) are removed from rows that already have them. Every set
+// below is a superset of the original seed keywords, so nothing genuine is lost.
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 const PRODUCT_KEYWORDS = {
   'aluminium-doors-and-windows': [
-    'aluminium doors Uganda', 'aluminium windows Kampala', 'casement windows Uganda', 'sliding windows Uganda',
-    'sliding doors Kampala', 'tilt and turn windows Uganda', 'awning windows Uganda', 'top hung windows Kampala',
-    'projected windows Uganda', 'side hung windows Uganda', 'pivot doors Uganda', 'swing doors Kampala',
-    'sliding folding doors Uganda', 'french doors Uganda', 'double glazed windows Uganda',
-    'powder coated aluminium windows Kampala', 'thermal break windows Uganda', 'shop fronts Uganda',
+    'aluminium doors Uganda', 'aluminium windows Kampala', 'casement windows Uganda', 'side hung windows Uganda',
+    'sliding windows Uganda', 'sliding doors Kampala', 'top hung windows Kampala', 'projected windows Uganda',
+    'awning windows Uganda', 'bi-fold doors Uganda', 'sliding folding doors Uganda', 'pivot doors Uganda',
+    'revolving doors Kampala', 'double glazed windows Uganda', 'powder coated aluminium windows Kampala',
     'aluminium window prices Uganda',
   ],
   ceiling: [
-    'suspended ceiling Uganda', 'acoustic ceiling Kampala', 'gypsum ceiling Uganda', 'aluminium ceiling Uganda',
-    'ceiling installation Kampala', 'false ceiling Uganda', 'stretch ceiling Kampala',
+    'suspended ceiling Uganda', 'acoustic ceiling Kampala', 'false ceiling Uganda', 'stretch ceiling Kampala',
+    'coffered ceiling Uganda', 'perforated metal ceiling Uganda', 'ceiling installation Kampala',
   ],
   'curtain-wall': [
     'curtain wall Uganda', 'curtain walling Kampala', 'structural glazing Uganda', 'glass facade Uganda',
     'commercial glazing Kampala', 'spider glazing Uganda', 'unitised curtain wall Uganda',
-    'glass curtain wall prices Uganda',
+    'stick curtain wall Kampala', 'glass curtain wall prices Uganda',
   ],
   facade: [
     'ACP cladding Uganda', 'aluminium composite panel Kampala', 'facade Kampala', 'wall cladding Uganda',
-    'building facade contractors Uganda', 'aluminium cladding Kampala', 'sky dome Uganda', 'glass canopy Kampala',
-    'louvers Uganda', 'aluminium louvres Kampala',
+    'aluminium cladding Kampala', 'building facade contractors Uganda', 'aluminium fins Uganda',
+    'brise soleil Kampala', 'sun shading aluminium Uganda',
   ],
   partitions: [
     'glass partitions Uganda', 'office partitions Kampala', 'aluminium partitions Uganda',
     'frameless glass partitions Kampala', 'demountable partitions Uganda', 'office fit out partitions Uganda',
-    'toilet cubicles Uganda',
   ],
   'glass-products': [
-    'glass products Uganda', 'glass doors Uganda', 'frameless glass Kampala', 'shower doors Uganda',
-    'shower cubicles Kampala', 'tempered glass Uganda', 'toughened glass Kampala', 'laminated glass Uganda',
-    'mirrors Uganda', 'glass installation Kampala',
+    'glass products Uganda', 'glass doors Uganda', 'frameless glass Kampala', 'laminated safety glass Uganda',
+    'double glazed units Kampala', 'sandblasted glass Uganda', 'etched glass Kampala', 'glass skylights Uganda',
+    'glass installation Kampala',
   ],
   'interior-design': [
     'interior design Kampala', 'office fit-out Uganda', 'interior fit out contractors Uganda',
-    'wooden doors Uganda', 'panel doors Kampala', 'wardrobes Uganda', 'kitchen fittings Kampala',
-    'office furniture fit out Uganda',
+    'shopfronts Uganda', 'shop fronts Kampala', 'reception counters Uganda', 'feature walls Kampala',
+    'modular spaces Uganda',
   ],
   railings: [
     'stainless steel railings Uganda', 'glass balustrade Kampala', 'balustrades Uganda', 'handrails Uganda',
-    'staircase railings Kampala', 'balcony railings Uganda', 'modern rails Uganda',
-    'CNC laser cut railings Kampala', 'stainless steel handrail prices Uganda',
+    'staircase railings Kampala', 'staircase handrails Uganda', 'balcony railings Uganda',
+    'stainless steel handrail prices Uganda',
   ],
   'steel-products': [
-    'steel grills Uganda', 'burglar proofing Kampala', 'burglarproof Uganda', 'security doors Uganda',
-    'steel doors Kampala', 'wrought iron gates Uganda', 'sliding gates Kampala', 'swing gates Uganda',
-    'garage doors Uganda', 'fence grill Kampala', 'steel windows Uganda', 'Trellidor Uganda',
-    'mosquito nets for windows Uganda',
+    'steel grills Uganda', 'burglar proofing Kampala', 'burglarproof Uganda', 'window grills Uganda',
+    'steel gates Uganda', 'roller shutters Kampala', 'sliding grilles Uganda', 'Trellidor Uganda',
+    'steel fabrication Uganda',
   ],
 };
 
 const products = await prisma.product.findMany({ select: { id: true, slug: true, keywords: true } });
 
 for (const p of products) {
-  const researched = PRODUCT_KEYWORDS[p.slug];
-  if (!researched) {
-    console.log(`- ${p.slug}: no researched set, skipped`);
+  const audited = PRODUCT_KEYWORDS[p.slug];
+  if (!audited) {
+    console.log(`- ${p.slug}: no audited set, left alone`);
     continue;
   }
-  const merged = Array.from(new Set([...p.keywords, ...researched]));
-  if (merged.length === p.keywords.length) {
-    console.log(`= ${p.slug}: already up to date (${merged.length})`);
-    continue;
-  }
-  await prisma.product.update({ where: { id: p.id }, data: { keywords: merged } });
-  console.log(`+ ${p.slug}: ${p.keywords.length} -> ${merged.length} keywords`);
+  const removed = p.keywords.filter((k) => !audited.includes(k));
+  await prisma.product.update({ where: { id: p.id }, data: { keywords: audited } });
+  console.log(
+    `${p.slug}: ${p.keywords.length} -> ${audited.length}` +
+      (removed.length ? `  (dropped: ${removed.join(', ')})` : ''),
+  );
 }
 
 await prisma.$disconnect();
