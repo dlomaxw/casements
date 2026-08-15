@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 import { SITE_URL } from '@/lib/seo';
+import { CORE_KEYWORDS } from '@/lib/seo-keywords';
 import './globals.css';
 
 // Google Tag Manager container (public identifier, safe to commit)
@@ -11,10 +12,13 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
   title: {
     template: '%s | Casements Africa Limited',
-    default: 'Casements Africa Limited | Aluminium, Steel, Glass & Wood',
+    // Lead with what people search for, not the company name — every competitor
+    // ranking for these terms puts the service and the country in the title.
+    default: 'Aluminium Windows, Doors & Curtain Walling in Uganda | Casements Africa',
   },
   description:
-    "Uganda's leading aluminium, glass, steel and wood finishing specialists. 60+ years of experience. Plot 86, Industrial Area, Kampala.",
+    "Uganda's aluminium, glass, steel and wood fabrication specialists since 1965. Aluminium windows and doors, curtain walling, facades, partitions, balustrades and steel burglar proofing — designed, fabricated and installed. Plot 86/90, Industrial Area, Kampala.",
+  keywords: CORE_KEYWORDS,
   openGraph: {
     siteName: 'Casements Africa Limited',
     type: 'website',

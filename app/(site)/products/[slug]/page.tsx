@@ -10,6 +10,7 @@ import { toEmbedUrl } from '@/lib/blog';
 import JsonLd from '@/components/seo/JsonLd';
 import { breadcrumbSchema, faqPageSchema, productServiceSchema } from '@/lib/schema';
 import { canonical } from '@/lib/seo';
+import { keywordsFor } from '@/lib/seo-keywords';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,13 +18,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const product = await getProductBySlugDb(params.slug);
   if (!product) return { title: 'Product Not Found' };
   const url = canonical(`/products/${params.slug}`);
+  // Location-qualified title: "…in Kampala, Uganda" is how the demand is
+  // actually phrased, and every competitor ranking for these terms carries it.
+  const title = `${product.title} in Kampala, Uganda`;
   return {
-    title: product.title,
+    title,
     description: product.description,
-    keywords: product.keywords,
+    keywords: keywordsFor(params.slug, product.keywords),
     alternates: { canonical: url },
     openGraph: {
-      title: product.title,
+      title,
       description: product.description,
       url,
       type: 'website',

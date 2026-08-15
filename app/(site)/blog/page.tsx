@@ -2,12 +2,17 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getPublishedPosts } from '@/lib/blog';
+import { canonical } from '@/lib/seo';
+import { CORE_KEYWORDS } from '@/lib/seo-keywords';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Blog & News',
-  description: 'News, projects and product insights from Casements Africa Limited.',
+  title: 'Blog & News — Aluminium and Glazing Insights',
+  description:
+    'Guides, project stories and product insights on aluminium windows, doors, curtain walling, glazing and steel security from Casements Africa Limited in Kampala.',
+  keywords: [...CORE_KEYWORDS, 'aluminium window guide Uganda', 'glazing tips Kampala'],
+  alternates: { canonical: canonical('/blog') },
 };
 
 export default async function BlogPage() {

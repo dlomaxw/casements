@@ -3,11 +3,17 @@ import ProductCard from '@/components/products/ProductCard';
 import ConsultationCTA from '@/components/home/ConsultationCTA';
 import { getSiteContent } from '@/lib/content';
 import { getProducts } from '@/lib/products-db';
+import { canonical } from '@/lib/seo';
+import { CORE_KEYWORDS } from '@/lib/seo-keywords';
+import JsonLd from '@/components/seo/JsonLd';
+import { breadcrumbSchema, offerCatalogSchema } from '@/lib/schema';
 
 export const metadata: Metadata = {
-  title: 'Products',
+  title: 'Aluminium, Glass & Steel Products in Uganda',
   description:
-    'Aluminium doors & windows, curtain walls, facades, glass products, ceilings, partitions, railings and steel security systems — fabricated and installed across Uganda.',
+    'Aluminium doors & windows, curtain walling, facades and ACP cladding, glass products, suspended ceilings, office partitions, balustrades and steel burglar proofing — fabricated and installed across Uganda since 1965.',
+  keywords: [...CORE_KEYWORDS, 'aluminium products Uganda', 'curtain walling Kampala', 'burglar proofing Uganda', 'office partitions Kampala', 'balustrades Uganda'],
+  alternates: { canonical: canonical('/products') },
 };
 
 export default async function ProductsPage() {
@@ -15,6 +21,8 @@ export default async function ProductsPage() {
   const products = await getProducts();
   return (
     <>
+      <JsonLd data={offerCatalogSchema(products)} />
+      <JsonLd data={breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Products', path: '/products' }])} />
       <section className="bg-brand-950 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-accent-400">{c('products.hero.eyebrow')}</p>

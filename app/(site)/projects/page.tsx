@@ -3,11 +3,15 @@ import Image from 'next/image';
 import ConsultationCTA from '@/components/home/ConsultationCTA';
 import { getSiteContent } from '@/lib/content';
 import { getProjects } from '@/lib/projects-db';
+import { canonical } from '@/lib/seo';
+import { CORE_KEYWORDS } from '@/lib/seo-keywords';
 
 export const metadata: Metadata = {
-  title: 'Projects',
+  title: 'Our Projects — Aluminium & Glazing Work in Kampala',
   description:
-    'A portfolio of completed installations by Casements Africa — towers, offices and residences across Kampala and East Africa.',
+    'Completed curtain walling, ACP cladding, aluminium window and glazing installations by Casements Africa — towers, hotels, hospitals, offices and residences across Kampala and East Africa.',
+  keywords: [...CORE_KEYWORDS, 'aluminium projects Uganda', 'curtain walling projects Kampala', 'glazing contractors Uganda'],
+  alternates: { canonical: canonical('/projects') },
 };
 
 export default async function ProjectsPage() {

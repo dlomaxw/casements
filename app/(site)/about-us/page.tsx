@@ -3,11 +3,15 @@ import Image from 'next/image';
 import ConsultationCTA from '@/components/home/ConsultationCTA';
 import { getSiteContent } from '@/lib/content';
 import { getProjects } from '@/lib/projects-db';
+import { canonical } from '@/lib/seo';
+import { CORE_KEYWORDS } from '@/lib/seo-keywords';
 
 export const metadata: Metadata = {
-  title: 'About Us',
+  title: 'About Us — Aluminium Fabricators in Uganda Since 1965',
   description:
-    "Casements Africa Limited — Uganda's leading aluminium, glass, steel and wood finishing specialists with 60+ years of experience.",
+    "Casements Africa Limited is one of Uganda's oldest aluminium, glass, steel and wood fabricators — 60+ years of design, fabrication and installation from our Industrial Area workshop in Kampala.",
+  keywords: [...CORE_KEYWORDS, 'oldest aluminium company Uganda', 'aluminium fabricators since 1965', 'ISO certified aluminium Uganda'],
+  alternates: { canonical: canonical('/about-us') },
 };
 
 const usps = [

@@ -36,6 +36,24 @@ export function organizationSchema(contact: { phone: string; email: string; addr
   };
 }
 
+// Opening hours as published on the site (Mon–Fri 8:00–17:30, Sat 8:00–13:00).
+// Kept here in machine-readable form so Google can show them in local results —
+// none of the competitors audited publish these.
+const OPENING_HOURS = [
+  {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    opens: '08:00',
+    closes: '17:30',
+  },
+  {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Saturday'],
+    opens: '08:00',
+    closes: '13:00',
+  },
+];
+
 export function localBusinessSchema(contact: { phone: string; email: string; address: string }) {
   return {
     '@context': 'https://schema.org',
@@ -52,8 +70,38 @@ export function localBusinessSchema(contact: { phone: string; email: string; add
       addressLocality: ORG.city,
       addressCountry: ORG.country,
     },
+    openingHoursSpecification: OPENING_HOURS,
     areaServed: [{ '@type': 'Country', name: 'Uganda' }],
     parentOrganization: { '@id': `${SITE_URL}/#organization` },
+  };
+}
+
+/**
+ * Lists every product line as a formal service catalogue attached to the
+ * Organization. This is how a search engine learns the full breadth of what we
+ * fabricate from one crawl of the home page, rather than having to discover
+ * each product page separately.
+ */
+export function offerCatalogSchema(products: { slug: string; title: string; description: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'OfferCatalog',
+    '@id': `${SITE_URL}/#services`,
+    name: 'Aluminium, glass, steel and wood fabrication services',
+    provider: { '@id': `${SITE_URL}/#organization` },
+    itemListElement: products.map((p, i) => ({
+      '@type': 'Offer',
+      position: i + 1,
+      itemOffered: {
+        '@type': 'Service',
+        '@id': `${canonical(`/products/${p.slug}`)}#service`,
+        name: p.title,
+        description: p.description,
+        url: canonical(`/products/${p.slug}`),
+        provider: { '@id': `${SITE_URL}/#organization` },
+        areaServed: [{ '@type': 'Country', name: 'Uganda' }],
+      },
+    })),
   };
 }
 

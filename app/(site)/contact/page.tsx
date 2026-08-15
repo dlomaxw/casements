@@ -5,13 +5,15 @@ import JsonLd from '@/components/seo/JsonLd';
 import { breadcrumbSchema } from '@/lib/schema';
 import { canonical } from '@/lib/seo';
 import { getSiteContent, telHref } from '@/lib/content';
+import { CORE_KEYWORDS } from '@/lib/seo-keywords';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Contact Us',
+  title: 'Contact Us — Free Quote on Aluminium & Glass Works',
   description:
-    'Contact Casements (A) Ltd — Plot 86/90, 5th Street, Industrial Area, Kampala. Call +256 752 700 700 or email sales@casements.co.ug for a free quote.',
+    'Contact Casements (A) Ltd — Plot 86/90, 5th Street, Industrial Area, Kampala. Call +256 752 700 700 or email sales@casements.co.ug for a free quote on aluminium windows, doors, curtain walling and steel works.',
+  keywords: [...CORE_KEYWORDS, 'aluminium quote Uganda', 'free quote aluminium windows Kampala', 'aluminium company Industrial Area Kampala'],
   alternates: { canonical: canonical('/contact') },
 };
 
