@@ -8,6 +8,8 @@ import Icon from './Icon';
 
 interface GalleryItem { src: string; alt: string }
 interface FaqItem { question: string; answer: string }
+interface PriceItem { label: string; price: number }
+interface PriceGroup { group: string; note?: string; items: PriceItem[] }
 interface ProductData {
   id?: string;
   title: string;
@@ -22,6 +24,7 @@ interface ProductData {
   subItems: string[];
   gallery: GalleryItem[];
   faqs: FaqItem[];
+  priceList: PriceGroup[];
   keywords: string[];
   published: boolean;
 }
@@ -46,6 +49,7 @@ export default function ProductEditor({ initial }: { initial?: Partial<ProductDa
     subItems: initial?.subItems ?? [],
     gallery: initial?.gallery ?? [],
     faqs: initial?.faqs ?? [],
+    priceList: initial?.priceList ?? [],
     keywords: initial?.keywords ?? [],
     published: initial?.published ?? true,
   });
@@ -94,6 +98,17 @@ export default function ProductEditor({ initial }: { initial?: Partial<ProductDa
   const setFaq = (i: number, patch: Partial<FaqItem>) => set('faqs', p.faqs.map((f, idx) => (idx === i ? { ...f, ...patch } : f)));
   const addFaq = () => set('faqs', [...p.faqs, { question: '', answer: '' }]);
   const delFaq = (i: number) => set('faqs', p.faqs.filter((_, idx) => idx !== i));
+
+  // --- price list ---
+  const setGroup = (gi: number, patch: Partial<PriceGroup>) =>
+    set('priceList', p.priceList.map((g, idx) => (idx === gi ? { ...g, ...patch } : g)));
+  const addGroup = () => set('priceList', [...p.priceList, { group: '', items: [{ label: '', price: 0 }] }]);
+  const delGroup = (gi: number) => set('priceList', p.priceList.filter((_, idx) => idx !== gi));
+  const setRow = (gi: number, ri: number, patch: Partial<PriceItem>) =>
+    setGroup(gi, { items: p.priceList[gi].items.map((it, idx) => (idx === ri ? { ...it, ...patch } : it)) });
+  const addRow = (gi: number) => setGroup(gi, { items: [...p.priceList[gi].items, { label: '', price: 0 }] });
+  const delRow = (gi: number, ri: number) =>
+    setGroup(gi, { items: p.priceList[gi].items.filter((_, idx) => idx !== ri) });
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -177,6 +192,44 @@ export default function ProductEditor({ initial }: { initial?: Partial<ProductDa
                 </div>
                 <input value={f.question} onChange={(e) => setFaq(i, { question: e.target.value })} className={field} placeholder="e.g. How long does installation take?" />
                 <textarea value={f.answer} onChange={(e) => setFaq(i, { answer: e.target.value })} rows={3} className={`${field} mt-2`} placeholder="Write a clear, factual answer…" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+      {/* Price list */}
+        <div className="rounded-xl border border-outline-variant bg-white p-6">
+          <div className="mb-1 flex items-center justify-between">
+            <h3 className="font-work font-semibold text-industrial-blue">Price guide <span className="font-mono text-[11px] font-normal text-on-surface-variant">(UGX)</span></h3>
+            <button type="button" onClick={addGroup} className="flex items-center gap-1 rounded-lg border border-outline-variant px-3 py-1.5 font-mono text-[11px] font-medium text-industrial-blue hover:border-safety-orange">
+              <Icon name="add" className="text-[16px]" /> Add price group
+            </button>
+          </div>
+          <p className="mb-4 font-mono text-[11px] text-on-surface-variant">
+            Optional. Publishing prices wins &ldquo;how much&rdquo; searches and is sent to Google as Offer data,
+            so keep these current — a stale price on the page is worse than none.
+          </p>
+          <div className="space-y-4">
+            {p.priceList.length === 0 && <p className="font-mono text-[11px] text-outline">No prices published.</p>}
+            {p.priceList.map((g, gi) => (
+              <div key={gi} className="rounded-lg border border-outline-variant/60 p-3">
+                <div className="mb-2 flex items-center gap-2">
+                  <input value={g.group} onChange={(e) => setGroup(gi, { group: e.target.value })} className={field} placeholder="Group name, e.g. Circular Uniport" />
+                  <button type="button" onClick={() => delGroup(gi)} className="shrink-0 text-error hover:opacity-80"><Icon name="delete" className="text-[18px]" /></button>
+                </div>
+                <input value={g.note ?? ''} onChange={(e) => setGroup(gi, { note: e.target.value })} className={`${field} mb-2`} placeholder="Optional note, e.g. VAT exclusive" />
+                <div className="space-y-2">
+                  {g.items.map((it, ri) => (
+                    <div key={ri} className="flex items-center gap-2">
+                      <input value={it.label} onChange={(e) => setRow(gi, ri, { label: e.target.value })} className={field} placeholder="Size, e.g. 3.2m diameter" />
+                      <input type="number" min="0" step="1000" value={it.price}
+                        onChange={(e) => setRow(gi, ri, { price: Number(e.target.value) })}
+                        className={`${field} w-40 shrink-0 text-right`} placeholder="3680000" />
+                      <button type="button" onClick={() => delRow(gi, ri)} className="shrink-0 text-error hover:opacity-80"><Icon name="close" className="text-[18px]" /></button>
+                    </div>
+                  ))}
+                </div>
+                <button type="button" onClick={() => addRow(gi)} className="mt-2 font-mono text-[11px] text-primary hover:underline">+ Add size</button>
               </div>
             ))}
           </div>

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import ProductHero from '@/components/products/ProductHero';
 import ProductGallery from '@/components/products/ProductGallery';
+import PriceTable from '@/components/products/PriceTable';
 import QuoteForm from '@/components/ui/QuoteForm';
 import { getProductBySlugDb } from '@/lib/products-db';
 import { getProductNav } from '@/lib/products-db';
@@ -94,6 +95,17 @@ export default async function ProductPage({ params }: { params: { slug: string }
                     </li>
                   ))}
                 </ul>
+              </>
+            )}
+
+            {product.priceList.length > 0 && (
+              <>
+                <h3 className="mt-12 font-display text-lg font-bold text-brand-950">Price Guide</h3>
+                <p className="mt-1 text-sm text-steel-800/60">
+                  Indicative prices in Ugandan Shillings. Delivery, site works and custom finishes are quoted separately —
+                  request a quote for an exact figure.
+                </p>
+                <PriceTable groups={product.priceList} />
               </>
             )}
 

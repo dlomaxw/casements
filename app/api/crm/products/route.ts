@@ -14,6 +14,14 @@ export async function GET() {
 }
 
 const gallerySchema = z.array(z.object({ src: z.string(), alt: z.string() }));
+const priceSchema = z.array(
+  z.object({
+    group: z.string().min(1),
+    note: z.string().optional(),
+    items: z.array(z.object({ label: z.string().min(1), price: z.number().nonnegative() })),
+  }),
+);
+
 const faqSchema = z.array(z.object({ question: z.string(), answer: z.string() }));
 
 const createSchema = z.object({
@@ -29,6 +37,7 @@ const createSchema = z.object({
   subItems: z.array(z.string()).optional(),
   gallery: gallerySchema.optional(),
   faqs: faqSchema.optional(),
+  priceList: priceSchema.optional(),
   keywords: z.array(z.string()).optional(),
   published: z.boolean().optional(),
 });
@@ -71,6 +80,7 @@ export async function POST(request: Request) {
       subItems: d.subItems ?? [],
       gallery: d.gallery ?? [],
       faqs: d.faqs ?? [],
+      priceList: d.priceList ?? [],
       keywords: d.keywords ?? [],
       order: (max._max.order ?? 0) + 1,
       published: d.published ?? true,

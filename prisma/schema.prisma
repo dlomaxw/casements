@@ -148,6 +148,7 @@ model Product {
   subItems        String[] // feature list
   gallery         Json? // [{ src, alt }]
   faqs            Json? // [{ question, answer }] — rendered on-page + FAQPage schema
+  priceList       Json? // [{ group, note?, items: [{ label, price }] }] — published UGX price table
   keywords        String[]
   order           Int      @default(0)
   published       Boolean  @default(true)

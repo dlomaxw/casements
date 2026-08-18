@@ -130,25 +130,44 @@ export function breadcrumbSchema(trail: { name: string; path: string }[]) {
 }
 
 // Product pages describe a fabricated-and-installed offering, so Service is the
-// honest type — we don't publish per-unit prices, and no ratings are invented.
+// honest type. Offers are attached only where a price table is actually
+// published on the page; no ratings are ever invented.
 export function productServiceSchema(p: {
   slug: string;
   title: string;
   description: string;
   image: string;
   type: string;
+  priceList?: { group: string; items: { label: string; price: number }[] }[];
 }) {
+  const url = canonical(`/products/${p.slug}`);
+
+  // Only products with a published price table carry offers — we never guess a
+  // price, and Google penalises prices that don't match the visible page.
+  const offers = (p.priceList ?? []).flatMap((g) =>
+    g.items.map((item) => ({
+      '@type': 'Offer',
+      name: `${g.group} — ${item.label}`,
+      price: item.price,
+      priceCurrency: 'UGX',
+      availability: 'https://schema.org/InStock',
+      url,
+      seller: { '@id': `${SITE_URL}/#organization` },
+    })),
+  );
+
   return {
     '@context': 'https://schema.org',
     '@type': 'Service',
-    '@id': `${canonical(`/products/${p.slug}`)}#service`,
+    '@id': `${url}#service`,
     name: p.title,
     description: p.description,
     image: p.image.startsWith('http') ? p.image : `${SITE_URL}${p.image}`,
     serviceType: p.type,
     provider: { '@id': `${SITE_URL}/#organization` },
     areaServed: [{ '@type': 'Country', name: 'Uganda' }],
-    url: canonical(`/products/${p.slug}`),
+    url,
+    ...(offers.length > 0 ? { offers } : {}),
   };
 }
 

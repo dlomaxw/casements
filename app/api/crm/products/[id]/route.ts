@@ -5,6 +5,14 @@ import { prisma } from '@/lib/db';
 import { can } from '@/lib/roles';
 
 const gallerySchema = z.array(z.object({ src: z.string(), alt: z.string() }));
+const priceSchema = z.array(
+  z.object({
+    group: z.string().min(1),
+    note: z.string().optional(),
+    items: z.array(z.object({ label: z.string().min(1), price: z.number().nonnegative() })),
+  }),
+);
+
 const faqSchema = z.array(z.object({ question: z.string(), answer: z.string() }));
 
 const patchSchema = z.object({
@@ -20,6 +28,7 @@ const patchSchema = z.object({
   subItems: z.array(z.string()).optional(),
   gallery: gallerySchema.optional(),
   faqs: faqSchema.optional(),
+  priceList: priceSchema.optional(),
   keywords: z.array(z.string()).optional(),
   published: z.boolean().optional(),
   order: z.number().optional(),
@@ -56,6 +65,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       ...(d.subItems ? { subItems: d.subItems } : {}),
       ...(d.gallery ? { gallery: d.gallery } : {}),
       ...(d.faqs ? { faqs: d.faqs } : {}),
+      ...(d.priceList ? { priceList: d.priceList } : {}),
       ...(d.keywords ? { keywords: d.keywords } : {}),
       ...(d.published !== undefined ? { published: d.published } : {}),
       ...(d.order !== undefined ? { order: d.order } : {}),

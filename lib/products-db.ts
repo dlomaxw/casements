@@ -26,6 +26,21 @@ export interface FaqItem {
   answer: string;
 }
 
+// Published price table. Prices are plain UGX integers — formatted at render
+// time so the stored value stays sortable and machine-readable for schema.org.
+export interface PriceItem {
+  label: string; // e.g. "3.2m diameter"
+  price: number; // UGX, VAT-exclusive unless the group note says otherwise
+}
+
+export interface PriceGroup {
+  group: string; // e.g. "Circular Uniport"
+  note?: string;
+  items: PriceItem[];
+}
+
+export const PRICE_CURRENCY = 'UGX';
+
 export interface ProductRecord {
   id: string;
   slug: string;
@@ -41,6 +56,7 @@ export interface ProductRecord {
   subItems: string[];
   gallery: GalleryItem[];
   faqs: FaqItem[];
+  priceList: PriceGroup[];
   keywords: string[];
   order: number;
   published: boolean;
@@ -63,6 +79,7 @@ function shape(p: any): ProductRecord {
     subItems: p.subItems ?? [],
     gallery: Array.isArray(p.gallery) ? (p.gallery as GalleryItem[]) : [],
     faqs: Array.isArray(p.faqs) ? (p.faqs as FaqItem[]) : [],
+    priceList: Array.isArray(p.priceList) ? (p.priceList as PriceGroup[]) : [],
     keywords: p.keywords ?? [],
     order: p.order ?? 0,
     published: p.published,

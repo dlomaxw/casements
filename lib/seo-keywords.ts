@@ -143,6 +143,23 @@ export const PRODUCT_KEYWORDS: Record<string, string[]> = {
     'Trellidor Uganda',
     'steel fabrication Uganda',
   ],
+  // subItems: Circular / Oval / Pyramidal Uniports, Guard Houses & Kiosks,
+  // Site Offices. Prices are published on the page, so "price"/"cost" terms
+  // are fair game here in a way they are not on the quote-only products.
+  'mini-homes': [
+    'mini homes Uganda',
+    'uniport Uganda',
+    'uniports Kampala',
+    'prefabricated houses Uganda',
+    'prefab house Kampala',
+    'portable cabins Uganda',
+    'guard house Uganda',
+    'site office Kampala',
+    'kiosk fabrication Uganda',
+    'mini home prices Uganda',
+    'uniport price Uganda',
+    'modular housing Uganda',
+  ],
 };
 
 /** Merge core terms with a product's own set, de-duplicated, order preserved. */
