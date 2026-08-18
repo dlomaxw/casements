@@ -150,8 +150,11 @@ export function resolveTestimonials(c: ContentResolver) {
   }));
 }
 
-// tel: href derived from a display phone number
+// tel: href derived from a display phone number.
+// A leading 0 means a national number or short code (e.g. the 0800 toll-free
+// line) — prefixing those with "+" produces "+0800…", which no dialer accepts.
 export function telHref(phone: string): string {
   const digits = phone.replace(/[^\d+]/g, '');
-  return `tel:${digits.startsWith('+') ? digits : '+' + digits}`;
+  if (digits.startsWith('+') || digits.startsWith('0')) return `tel:${digits}`;
+  return `tel:+${digits}`;
 }

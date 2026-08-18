@@ -6,6 +6,7 @@ import WhatsAppButton from '@/components/layout/WhatsAppButton';
 import { getSiteContent, telHref } from '@/lib/content';
 import { getProductNav } from '@/lib/products-db';
 import JsonLd from '@/components/seo/JsonLd';
+import CallConversionTracker from '@/components/seo/CallConversionTracker';
 import { localBusinessSchema, organizationSchema, websiteSchema } from '@/lib/schema';
 import QuoteModalProvider from '@/components/shared/QuoteModal';
 import Chatbot from '@/components/shared/Chatbot';
@@ -32,6 +33,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <Suspense fallback={null}>
         <Analytics />
       </Suspense>
+      <CallConversionTracker />
       <QuoteModalProvider categories={products.map((p) => ({ slug: p.slug, title: p.title }))}>
         <Header contact={contact} products={products} />
         <main>{children}</main>
