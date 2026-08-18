@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Button from './Button';
+import { reportLeadConversion } from '@/lib/gtag';
 
 interface ContactValues {
   name: string;
@@ -29,9 +30,11 @@ export default function ContactForm() {
       });
       if (!res.ok) throw new Error('Request failed');
       // GA4 lead event
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'generate_lead', { event_category: 'Contact' });
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'generate_lead', { event_category: 'Contact' });
       }
+      // Google Ads "Submit lead form" conversion
+      reportLeadConversion();
       reset();
       setStatus('success');
     } catch {

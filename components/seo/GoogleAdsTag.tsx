@@ -1,4 +1,5 @@
 import Script from 'next/script';
+import { GOOGLE_ADS_ID, LEAD_CONVERSION } from '@/lib/gtag';
 
 /**
  * Google Ads global site tag (gtag.js).
@@ -7,13 +8,12 @@ import Script from 'next/script';
  * gtag.js load plus a `config` call per destination, and a second request for
  * the same library is served from cache and de-duplicated by gtag itself.
  *
- * This tag alone only builds remarketing audiences — recording a *conversion*
- * additionally needs a `gtag('event', 'conversion', { send_to: 'AW-…/<label>' })`
- * call fired on the action you count (quote submitted, call clicked). Supply the
- * conversion label from Google Ads and it can be wired to the form handlers.
+ * This tag alone only builds remarketing audiences. Conversions are recorded by
+ * reportLeadConversion() in lib/gtag.ts, which the quote and contact forms call
+ * on a successful submission. The same function is also published globally as
+ * window.gtag_report_conversion(url) so a plain link or button can fire it
+ * inline, exactly as Google's pasted snippet expects.
  */
-export const GOOGLE_ADS_ID = 'AW-18332719306'; // public identifier, safe to commit
-
 export default function GoogleAdsTag() {
   return (
     <>
@@ -26,7 +26,19 @@ export default function GoogleAdsTag() {
         {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', '${GOOGLE_ADS_ID}');`}
+gtag('config', '${GOOGLE_ADS_ID}');
+window.gtag_report_conversion = function (url) {
+  var navigated = false;
+  var go = function () { if (!navigated && typeof url !== 'undefined') { navigated = true; window.location = url; } };
+  gtag('event', 'conversion', {
+    send_to: '${LEAD_CONVERSION.sendTo}',
+    value: ${LEAD_CONVERSION.value},
+    currency: '${LEAD_CONVERSION.currency}',
+    event_callback: go
+  });
+  if (typeof url !== 'undefined') setTimeout(go, 1000);
+  return false;
+};`}
       </Script>
     </>
   );

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Button from './Button';
+import { reportLeadConversion } from '@/lib/gtag';
 
 interface QuoteValues {
   fullName: string;
@@ -34,9 +35,11 @@ export default function QuoteForm({ defaultCategory, categories }: { defaultCate
         body: JSON.stringify({ ...values, sourcePage: typeof window !== 'undefined' ? window.location.pathname : undefined }),
       });
       if (!res.ok) throw new Error('Request failed');
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'generate_lead', { event_category: 'CRM', event_label: values.productCategory });
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'generate_lead', { event_category: 'CRM', event_label: values.productCategory });
       }
+      // Google Ads "Submit lead form" conversion
+      reportLeadConversion();
       reset();
       setStatus('success');
     } catch {
