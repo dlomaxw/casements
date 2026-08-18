@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 import { SITE_URL } from '@/lib/seo';
 import { CORE_KEYWORDS } from '@/lib/seo-keywords';
+import GoogleAdsTag from '@/components/seo/GoogleAdsTag';
 import './globals.css';
 
 // Google Tag Manager container (public identifier, safe to commit)
@@ -58,6 +59,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </noscript>
         {children}
         {gaId && <GoogleAnalytics gaId={gaId} />}
+        {/* Google Ads global site tag */}
+        <GoogleAdsTag />
       </body>
     </html>
   );
