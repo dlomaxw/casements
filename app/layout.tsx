@@ -8,6 +8,10 @@ import './globals.css';
 // Google Tag Manager container (public identifier, safe to commit)
 const GTM_ID = 'GTM-KR7G24KQ';
 
+// GA4 measurement ID. Also public; NEXT_PUBLIC_GA_ID can override it per
+// environment, but the default means analytics work without extra config.
+const GA_ID = 'G-FVE7ZGGMM3';
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   alternates: { canonical: '/' },
@@ -41,7 +45,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  const gaId = process.env.NEXT_PUBLIC_GA_ID ?? GA_ID;
   return (
     <html lang="en">
       <body>
