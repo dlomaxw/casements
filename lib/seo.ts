@@ -1,6 +1,19 @@
 // Single source of truth for the canonical site URL.
-// Set NEXT_PUBLIC_SITE_URL in Vercel; falls back to the live domain.
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://casements.co.ug').replace(/\/$/, '');
+//
+// The canonical host is always the brand domain. NEXT_PUBLIC_SITE_URL can point
+// it elsewhere (a staging host, say), but a *.vercel.app value is ignored: those
+// are deployment addresses, and emitting them in canonicals, sitemap entries and
+// schema @ids tells Google the real site lives there instead of on casements.co.ug.
+const CANONICAL_HOST = 'https://casements.co.ug';
+
+function resolveSiteUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '');
+  if (!configured) return CANONICAL_HOST;
+  if (/\.vercel\.app$/i.test(new URL(configured).hostname)) return CANONICAL_HOST;
+  return configured;
+}
+
+export const SITE_URL = resolveSiteUrl();
 
 export const ORG = {
   name: 'Casements Africa Limited',
