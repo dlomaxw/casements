@@ -4,13 +4,14 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { can } from '@/lib/roles';
 import { uniqueSlug } from '@/lib/blog';
+import { externalUrl, mediaUrl } from '@/lib/validators';
 
 const patchSchema = z.object({
   title: z.string().min(3).optional(),
   excerpt: z.string().nullable().optional(),
   body: z.string().min(1).optional(),
-  coverImage: z.string().url().nullable().optional().or(z.literal('')),
-  videoUrl: z.string().url().nullable().optional().or(z.literal('')),
+  coverImage: mediaUrl.nullable().optional(),
+  videoUrl: externalUrl.nullable().optional(),
   category: z.string().optional(),
   status: z.enum(['DRAFT', 'PUBLISHED']).optional(),
 });
@@ -28,7 +29,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   if (!session || !can(session.user.role, 'manage_blog')) return Response.json({ error: 'Forbidden' }, { status: 403 });
 
   const parsed = patchSchema.safeParse(await request.json().catch(() => null));
-  if (!parsed.success) return Response.json({ error: 'Invalid input' }, { status: 400 });
+  if (!parsed.success) return Response.json({ error: 'Invalid input', issues: parsed.error.flatten() }, { status: 400 });
   const d = parsed.data;
 
   const existing = await prisma.post.findUnique({ where: { id: params.id } });

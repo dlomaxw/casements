@@ -21,6 +21,16 @@ const field =
   'w-full rounded-lg border border-outline-variant bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20';
 const label = 'mb-1 block font-mono text-xs font-medium uppercase tracking-wide text-on-surface-variant';
 
+// Field names as the writer sees them, for server-side validation errors.
+const LABELS: Record<string, string> = {
+  title: 'Title',
+  excerpt: 'Excerpt',
+  body: 'Body',
+  coverImage: 'Cover image',
+  videoUrl: 'Video link',
+  category: 'Category',
+};
+
 export default function PostEditor({ initial }: { initial?: Partial<PostData> }) {
   const router = useRouter();
   const editing = Boolean(initial?.id);
@@ -54,7 +64,13 @@ export default function PostEditor({ initial }: { initial?: Partial<PostData> })
       router.refresh();
     } else {
       const d = await res.json().catch(() => ({}));
-      setError(d.error ?? 'Could not save the post.');
+      // Name the offending field — "Invalid input" alone leaves the writer
+      // guessing which of six inputs the server rejected.
+      const fields: Record<string, string[]> = d.issues?.fieldErrors ?? {};
+      const detail = Object.entries(fields)
+        .map(([field, msgs]) => `${LABELS[field] ?? field}: ${msgs.join(', ')}`)
+        .join(' · ');
+      setError(detail || d.error || 'Could not save the post.');
     }
   };
 

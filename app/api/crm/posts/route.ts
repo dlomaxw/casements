@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { can } from '@/lib/roles';
 import { uniqueSlug } from '@/lib/blog';
+import { externalUrl, mediaUrl } from '@/lib/validators';
 
 // GET /api/crm/posts — list all posts (draft + published). Requires manage_blog.
 export async function GET() {
@@ -22,8 +23,8 @@ const createSchema = z.object({
   title: z.string().min(3),
   excerpt: z.string().optional(),
   body: z.string().min(1),
-  coverImage: z.string().url().optional().or(z.literal('')),
-  videoUrl: z.string().url().optional().or(z.literal('')),
+  coverImage: mediaUrl.optional(),
+  videoUrl: externalUrl.optional(),
   category: z.string().optional(),
   status: z.enum(['DRAFT', 'PUBLISHED']).default('DRAFT'),
 });
