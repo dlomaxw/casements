@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import Icon from './Icon';
+import { downscaleImage } from '@/lib/downscale';
 
 const field =
   'w-full rounded-lg border border-outline-variant bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20';
@@ -19,16 +20,34 @@ export default function ImageUploadField({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
 
-  const onFile = async (file: File) => {
+  const onFile = async (original: File) => {
     setError('');
     setUploading(true);
-    const fd = new FormData();
-    fd.append('file', file);
-    const res = await fetch('/api/crm/upload', { method: 'POST', body: fd });
-    setUploading(false);
-    const data = await res.json().catch(() => ({}));
-    if (res.ok && data.url) onChange(data.url);
-    else setError(data.error ?? 'Upload failed');
+    try {
+      // Shrink first: a phone photo is usually far larger than the platform
+      // will accept, and the failure it produces is unreadable.
+      const file = await downscaleImage(original);
+
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/crm/upload', { method: 'POST', body: fd });
+
+      // A body rejected by the platform never reaches our route, so the
+      // response isn't JSON — say something useful instead of "undefined".
+      const data = await res.json().catch(() => null);
+
+      if (res.ok && data?.url) {
+        onChange(data.url);
+      } else if (res.status === 413) {
+        setError('That image is too large to upload. Try one under 4MB.');
+      } else {
+        setError(data?.error ?? `Upload failed (${res.status}). Please try again.`);
+      }
+    } catch {
+      setError('Upload failed — check your connection and try again.');
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (

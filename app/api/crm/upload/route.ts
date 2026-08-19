@@ -17,7 +17,12 @@ export async function POST(request: Request) {
   const form = await request.formData().catch(() => null);
   const file = form?.get('file');
   if (!(file instanceof File)) return Response.json({ error: 'No file provided' }, { status: 400 });
-  if (file.size > 8 * 1024 * 1024) return Response.json({ error: 'File too large (max 8MB)' }, { status: 400 });
+  // Vercel rejects request bodies over ~4.5MB before this handler runs, so a
+  // higher limit here would be a promise the platform doesn't keep. The CRM
+  // downscales images in the browser first, so this is rarely hit.
+  if (file.size > 4 * 1024 * 1024) {
+    return Response.json({ error: 'File too large (max 4MB after resizing)' }, { status: 400 });
+  }
 
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
   const pathname = `casements/${Date.now()}-${safeName}`;
