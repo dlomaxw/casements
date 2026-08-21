@@ -177,6 +177,26 @@ export const PRODUCT_KEYWORDS: Record<string, string[]> = {
     'blinds installation Kampala',
     'roller blind prices Uganda',
   ],
+  // subItems: Lever & Pull Handles, Mortise Locks, Euro Cylinders, Hinges,
+  // Closers, Floor Springs, Multipoint Locking, Panic Exit, Glass & Sliding
+  // Door Hardware, Smart Locks, Privacy Hardware, Escutcheons, Accessories.
+  'door-hardware': [
+    'door hardware Uganda',
+    'door handles Kampala',
+    'lever handles Uganda',
+    'pull handles Kampala',
+    'mortise locks Uganda',
+    'door locks Kampala',
+    'euro cylinder Uganda',
+    'door closers Uganda',
+    'floor springs Kampala',
+    'panic bars Uganda',
+    'glass door fittings Uganda',
+    'multipoint lock Uganda',
+    'smart locks Kampala',
+    'door hinges Uganda',
+    'architectural hardware Uganda',
+  ],
 };
 
 /** Merge core terms with a product's own set, de-duplicated, order preserved. */

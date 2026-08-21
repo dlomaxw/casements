@@ -14,6 +14,7 @@ export const PRODUCT_TYPES = [
   'Railings',
   'Interior Design',
   'Blinds',
+  'Hardware',
   'Other',
 ] as const;
 
