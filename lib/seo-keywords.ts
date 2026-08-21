@@ -160,6 +160,23 @@ export const PRODUCT_KEYWORDS: Record<string, string[]> = {
     'uniport price Uganda',
     'modular housing Uganda',
   ],
+  // subItems: Blackout / Sunscreen / Translucent / Light-Filtering / Dual
+  // (Zebra) blinds, manual chain, motorised, custom commercial, installation.
+  'roller-blinds': [
+    'roller blinds Uganda',
+    'roller blinds Kampala',
+    'blackout blinds Uganda',
+    'sunscreen blinds Kampala',
+    'zebra blinds Uganda',
+    'dual roller blinds Kampala',
+    'translucent blinds Uganda',
+    'light filtering blinds Uganda',
+    'office blinds Kampala',
+    'window blinds Uganda',
+    'motorised blinds Uganda',
+    'blinds installation Kampala',
+    'roller blind prices Uganda',
+  ],
 };
 
 /** Merge core terms with a product's own set, de-duplicated, order preserved. */

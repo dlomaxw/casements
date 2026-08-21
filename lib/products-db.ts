@@ -13,6 +13,7 @@ export const PRODUCT_TYPES = [
   'Partitions',
   'Railings',
   'Interior Design',
+  'Blinds',
   'Other',
 ] as const;
 
