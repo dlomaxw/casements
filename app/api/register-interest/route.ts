@@ -4,8 +4,10 @@ import { clientIp, rateLimit } from '@/lib/rate-limit';
 
 const schema = z.object({
   name: z.string().min(2),
+  // Arrives in E.164 from the modal, which validates length per country.
   phone: z.string().min(5),
   email: z.string().email().optional().or(z.literal('')),
+  country: z.string().max(60).optional(),
 });
 
 export async function POST(request: Request) {
@@ -18,7 +20,7 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Invalid input', issues: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { name, phone, email } = parsed.data;
+  const { name, phone, email, country } = parsed.data;
 
   // Capture the interest as a CRM lead first — nothing is ever lost even if
   // email delivery isn't configured (RESEND_API_KEY).
@@ -28,7 +30,9 @@ export async function POST(request: Request) {
       phone,
       email: email || undefined,
       productCategory: 'general-enquiry',
-      message: 'Registered interest via homepage popup.',
+      message: country
+        ? `Registered interest via homepage popup. Country: ${country}.`
+        : 'Registered interest via homepage popup.',
       sourcePage: request.headers.get('referer') ?? undefined,
     });
     const rep = await assignLeadToRep(lead.id, 'general-enquiry');

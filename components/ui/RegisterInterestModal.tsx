@@ -1,7 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { COUNTRIES, DEFAULT_COUNTRY, checkPhone, detectCountry, findCountry } from '@/lib/countries';
 
 interface Props {
   phone: string;
@@ -14,7 +15,13 @@ const SESSION_KEY = 'casements_interest_shown';
 export default function RegisterInterestModal({ phone, phoneHref, email }: Props) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: '', phone: '', email: '' });
+  const [countryIso, setCountryIso] = useState(DEFAULT_COUNTRY);
+  const [touchedPhone, setTouchedPhone] = useState(false);
+  const [nameError, setNameError] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const country = findCountry(countryIso);
+  const phoneCheck = useMemo(() => checkPhone(form.phone, country), [form.phone, country]);
 
   const whatsappHref = `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(
     "Hello Casements, I'd like to register my interest.",
@@ -42,13 +49,19 @@ export default function RegisterInterestModal({ phone, phoneHref, email }: Props
   const close = () => setOpen(false);
 
   const submit = async () => {
-    if (!form.name || !form.phone) return;
+    // Surface problems on click rather than disabling the button: a dead
+    // button tells the visitor nothing about what is wrong.
+    setTouchedPhone(true);
+    setNameError(form.name.trim().length < 2 ? 'Please enter your name.' : '');
+    if (form.name.trim().length < 2 || !phoneCheck.valid) return;
     setStatus('loading');
     try {
       const res = await fetch('/api/register-interest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        // Send the number in E.164 so the CRM and WhatsApp both get a dialable
+        // value, whatever format the visitor typed.
+        body: JSON.stringify({ ...form, phone: phoneCheck.e164, country: country.name }),
       });
       if (!res.ok) throw new Error('Request failed');
       if (typeof window !== 'undefined' && (window as any).gtag) {
@@ -64,6 +77,11 @@ export default function RegisterInterestModal({ phone, phoneHref, email }: Props
 
   const field =
     'w-full rounded-md border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 placeholder:text-brand-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200';
+
+  // Only complain once they've left the field or tried to submit.
+  const showPhoneError = touchedPhone && !phoneCheck.valid;
+  const phoneDigitHint =
+    country.min === country.max ? `${country.min} digits` : `${country.min}–${country.max} digits`;
 
   return (
     <div
@@ -123,18 +141,74 @@ export default function RegisterInterestModal({ phone, phoneHref, email }: Props
               </div>
 
               <div className="space-y-3">
-                <input
-                  className={field}
-                  placeholder="Full name *"
-                  value={form.name}
-                  onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                />
-                <input
-                  className={field}
-                  placeholder="Phone number *"
-                  value={form.phone}
-                  onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
-                />
+                <div>
+                  <input
+                    className={`${field} ${nameError ? 'border-red-400' : ''}`}
+                    placeholder="Full name *"
+                    aria-invalid={Boolean(nameError)}
+                    value={form.name}
+                    onChange={(e) => {
+                      setForm((p) => ({ ...p, name: e.target.value }));
+                      if (nameError) setNameError('');
+                    }}
+                  />
+                  {nameError && <p className="mt-1 text-[11px] text-red-600">{nameError}</p>}
+                </div>
+                <div>
+                  <label className="sr-only" htmlFor="ri-country">Country</label>
+                  <select
+                    id="ri-country"
+                    className={`${field} mb-2`}
+                    value={countryIso}
+                    onChange={(e) => setCountryIso(e.target.value)}
+                  >
+                    {COUNTRIES.map((c) => (
+                      <option key={c.iso} value={c.iso}>
+                        {c.flag} {c.name} (+{c.dial})
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Dial code sits outside the input so the visitor only ever
+                      types their own national number. */}
+                  <div
+                    className={`flex items-stretch overflow-hidden rounded-md border bg-white focus-within:ring-2 ${
+                      showPhoneError
+                        ? 'border-red-400 focus-within:border-red-500 focus-within:ring-red-100'
+                        : 'border-brand-200 focus-within:border-brand-500 focus-within:ring-brand-200'
+                    }`}
+                  >
+                    <span className="flex select-none items-center gap-1.5 border-r border-brand-100 bg-brand-50 px-3 text-sm font-semibold text-brand-800">
+                      <span aria-hidden>{country.flag}</span>+{country.dial}
+                    </span>
+                    <input
+                      className="w-full bg-transparent px-3 py-3 text-sm text-brand-900 placeholder:text-brand-400 focus:outline-none"
+                      inputMode="tel"
+                      autoComplete="tel-national"
+                      aria-invalid={showPhoneError}
+                      aria-describedby="ri-phone-hint"
+                      placeholder={`Phone number * (${phoneDigitHint})`}
+                      value={form.phone}
+                      onBlur={() => setTouchedPhone(true)}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        // Someone pasting +254… should land on Kenya, not be
+                        // told their Kenyan number is a bad Ugandan one.
+                        const detected = detectCountry(v);
+                        if (detected && detected !== countryIso) setCountryIso(detected);
+                        setForm((p) => ({ ...p, phone: v }));
+                      }}
+                    />
+                  </div>
+                  <p
+                    id="ri-phone-hint"
+                    className={`mt-1 text-[11px] ${showPhoneError ? 'text-red-600' : 'text-brand-800/60'}`}
+                  >
+                    {showPhoneError
+                      ? phoneCheck.error
+                      : `Enter it with or without the leading 0 — we'll send it as ${phoneCheck.valid ? phoneCheck.e164 : `+${country.dial}…`}`}
+                  </p>
+                </div>
                 <input
                   className={field}
                   type="email"
@@ -150,7 +224,7 @@ export default function RegisterInterestModal({ phone, phoneHref, email }: Props
 
               <button
                 onClick={submit}
-                disabled={status === 'loading' || !form.name || !form.phone}
+                disabled={status === 'loading'}
                 className="w-full rounded-md bg-accent-500 px-6 py-3 text-sm font-semibold text-brand-950 transition hover:bg-accent-400 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {status === 'loading' ? 'Sending…' : 'Register My Interest'}
