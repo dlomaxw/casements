@@ -6,6 +6,7 @@ import { prisma } from '@/lib/db';
 import { getProductBySlug } from '@/lib/products';
 import { can } from '@/lib/roles';
 import LeadsTable from '@/components/crm/LeadsTable';
+import LeadReportBar from '@/components/crm/LeadReportBar';
 import Icon from '@/components/crm/Icon';
 
 export const dynamic = 'force-dynamic';
@@ -105,6 +106,8 @@ export default async function LeadsPage({
           Filter
         </button>
       </form>
+
+      <LeadReportBar status={status} category={category} q={q} />
 
       <LeadsTable leads={leads} />
 
