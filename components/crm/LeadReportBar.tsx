@@ -16,7 +16,7 @@ export default function LeadReportBar({ status, category, q }: Props) {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
 
-  const href = (() => {
+  const params = (() => {
     const sp = new URLSearchParams({ period });
     if (period === 'custom') {
       if (from) sp.set('from', from);
@@ -25,8 +25,12 @@ export default function LeadReportBar({ status, category, q }: Props) {
     if (status) sp.set('status', status);
     if (category) sp.set('category', category);
     if (q) sp.set('q', q);
-    return `/api/crm/leads/report?${sp}`;
+    return sp;
   })();
+
+  const csvHref = `/api/crm/leads/report?${params}`;
+  const docHref = `/api/crm/leads/report?${params}&format=doc`;
+  const pdfHref = `/crm/leads/report?${params}`;
 
   const filtered = [status && `status ${status}`, category && `category ${category}`, q && `search “${q}”`]
     .filter(Boolean)
@@ -64,20 +68,37 @@ export default function LeadReportBar({ status, category, q }: Props) {
           </div>
         )}
 
-        {/* A plain link, so the browser handles the download natively. */}
-        <a
-          href={href}
-          download
-          className="flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 font-mono text-xs font-semibold uppercase tracking-wide text-white hover:opacity-90 sm:ml-auto"
-        >
-          <Icon name="table_view" className="text-[18px]" />
-          Export CSV
-        </a>
+        {/* Plain links, so the browser handles each download natively. */}
+        <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+          <a
+            href={pdfHref}
+            className="flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 font-mono text-xs font-semibold uppercase tracking-wide text-white hover:opacity-90"
+          >
+            <Icon name="picture_as_pdf" className="text-[18px]" />
+            PDF
+          </a>
+          <a
+            href={docHref}
+            download
+            className="flex items-center justify-center gap-2 rounded-lg border border-outline-variant bg-white px-4 py-2.5 font-mono text-xs font-semibold uppercase tracking-wide text-industrial-blue hover:border-safety-orange"
+          >
+            <Icon name="description" className="text-[18px]" />
+            Word
+          </a>
+          <a
+            href={csvHref}
+            download
+            className="flex items-center justify-center gap-2 rounded-lg border border-outline-variant bg-white px-4 py-2.5 font-mono text-xs font-semibold uppercase tracking-wide text-industrial-blue hover:border-safety-orange"
+          >
+            <Icon name="table_view" className="text-[18px]" />
+            CSV
+          </a>
+        </div>
       </div>
 
       <p className="mt-3 font-mono text-[11px] text-on-surface-variant">
-        Every field is included: contact details, product, size, timeline, status, owner, follow-up date, message,
-        notes and activity count.
+        PDF and Word give a formatted, branded report. CSV is the raw data for spreadsheets — phone numbers are
+        written as text so Excel keeps the leading zero.
         {filtered ? ` Current filters apply — ${filtered}.` : ' No filters applied — all leads in the period.'}
       </p>
     </div>

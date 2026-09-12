@@ -5,8 +5,11 @@ import { prisma } from '@/lib/db';
 import { can } from '@/lib/roles';
 import { getProductNav } from '@/lib/products-db';
 import {
+  PERIOD_LABELS,
   REPORT_PERIODS,
   leadsToCsv,
+  leadsToHtmlDocument,
+  reportDocFilename,
   reportFilename,
   resolveRange,
   type ReportPeriod,
@@ -74,8 +77,27 @@ export async function GET(request: Request) {
   ]);
 
   const productTitles = Object.fromEntries(nav.map((p) => [p.slug, p.title]));
-  const csv = leadsToCsv(leads, productTitles);
+  const filters = [status && `status ${status}`, category, q && `search "${q}"`].filter(Boolean).join(' · ');
 
+  // Word opens an HTML document saved as .doc, so a formatted, branded report
+  // needs no document library — and phone numbers stay text, unlike in CSV.
+  if (url.searchParams.get('format') === 'doc') {
+    const html = leadsToHtmlDocument(leads, productTitles, {
+      periodLabel: period === 'custom' ? `${from ?? 'start'} to ${to ?? 'today'}` : PERIOD_LABELS[period],
+      generatedBy: session.user.name ?? session.user.email ?? 'CRM',
+      filters: filters || undefined,
+    });
+    return new Response(html, {
+      headers: {
+        'Content-Type': 'application/msword; charset=utf-8',
+        'Content-Disposition': `attachment; filename="${reportDocFilename(period, from, to)}"`,
+        'Cache-Control': 'no-store',
+        'X-Lead-Count': String(leads.length),
+      },
+    });
+  }
+
+  const csv = leadsToCsv(leads, productTitles);
   return new Response(csv, {
     headers: {
       'Content-Type': 'text/csv; charset=utf-8',
