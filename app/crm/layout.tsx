@@ -37,12 +37,24 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
   const showCategories = can(role, 'view_leads');
   const productNav = showCategories ? await getProductNav() : [];
 
-  let newLeads = 0;
+  // The header badge counts work that has stalled — overdue actions, leads with
+  // no action set, and new leads nobody has contacted — not merely new arrivals.
+  let needsAttention = 0;
   if (showCategories) {
-    newLeads = await prisma.lead.count({
+    const scope = role === 'ADMIN' || role === 'MANAGER' ? {} : { assignedToId: session.user.id };
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
+    needsAttention = await prisma.lead.count({
       where: {
-        status: 'NEW',
-        ...(role === 'ADMIN' || role === 'MANAGER' ? {} : { assignedToId: session.user.id }),
+        ...scope,
+        status: { notIn: ['WON', 'LOST', 'DISQUALIFIED'] },
+        OR: [
+          { nextActionDate: { lte: endOfToday } },
+          { nextActionDate: null },
+          { firstResponseAt: null },
+        ],
       },
     });
   }
@@ -50,6 +62,7 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
   const mainNav: MainNavItem[] = [
     { href: '/crm', icon: 'home', label: 'Dashboard' },
     ...(can(role, 'view_leads') ? [{ href: '/crm/leads', icon: 'person', label: 'Leads' }] : []),
+    ...(can(role, 'view_leads') ? [{ href: '/crm/leads/board', icon: 'view_kanban', label: 'Pipeline board' }] : []),
     ...(can(role, 'view_leads')
       ? [{ href: 'http://favourwings.com/quotations/quotation_system/', icon: 'request_quote', label: 'Quotation System', external: true }]
       : []),
@@ -82,12 +95,12 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
             </Link>
 
             <div className="flex items-center gap-3">
-              {newLeads > 0 && (
-                <Link href="/crm/leads?status=NEW" className="relative flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high"
-                  aria-label={`${newLeads} new leads`}>
+              {needsAttention > 0 && (
+                <Link href="/crm/leads?attention=overdue" className="relative flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high"
+                  aria-label={`${needsAttention} leads need attention`}>
                   <Icon name="notifications" />
                   <span className="absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-safety-orange px-1 text-[10px] font-bold text-white">
-                    {newLeads}
+                    {needsAttention}
                   </span>
                 </Link>
               )}

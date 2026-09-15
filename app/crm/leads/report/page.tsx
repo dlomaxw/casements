@@ -15,7 +15,9 @@ import PrintButton from '@/components/crm/PrintButton';
 
 export const dynamic = 'force-dynamic';
 
-const STATUSES: LeadStatus[] = ['NEW', 'CONTACTED', 'SITE_ASSESSED', 'QUOTED', 'WON', 'LOST'];
+const STATUSES: LeadStatus[] = [
+  'NEW', 'CONTACTED', 'QUALIFIED', 'SITE_ASSESSED', 'QUOTED', 'WON', 'LOST', 'DISQUALIFIED',
+];
 
 /**
  * Print-ready lead report. "Save as PDF" in the browser's print dialog produces

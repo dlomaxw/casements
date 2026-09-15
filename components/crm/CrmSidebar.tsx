@@ -36,7 +36,12 @@ export default function CrmSidebar({ products, mainNav }: { products: ProductNav
       <nav className="flex-1 overflow-y-auto py-4">
         {mainNav.map((item) => {
           // "/crm" must match exactly; every other entry matches its subtree.
-          const active = !item.external && (item.href === '/crm' ? pathname === '/crm' : pathname.startsWith(item.href));
+          // The longest match wins, so /crm/leads/board does not also light up
+          // the /crm/leads row.
+          const matches = mainNav
+            .filter((i) => !i.external && (i.href === '/crm' ? pathname === '/crm' : pathname.startsWith(i.href)))
+            .sort((a, b) => b.href.length - a.href.length);
+          const active = !item.external && matches[0]?.href === item.href;
           return (
             <Link
               key={item.href}

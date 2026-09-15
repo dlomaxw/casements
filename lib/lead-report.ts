@@ -1,6 +1,14 @@
 import type { Lead, LeadStatus, ProjectSize } from '@prisma/client';
 
 /** Report periods offered in the CRM. */
+import {
+  LOSS_REASON_LABELS,
+  SOURCE_LABELS,
+  formatUgx,
+  missingQualification,
+  responseHours,
+} from '@/lib/pipeline';
+
 export const REPORT_PERIODS = ['today', '7d', '30d', 'month', 'custom', 'all'] as const;
 export type ReportPeriod = (typeof REPORT_PERIODS)[number];
 
@@ -81,10 +89,12 @@ export function resolveRange(
 const STATUS_LABELS: Record<LeadStatus, string> = {
   NEW: 'New',
   CONTACTED: 'Contacted',
+  QUALIFIED: 'Qualified',
   SITE_ASSESSED: 'Site assessed',
   QUOTED: 'Quoted',
   WON: 'Won',
   LOST: 'Lost',
+  DISQUALIFIED: 'Disqualified',
 };
 
 const SIZE_LABELS: Record<ProjectSize, string> = {
@@ -145,9 +155,18 @@ const COLUMNS = [
   'Product',
   'Project size',
   'Timeline',
-  'Status',
+  'Stage',
+  'Source',
+  'Source detail',
   'Assigned to',
   'Assigned email',
+  'Next action',
+  'Next action date',
+  'Loss reason',
+  'Deal value (UGX)',
+  'Qualified',
+  'Contact attempts',
+  'First response (hrs)',
   'Follow-up date',
   'Source page',
   'Message',
@@ -177,8 +196,17 @@ export function leadsToCsv(leads: ReportLead[], productTitles: Record<string, st
       l.projectSize ? SIZE_LABELS[l.projectSize] : '',
       l.timeline ?? '',
       STATUS_LABELS[l.status],
+      l.source ? SOURCE_LABELS[l.source as keyof typeof SOURCE_LABELS] ?? l.source : '',
+      l.sourceDetail ?? '',
       l.assignedTo?.name ?? 'Unassigned',
       l.assignedTo?.email ?? '',
+      l.nextAction ?? '',
+      fmtDate(l.nextActionDate),
+      l.lossReason ? LOSS_REASON_LABELS[l.lossReason as keyof typeof LOSS_REASON_LABELS] ?? l.lossReason : '',
+      l.dealValue == null ? '' : String(l.dealValue),
+      missingQualification(l).length === 0 ? 'Yes' : 'No',
+      l.contactAttempts ?? 0,
+      responseHours(l) === null ? '' : (responseHours(l) as number).toFixed(1),
       fmtDate(l.followUpDate),
       l.sourcePage ?? '',
       l.message ?? '',
@@ -231,8 +259,16 @@ export function summarise(leads: ReportLead[], titles: Record<string, string>) {
     byStatus: by((l) => STATUS_LABELS[l.status]),
     byProduct: by((l) => productLabel(l, titles)),
     byOwner: by((l) => l.assignedTo?.name ?? 'Unassigned'),
+    bySource: by((l) =>
+      l.source ? SOURCE_LABELS[l.source as keyof typeof SOURCE_LABELS] ?? l.source : 'Unknown',
+    ),
+    byLossReason: by((l) =>
+      l.lossReason ? LOSS_REASON_LABELS[l.lossReason as keyof typeof LOSS_REASON_LABELS] ?? l.lossReason : '',
+    ).filter(([k]) => k !== ''),
     withPhone: leads.filter((l) => (l.phone ?? '').replace(/\D/g, '').length >= 7).length,
     withEmail: leads.filter((l) => (l.email ?? '').includes('@')).length,
+    qualified: leads.filter((l) => missingQualification(l).length === 0).length,
+    pipelineValue: leads.reduce((sum, l) => sum + Number(l.dealValue ?? 0), 0),
   };
 }
 
@@ -263,8 +299,18 @@ export function leadsToHtmlBody(
       <td>${esc(productLabel(l, titles))}</td>
       <td>${esc(l.projectSize ? SIZE_LABELS[l.projectSize] : '—')}</td>
       <td>${esc(STATUS_LABELS[l.status])}</td>
+      <td>${esc(l.source ? SOURCE_LABELS[l.source as keyof typeof SOURCE_LABELS] ?? l.source : '—')}</td>
       <td>${esc(l.assignedTo?.name ?? 'Unassigned')}</td>
-      <td>${esc(l.followUpDate ? fmtDate(l.followUpDate) : '—')}</td>
+      <td>${
+        l.lossReason
+          ? esc(LOSS_REASON_LABELS[l.lossReason as keyof typeof LOSS_REASON_LABELS] ?? l.lossReason)
+          : esc(l.nextAction ?? '—')
+      }${
+        l.nextActionDate && !l.lossReason
+          ? `<div style="color:#6b7280;font-size:8pt">${fmtDate(l.nextActionDate)}</div>`
+          : ''
+      }</td>
+      <td align="right">${l.dealValue == null ? '—' : esc(formatUgx(l.dealValue))}</td>
       <td style="font-size:8.5pt">${esc(l.message ?? '')}${
         l.notes ? `<div style="color:#1f7a3d;margin-top:3px"><b>Note:</b> ${esc(l.notes)}</div>` : ''
       }</td>
@@ -285,11 +331,19 @@ export function leadsToHtmlBody(
     <div style="background:#f0f7f2;border:1px solid #cfe5d7;padding:10px 12px;margin-bottom:16px">
       <div style="font-size:14pt;font-weight:bold;color:#14572c">${s.total} leads</div>
       <div style="font-size:10pt;color:#374151;margin:6px 0">
-        ${s.withPhone} with a phone number · ${s.withEmail} with an email
+        ${s.withPhone} with a phone number · ${s.withEmail} with an email · ${s.qualified} fully qualified${
+          s.pipelineValue > 0 ? ` · ${esc(formatUgx(s.pipelineValue))} total value` : ''
+        }
       </div>
       <div style="margin-top:8px"><b style="font-size:10pt;color:#14572c">By status</b><br>${chip(s.byStatus)}</div>
       <div style="margin-top:6px"><b style="font-size:10pt;color:#14572c">By product</b><br>${chip(s.byProduct.slice(0, 8))}</div>
       <div style="margin-top:6px"><b style="font-size:10pt;color:#14572c">By owner</b><br>${chip(s.byOwner)}</div>
+      <div style="margin-top:6px"><b style="font-size:10pt;color:#14572c">By source</b><br>${chip(s.bySource)}</div>
+      ${
+        s.byLossReason.length > 0
+          ? `<div style="margin-top:6px"><b style="font-size:10pt;color:#14572c">Why closed</b><br>${chip(s.byLossReason)}</div>`
+          : ''
+      }
     </div>
 
     <table border="1" cellspacing="0" cellpadding="5"
@@ -298,11 +352,12 @@ export function leadsToHtmlBody(
         <tr style="background:#1f7a3d;color:#fff;font-size:9pt">
           <th align="left">Date</th><th align="left">Name</th><th align="left">Phone</th>
           <th align="left">Email</th><th align="left">Product</th><th align="left">Size</th>
-          <th align="left">Status</th><th align="left">Owner</th><th align="left">Follow-up</th>
+          <th align="left">Stage</th><th align="left">Source</th><th align="left">Owner</th>
+          <th align="left">Next action / reason</th><th align="left">Value</th>
           <th align="left">Message / notes</th>
         </tr>
       </thead>
-      <tbody>${body || '<tr><td colspan="10" align="center">No leads in this period.</td></tr>'}</tbody>
+      <tbody>${body || '<tr><td colspan="12" align="center">No leads in this period.</td></tr>'}</tbody>
     </table>
 
     <div style="margin-top:14px;font-size:8pt;color:#6b7280">

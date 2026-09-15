@@ -2,44 +2,85 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireSession } from '@/lib/session';
 import { prisma } from '@/lib/db';
-import LeadStatusForm from '@/components/crm/LeadStatusForm';
-import ReassignForm from '@/components/crm/ReassignForm';
-import Icon from '@/components/crm/Icon';
 import { can } from '@/lib/roles';
+import { getProductNav } from '@/lib/products-db';
+import { findPossibleDuplicates } from '@/lib/leads-query';
+import {
+  ATTENTION_LABELS,
+  BUDGET_LABELS,
+  DECISION_LABELS,
+  LOSS_REASON_LABELS,
+  OUTCOME_LABELS,
+  RESPONSE_SLA_HOURS,
+  SOURCE_LABELS,
+  STAGE_LABELS,
+  URGENCY_LABELS,
+  attentionState,
+  formatUgx,
+  isClosed,
+  responseHours,
+  type Stage,
+} from '@/lib/pipeline';
+import PipelineForm from '@/components/crm/lead/PipelineForm';
+import ContactStrip from '@/components/crm/lead/ContactStrip';
+import LeadDetailsForm from '@/components/crm/lead/LeadDetailsForm';
+import DuplicateNotice from '@/components/crm/lead/DuplicateNotice';
+import Icon from '@/components/crm/Icon';
 
 export const dynamic = 'force-dynamic';
+
+const iso = (d: Date | null) => (d ? d.toISOString() : null);
 
 export default async function LeadDetailPage({ params }: { params: { id: string } }) {
   const session = await requireSession();
   if (!can(session.user.role, 'view_leads')) notFound();
-  const isAdmin = can(session.user.role, 'assign_leads');
+  const canAssign = can(session.user.role, 'assign_leads');
 
   const lead = await prisma.lead.findUnique({
     where: { id: params.id },
     include: {
-      assignedTo: { select: { name: true, email: true } },
+      assignedTo: { select: { id: true, name: true, email: true } },
+      duplicateOf: { select: { id: true, fullName: true } },
       activities: { orderBy: { createdAt: 'desc' } },
     },
   });
   if (!lead) notFound();
-  // §17: reps can only open their own leads
-  if (!isAdmin && lead.assignedToId !== session.user.id) notFound();
+  // Reps can only open their own leads
+  if (!canAssign && lead.assignedToId !== session.user.id) notFound();
 
-  // Admins can reassign — load the active team for the picker
-  const reps = isAdmin
-    ? await prisma.user.findMany({
-        where: { active: true, role: { in: ['ADMIN', 'MANAGER', 'SALES_REP'] } },
-        orderBy: { name: 'asc' },
-        select: { id: true, name: true, role: true },
-      })
-    : [];
+  const [reps, categories, duplicates] = await Promise.all([
+    canAssign
+      ? prisma.user.findMany({
+          where: { active: true, role: { in: ['ADMIN', 'MANAGER', 'SALES_REP'] } },
+          orderBy: { name: 'asc' },
+          select: { id: true, name: true, role: true },
+        })
+      : Promise.resolve(
+          lead.assignedTo ? [{ id: lead.assignedTo.id, name: lead.assignedTo.name, role: 'SALES_REP' }] : [],
+        ),
+    getProductNav(),
+    lead.duplicateOfId
+      ? Promise.resolve([])
+      : findPossibleDuplicates({
+          phone: lead.phone,
+          email: lead.email,
+          fullName: lead.fullName,
+          excludeId: lead.id,
+        }),
+  ]);
 
-  const detail = (label: string, value?: string | null) => (
-    <div>
-      <dt className="font-mono text-[11px] uppercase tracking-wide text-outline">{label}</dt>
-      <dd className="mt-0.5 text-sm text-on-surface">{value || '—'}</dd>
-    </div>
-  );
+  const attention = attentionState(lead);
+  const hours = responseHours(lead);
+  const closed = isClosed(lead.status);
+
+  const qualification: [string, string | null][] = [
+    ['What they need', lead.qualNeed],
+    ['Site location', lead.qualLocation],
+    ['Budget', lead.qualBudget ? BUDGET_LABELS[lead.qualBudget as keyof typeof BUDGET_LABELS] ?? lead.qualBudget : null],
+    ['Urgency', lead.qualUrgency ? URGENCY_LABELS[lead.qualUrgency as keyof typeof URGENCY_LABELS] ?? lead.qualUrgency : null],
+    ['Decision', lead.qualDecision ? DECISION_LABELS[lead.qualDecision as keyof typeof DECISION_LABELS] ?? lead.qualDecision : null],
+  ];
+  const answered = qualification.filter(([, v]) => v).length;
 
   return (
     <div>
@@ -47,57 +88,139 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
         <Icon name="arrow_back" className="text-[16px]" /> Back to leads
       </Link>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+      {/* Header */}
+      <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="font-work text-2xl font-semibold text-industrial-blue">{lead.fullName}</h1>
-          <p className="mt-1 font-mono text-xs text-on-surface-variant">
-            Created {new Date(lead.createdAt).toLocaleString()} · Status <span className="font-semibold text-primary">{lead.status}</span>
+          <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs text-on-surface-variant">
+            <span className="rounded bg-industrial-blue px-2 py-0.5 font-semibold text-white">
+              {STAGE_LABELS[lead.status as Stage] ?? lead.status}
+            </span>
+            <span>{lead.source ? SOURCE_LABELS[lead.source as keyof typeof SOURCE_LABELS] ?? lead.source : 'No source'}</span>
+            <span>·</span>
+            <span>{lead.assignedTo?.name ?? 'No owner'}</span>
+            <span>·</span>
+            <span>Captured {new Date(lead.createdAt).toLocaleDateString()}</span>
+            {lead.dealValue != null && (
+              <>
+                <span>·</span>
+                <span className="font-semibold text-primary">{formatUgx(lead.dealValue)}</span>
+              </>
+            )}
           </p>
         </div>
-        {lead.phone ? (
-          <a href={`tel:${lead.phone}`} className="flex items-center gap-2 rounded-lg bg-industrial-blue px-5 py-2.5 font-mono text-xs font-semibold uppercase tracking-wide text-white hover:opacity-90">
-            <Icon name="call" className="text-[18px]" /> Call {lead.phone}
-          </a>
-        ) : lead.email ? (
-          <a href={`mailto:${lead.email}`} className="flex items-center gap-2 rounded-lg bg-industrial-blue px-5 py-2.5 font-mono text-xs font-semibold uppercase tracking-wide text-white hover:opacity-90">
-            <Icon name="mail" className="text-[18px]" /> Email
-          </a>
-        ) : null}
       </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-8">
+      {/* Why this lead needs attention today */}
+      {attention !== 'ok' && (
+        <p className="mt-4 flex items-center gap-2 rounded-lg border border-safety-orange bg-safety-orange/10 px-4 py-2.5 font-mono text-xs font-semibold text-industrial-blue">
+          <Icon name="priority_high" className="text-safety-orange" />
+          {ATTENTION_LABELS[attention]}
+          {attention === 'overdue' && lead.nextActionDate
+            ? ` — "${lead.nextAction}" was due ${new Date(lead.nextActionDate).toLocaleDateString()}`
+            : ''}
+        </p>
+      )}
+
+      {/* Closed summary */}
+      {closed && lead.lossReason && (
+        <p className="mt-4 flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2.5 font-mono text-xs text-on-surface-variant">
+          <Icon name="block" className="text-error" />
+          {STAGE_LABELS[lead.status as Stage]} — {LOSS_REASON_LABELS[lead.lossReason as keyof typeof LOSS_REASON_LABELS] ?? lead.lossReason}
+          {lead.lossDetail ? `: ${lead.lossDetail}` : ''}
+          {lead.duplicateOf && (
+            <Link href={`/crm/leads/${lead.duplicateOf.id}`} className="text-primary hover:underline">
+              → {lead.duplicateOf.fullName}
+            </Link>
+          )}
+        </p>
+      )}
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
+          {!closed && (
+            <ContactStrip
+              leadId={lead.id}
+              fullName={lead.fullName}
+              phone={lead.phone}
+              email={lead.email}
+              contactAttempts={lead.contactAttempts}
+              lastContactedAt={iso(lead.lastContactedAt)}
+            />
+          )}
+
+          <DuplicateNotice
+            leadId={lead.id}
+            duplicates={duplicates.map((d) => ({
+              id: d.id,
+              fullName: d.fullName,
+              phone: d.phone,
+              email: d.email,
+              status: d.status,
+              createdAt: d.createdAt.toISOString(),
+              assignedTo: d.assignedTo?.name ?? null,
+            }))}
+          />
+
+          <LeadDetailsForm
+            lead={{
+              id: lead.id,
+              fullName: lead.fullName,
+              phone: lead.phone,
+              email: lead.email,
+              productCategory: lead.productCategory,
+              projectSize: lead.projectSize,
+              timeline: lead.timeline,
+              message: lead.message,
+            }}
+            categories={categories.map((c) => ({ slug: c.slug, title: c.title }))}
+          />
+
+          {/* Qualification summary */}
           <section className="rounded-xl border border-outline-variant bg-white p-6">
-            <h2 className="font-work font-semibold text-industrial-blue">Lead Details</h2>
+            <h2 className="flex items-center justify-between font-work font-semibold text-industrial-blue">
+              Qualification
+              <span className={`font-mono text-[11px] font-normal ${answered === 5 ? 'text-primary' : 'text-on-surface-variant'}`}>
+                {answered} of 5 answered
+              </span>
+            </h2>
             <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-              {detail('Phone', lead.phone)}
-              {detail('Email', lead.email)}
-              {detail('Product Category', lead.productCategory === 'general-enquiry' ? 'General enquiry' : lead.productCategory)}
-              {detail('Project Size', lead.projectSize)}
-              {detail('Timeline', lead.timeline)}
-              {detail('Source Page', lead.sourcePage)}
-              {detail('Assigned To', lead.assignedTo?.name)}
+              {qualification.map(([name, value]) => (
+                <div key={name}>
+                  <dt className="font-mono text-[11px] uppercase tracking-wide text-outline">{name}</dt>
+                  <dd className={`mt-0.5 text-sm ${value ? 'text-on-surface' : 'text-error'}`}>
+                    {value ?? 'Not established'}
+                  </dd>
+                </div>
+              ))}
             </dl>
-            {lead.message && (
-              <div className="mt-4">
-                <dt className="font-mono text-[11px] uppercase tracking-wide text-outline">Message</dt>
-                <dd className="mt-1 whitespace-pre-wrap text-sm text-on-surface">{lead.message}</dd>
-              </div>
-            )}
           </section>
 
+          {/* Activity */}
           <section className="rounded-xl border border-outline-variant bg-white p-6">
-            <h2 className="font-work font-semibold text-industrial-blue">Activity Log</h2>
+            <h2 className="font-work font-semibold text-industrial-blue">Activity log</h2>
             {lead.activities.length === 0 ? (
               <p className="mt-3 text-sm text-on-surface-variant">No activity yet.</p>
             ) : (
               <ul className="mt-4 space-y-4">
                 {lead.activities.map((a) => (
                   <li key={a.id} className="flex gap-3">
-                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-safety-orange" />
+                    <span
+                      className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
+                        a.type === 'CONTACT_ATTEMPT' ? 'bg-primary' : a.type === 'NOTE' ? 'bg-outline' : 'bg-safety-orange'
+                      }`}
+                    />
                     <div>
-                      <p className="text-sm text-on-surface">{a.note ?? a.type}</p>
-                      <p className="font-mono text-[11px] text-on-surface-variant">{a.type} · {new Date(a.createdAt).toLocaleString()}</p>
+                      <p className="text-sm text-on-surface">
+                        {a.outcome
+                          ? OUTCOME_LABELS[a.outcome as keyof typeof OUTCOME_LABELS] ?? a.outcome
+                          : a.note ?? a.type}
+                        {a.outcome && a.note ? ` — ${a.note}` : ''}
+                      </p>
+                      <p className="font-mono text-[11px] text-on-surface-variant">
+                        {a.actorName ? `${a.actorName} · ` : ''}
+                        {new Date(a.createdAt).toLocaleString()}
+                      </p>
                     </div>
                   </li>
                 ))}
@@ -106,15 +229,48 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
           </section>
         </div>
 
-        <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
-          <LeadStatusForm
-            leadId={lead.id}
-            currentStatus={lead.status}
-            currentFollowUp={lead.followUpDate ? lead.followUpDate.toISOString() : null}
+        {/* Right column */}
+        <div className="space-y-6">
+          <PipelineForm
+            lead={{
+              id: lead.id,
+              status: lead.status,
+              source: lead.source,
+              sourceDetail: lead.sourceDetail,
+              assignedToId: lead.assignedToId,
+              nextAction: lead.nextAction,
+              nextActionDate: iso(lead.nextActionDate),
+              lossReason: lead.lossReason,
+              lossDetail: lead.lossDetail,
+              qualNeed: lead.qualNeed,
+              qualLocation: lead.qualLocation,
+              qualBudget: lead.qualBudget,
+              qualUrgency: lead.qualUrgency,
+              qualDecision: lead.qualDecision,
+              dealValue: lead.dealValue == null ? null : String(lead.dealValue),
+              quotationRef: lead.quotationRef,
+              quotationUrl: lead.quotationUrl,
+            }}
+            reps={reps}
+            canAssign={canAssign}
           />
-          {isAdmin && (
-            <ReassignForm leadId={lead.id} currentAssigneeId={lead.assignedToId} reps={reps} />
-          )}
+
+          {/* Response time */}
+          <section className="rounded-xl border border-outline-variant bg-white p-6">
+            <h2 className="font-work font-semibold text-industrial-blue">Response time</h2>
+            {hours === null ? (
+              <p className="mt-2 font-mono text-xs text-error">
+                Nobody has contacted this lead yet.
+              </p>
+            ) : (
+              <p className={`mt-2 font-work text-2xl font-bold ${hours <= RESPONSE_SLA_HOURS ? 'text-primary' : 'text-error'}`}>
+                {hours < 1 ? `${Math.round(hours * 60)} min` : `${hours.toFixed(1)} hrs`}
+              </p>
+            )}
+            <p className="mt-1 font-mono text-[11px] text-on-surface-variant">
+              Target: first contact within {RESPONSE_SLA_HOURS} hours of capture.
+            </p>
+          </section>
         </div>
       </div>
     </div>

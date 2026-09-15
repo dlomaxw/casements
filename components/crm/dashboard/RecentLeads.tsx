@@ -4,10 +4,12 @@ import type { LeadStatus } from '@prisma/client';
 const STATUS: Record<LeadStatus, { label: string; dot: string }> = {
   NEW: { label: 'New', dot: 'bg-primary' },
   CONTACTED: { label: 'Contacted', dot: 'bg-blue-500' },
+  QUALIFIED: { label: 'Qualified', dot: 'bg-teal-600' },
   SITE_ASSESSED: { label: 'Site Assessed', dot: 'bg-purple-500' },
   QUOTED: { label: 'Quoted', dot: 'bg-safety-orange' },
   WON: { label: 'Won', dot: 'bg-emerald-600' },
   LOST: { label: 'Lost', dot: 'bg-error' },
+  DISQUALIFIED: { label: 'Disqualified', dot: 'bg-slate-400' },
 };
 
 const CHIP = ['bg-primary-container/20 text-primary', 'bg-blue-100 text-blue-700', 'bg-amber-100 text-amber-800', 'bg-purple-100 text-purple-700', 'bg-slate-100 text-slate-700'];

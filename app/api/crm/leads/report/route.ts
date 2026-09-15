@@ -17,7 +17,9 @@ import {
 
 export const dynamic = 'force-dynamic';
 
-const STATUSES: LeadStatus[] = ['NEW', 'CONTACTED', 'SITE_ASSESSED', 'QUOTED', 'WON', 'LOST'];
+const STATUSES: LeadStatus[] = [
+  'NEW', 'CONTACTED', 'QUALIFIED', 'SITE_ASSESSED', 'QUOTED', 'WON', 'LOST', 'DISQUALIFIED',
+];
 
 /**
  * GET /api/crm/leads/report — downloads the lead list as CSV.

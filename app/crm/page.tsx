@@ -5,6 +5,20 @@ import { prisma } from '@/lib/db';
 import { can, ROLE_LABELS, type Role } from '@/lib/roles';
 import { getTrafficSummary, getDailySeries } from '@/lib/analytics';
 import { getProductNav } from '@/lib/products-db';
+import {
+  getAttentionCounts,
+  getLossBreakdown,
+  getPipelineValue,
+  getRepPerformance,
+  getSourcePerformance,
+} from '@/lib/pipeline-stats';
+import {
+  AttentionQueue,
+  LossReasons,
+  PipelineValueCard,
+  SourceQuality,
+  TeamPerformance,
+} from '@/components/crm/dashboard/PipelineInsights';
 import PipelineChevrons from '@/components/crm/dashboard/PipelineChevrons';
 import KpiCard from '@/components/crm/dashboard/KpiCard';
 import TrafficChart from '@/components/crm/dashboard/TrafficChart';
@@ -24,7 +38,9 @@ export default async function CrmDashboardPage() {
   const scopeUserId = isManagerish ? undefined : session.user.id;
 
   const quickActions = [
+    { show: viewLeads, href: '/crm/leads/new', icon: 'person_add', title: 'Add a lead', desc: 'Phone, walk-in or referral' },
     { show: viewLeads, href: '/crm/leads', icon: 'group', title: 'Leads', desc: 'Manage leads' },
+    { show: viewLeads, href: '/crm/leads/board', icon: 'view_kanban', title: 'Pipeline board', desc: 'Drag leads through stages' },
     { show: viewLeads, href: QUOTATION_URL, external: true, icon: 'description', title: 'Quotation System', desc: 'Create quotations' },
     { show: can(role, 'manage_content'), href: '/crm/products', icon: 'inventory_2', title: 'Products', desc: 'Manage catalogue' },
     { show: can(role, 'manage_content'), href: '/crm/projects', icon: 'work', title: 'Projects', desc: 'Manage portfolio' },
@@ -39,6 +55,15 @@ export default async function CrmDashboardPage() {
   const [traffic, series] = showAnalytics
     ? await Promise.all([getTrafficSummary(), getDailySeries(30)])
     : [null, []];
+
+  const [attention, pipelineValue] = viewLeads
+    ? await Promise.all([getAttentionCounts(scopeUserId), getPipelineValue(scopeUserId)])
+    : [null, []];
+
+  // Manager-level reporting: who is performing, which channels pay, why work is lost.
+  const [repPerformance, sourcePerformance, lossBreakdown] = isManagerish
+    ? await Promise.all([getRepPerformance(), getSourcePerformance(), getLossBreakdown()])
+    : [[], [], []];
 
   const [stats, overdue, recent, productNav] = viewLeads
     ? await Promise.all([
@@ -125,6 +150,14 @@ export default async function CrmDashboardPage() {
         </div>
       )}
 
+      {/* The daily work queue and the money in play */}
+      {viewLeads && attention && (
+        <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.4fr_1fr]">
+          <AttentionQueue counts={attention} />
+          <PipelineValueCard stages={pipelineValue} />
+        </div>
+      )}
+
       {/* Traffic + pipeline */}
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
         {traffic && (
@@ -176,6 +209,23 @@ export default async function CrmDashboardPage() {
             <CategoryDonut slices={donutSlices} />
           </section>
         </div>
+      )}
+
+      {/* Manager reporting */}
+      {isManagerish && (
+        <>
+          {repPerformance.length > 0 && (
+            <div className="mt-6">
+              <TeamPerformance reps={repPerformance} />
+            </div>
+          )}
+          {(sourcePerformance.length > 0 || lossBreakdown.length > 0) && (
+            <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+              <SourceQuality sources={sourcePerformance} />
+              <LossReasons reasons={lossBreakdown} />
+            </div>
+          )}
+        </>
       )}
 
       {/* Overdue follow-ups */}

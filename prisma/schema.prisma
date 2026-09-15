@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Lead {
-  id              String      @id @default(cuid())
+  id              String       @id @default(cuid())
   fullName        String
   email           String?
   phone           String? // optional: general contact enquiries have no phone
@@ -16,44 +16,110 @@ model Lead {
   projectSize     ProjectSize? // null for general contact enquiries
   timeline        String?
   message         String?
-  sourcePage      String?
-  status          LeadStatus  @default(NEW)
-  assignedToId    String?
-  assignedTo      User?       @relation(fields: [assignedToId], references: [id])
-  followUpDate    DateTime?
-  notes           String?
-  activities      Activity[]
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  sourcePage      String? // the URL the web form was submitted from (web leads only)
+
+  // ---- Mandatory pipeline fields (see lib/pipeline.ts) -------------------
+  // Every lead must always carry: source, owner, stage. While the lead is
+  // open it must also carry a next action; to close it as LOST/DISQUALIFIED
+  // it must carry a loss reason. The rules are enforced server-side in
+  // lib/pipeline.ts — the UI only mirrors them.
+  source       LeadSource @default(WEBSITE_FORM)
+  sourceDetail String? // campaign, referrer name, exhibition — free text detail
+
+  status LeadStatus @default(NEW) // the stage
+
+  // Owner. Mandatory in the application layer (lib/pipeline.ts): no code path
+  // may leave a lead unowned. Kept nullable in the database so the change is
+  // purely additive and no existing row has to be rewritten to migrate.
+  assignedToId String?
+  assignedTo   User?   @relation(fields: [assignedToId], references: [id])
+
+  // Next action — mandatory while the lead is open.
+  nextAction     String?
+  nextActionDate DateTime?
+
+  // Loss reason — mandatory when the stage is LOST or DISQUALIFIED.
+  lossReason String? // LossReason value
+  lossDetail String?
+
+  // ---- Qualification (the structured first-contact check) ---------------
+  // All five must be present before a lead may enter QUALIFIED.
+  qualNeed      String? // what they actually want built
+  qualLocation  String? // site location — rules out out-of-area work
+  qualBudget    String? // BudgetBand value
+  qualUrgency   String? // Urgency value
+  qualDecision  String? // DecisionReadiness value
+  qualifiedAt   DateTime?
+  qualifiedById String?
+
+  // ---- Money ------------------------------------------------------------
+  // Deal value in UGX, so the pipeline can be reported in shillings and not
+  // only in lead counts. quotationRef links out to the external quotation
+  // system (favourwings) that actually produces the document.
+  dealValue    BigInt? // UGX
+  quotationRef String?
+  quotationUrl String?
+  quotedAt     DateTime?
+  wonAt        DateTime?
+  closedAt     DateTime? // WON, LOST or DISQUALIFIED — for cycle-time reporting
+
+  // ---- Contact discipline / SLA -----------------------------------------
+  lastContactedAt DateTime? // set whenever a contact attempt is logged
+  firstResponseAt DateTime? // first contact attempt — drives the response-time SLA
+  contactAttempts Int       @default(0)
+
+  // Duplicate handling — a lead closed as DUPLICATE points at the original.
+  duplicateOfId String?
+  duplicateOf   Lead?   @relation("LeadDuplicates", fields: [duplicateOfId], references: [id])
+  duplicates    Lead[]  @relation("LeadDuplicates")
+
+  followUpDate DateTime? // legacy — superseded by nextActionDate
+  notes        String?
+  activities   Activity[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([status])
+  @@index([assignedToId])
+  @@index([nextActionDate])
+  @@index([source])
 }
 
 model Activity {
   id        String   @id @default(cuid())
   leadId    String
   lead      Lead     @relation(fields: [leadId], references: [id])
-  type      String // STATUS_CHANGE | NOTE | EMAIL_SENT | CALL_LOGGED
+  type      String // STATUS_CHANGE | NOTE | EMAIL_SENT | CALL_LOGGED | CONTACT_ATTEMPT | QUALIFICATION
   note      String?
+  // Structured outcome of a contact attempt (ContactOutcome value) — so
+  // "called, no response" is a recorded fact, not a note someone forgot to type.
+  outcome   String?
+  // Who did it. Null for system-generated entries (form capture, auto-assign).
+  actorId   String?
+  actorName String?
   createdAt DateTime @default(now())
+
+  @@index([leadId, createdAt])
 }
 
 model User {
-  id             String          @id @default(cuid())
-  name           String
-  email          String          @unique
+  id              String          @id @default(cuid())
+  name            String
+  email           String          @unique
   // Not in the original doc schema, but required for NextAuth credentials login
-  passwordHash   String?
-  whatsappNumber String?
-  title          String? // e.g. "Sales Director — Kampala HQ"
-  role           Role            @default(SALES_REP)
-  active         Boolean         @default(true)
+  passwordHash    String?
+  whatsappNumber  String?
+  title           String? // e.g. "Sales Director — Kampala HQ"
+  role            Role            @default(SALES_REP)
+  active          Boolean         @default(true)
   // Notification preferences (Settings dashboard)
-  notifyEmail     Boolean @default(true)
-  notifyDesktop   Boolean @default(false)
-  notifyInventory Boolean @default(false)
-  leads          Lead[]
-  productMap     RepProductMap[]
-  posts          Post[]
-  media          Media[]
+  notifyEmail     Boolean         @default(true)
+  notifyDesktop   Boolean         @default(false)
+  notifyInventory Boolean         @default(false)
+  leads           Lead[]
+  productMap      RepProductMap[]
+  posts           Post[]
+  media           Media[]
 }
 
 model Post {
@@ -165,12 +231,31 @@ model RepProductMap {
 }
 
 enum LeadStatus {
-  NEW
-  CONTACTED
-  SITE_ASSESSED
-  QUOTED
-  WON
-  LOST
+  NEW // captured, nobody has spoken to them yet
+  CONTACTED // reached (or attempted) — qualification not yet complete
+  QUALIFIED // passed the first-contact check: real need, in area, budget, urgency
+  SITE_ASSESSED // site visit / measurements done
+  QUOTED // quotation issued
+  WON // order placed
+  LOST // was a genuine prospect, did not close
+  DISQUALIFIED // never a genuine prospect: spam, out of area, duplicate, no need
+}
+
+// Where the lead actually came from. An enum, not free text, so the marketing
+// spend can be measured per channel.
+enum LeadSource {
+  WEBSITE_FORM
+  WEBSITE_CHAT
+  PHONE_CALL
+  WHATSAPP
+  WALK_IN
+  REFERRAL
+  REPEAT_CLIENT
+  FACEBOOK
+  INSTAGRAM
+  GOOGLE_ADS
+  EXHIBITION
+  OTHER
 }
 
 enum ProjectSize {

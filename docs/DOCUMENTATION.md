@@ -96,8 +96,10 @@ Login at `/crm/login`. What appears depends on the user's role (§4).
 |---|---|---|
 | **Dashboard** | `/crm` | Role-aware overview, quick actions, traffic snapshot, lead pipeline |
 | **Analytics** | `/crm/analytics` | Website visits and most-viewed pages |
-| **Leads** | `/crm/leads` | Sales pipeline (search, filter, paginate) |
-| **Lead detail** | `/crm/leads/[id]` | Status, notes, follow-up, activity log, reassignment |
+| **Leads** | `/crm/leads` | Sales pipeline (search, filter, sort, bulk actions, work queue tabs) |
+| **Add lead** | `/crm/leads/new` | Enter a phone, walk-in, WhatsApp or referral enquiry by hand |
+| **Pipeline board** | `/crm/leads/board` | The open pipeline as draggable columns |
+| **Lead detail** | `/crm/leads/[id]` | Stage, qualification, contact log, next action, reassignment |
 | **Products** | `/crm/products` | Full product catalogue management |
 | **Projects** | `/crm/projects` | Portfolio management |
 | **Content** | `/crm/content` | Website text and images |
@@ -235,9 +237,68 @@ Published posts appear on `/blog`, get their own page at `/blog/[slug]`, feed th
 
 ### Lead pipeline
 
-`NEW → CONTACTED → SITE_ASSESSED → QUOTED → WON / LOST`
+```
+NEW → CONTACTED → QUALIFIED → SITE_ASSESSED → QUOTED → WON
+               ↘ DISQUALIFIED        any open stage ↘ LOST
+```
 
-Each lead holds contact details, product, project size, timeline, message, source page, assigned rep, follow-up date, notes and a full activity log. A daily cron job (06:00 UTC) emails reps a digest of overdue follow-ups.
+**LOST** is a genuine prospect that did not close. **DISQUALIFIED** is a lead
+that was never real — spam, a duplicate, out of our area, or no actual need.
+Keeping them apart is what makes the numbers mean anything.
+
+#### The five mandatory fields
+
+The rules live in one file, `lib/pipeline.ts`, and are enforced by the API on
+every write. The interface only makes the compliant path the quickest one — a
+lead cannot be left in an undefined state by any route, including bulk actions
+and the drag-and-drop board.
+
+| Field | When it is required |
+|---|---|
+| **Source** | Always. A controlled list (website, phone, WhatsApp, walk-in, referral, Facebook, Instagram, Google Ads, exhibition…) — never free text, so spend per channel can be judged |
+| **Owner** | Always. Web leads are auto-assigned; if no rep matches, the lead falls to a manager rather than sitting unowned |
+| **Stage** | Always, and it may only move along the pipeline above |
+| **Next action** | Whenever the lead is open — a description *and* a date. Cleared automatically when the lead closes |
+| **Loss reason** | To close as LOST or DISQUALIFIED. The list differs for each: "chose a competitor" is a loss, "spam" is a disqualification |
+
+Two further gates:
+
+- **Qualification** — a lead cannot reach QUALIFIED until all five first-contact
+  answers are recorded: what they need, site location, budget band, urgency and
+  decision readiness.
+- **Value** — a lead cannot be marked QUOTED or WON without a quotation value in
+  UGX, so the pipeline can be reported in shillings rather than in lead counts.
+
+#### Recording contact
+
+The lead page has one-click outcome buttons — *spoke to them*, *called, no
+answer*, *phone off*, *asked us to call back*, *WhatsApp sent*, *wrong number* —
+each writing a timestamped entry with the member of staff's name. This replaced
+free-text notes, which is why the CRM previously went stale. The first attempt
+also stamps the **response-time clock**; the target is first contact within four
+hours of capture.
+
+#### Keeping it honest
+
+- **Needs attention** tiles on the dashboard and tabs on the list: overdue, due
+  today, never contacted, no next action, gone quiet (no contact for a week), no
+  owner. Each links straight to the filtered leads.
+- The **header badge** counts stalled leads, not new arrivals.
+- A daily cron (06:00 UTC) emails each rep their stalled leads and each manager
+  a team summary. This runs and reports its counts even before an email provider
+  is configured.
+- **Duplicates** are detected on the last nine digits of the phone number, on
+  email and on name. Closing one as a duplicate links it to the original rather
+  than deleting it, so campaign duplicate rates stay measurable.
+
+#### Reporting
+
+Dashboard panels, all from `lib/pipeline-stats.ts`: open pipeline value by
+stage, per-rep performance (workload, win rate, won value, average response
+time, overdue count), source quality (share of leads from each channel that were
+not disqualified) and a breakdown of why leads close out. CSV, Word and PDF
+exports carry source, owner, next action, loss reason, deal value, qualification
+status, contact attempts and response time.
 
 ---
 
@@ -281,8 +342,8 @@ All URLs derive from one setting (`NEXT_PUBLIC_SITE_URL`) — changing it when t
 
 | Model | Purpose |
 |---|---|
-| **Lead** | Enquiries from every form, with pipeline status and assignment |
-| **Activity** | Audit trail per lead (status changes, notes, assignments) |
+| **Lead** | Enquiries from every source, with pipeline stage, source, owner, next action, loss reason, qualification answers and deal value |
+| **Activity** | Audit trail per lead — stage changes, notes, assignments and contact attempts with a structured outcome and the staff member's name |
 | **User** | Staff accounts: role, active flag, notification preferences, job title |
 | **RepProductMap** | Maps a product category to the sales rep who receives its leads |
 | **Product** | Catalogue: images, gallery, features, FAQs, video, brochure, type |
@@ -292,7 +353,18 @@ All URLs derive from one setting (`NEXT_PUBLIC_SITE_URL`) — changing it when t
 | **SiteContent** | Key/value overrides for editable website text and images |
 | **PageView** | Anonymous analytics events |
 
-**Enums:** `LeadStatus`, `ProjectSize`, `Role`, `PostStatus`.
+**Enums:** `LeadStatus` (now including `QUALIFIED` and `DISQUALIFIED`),
+`LeadSource`, `ProjectSize`, `Role`, `PostStatus`. Loss reasons, budget bands,
+urgency, decision readiness and contact outcomes are controlled vocabularies
+held in `lib/pipeline.ts` rather than database enums, so the business can adjust
+them without a migration.
+
+> **Migration note:** the pipeline change is purely additive — new nullable
+> columns with defaults, two new enum values, and indexes. No existing lead row
+> is rewritten. The exact SQL is saved at `prisma/sql/2026-09-16-pipeline.sql`;
+> apply it with `npx prisma db push` or by running the file directly. Leads
+> captured before the change simply have empty pipeline fields, and the CRM
+> surfaces them in the "needs attention" queue to be tidied up.
 
 ### Live data (August 2026)
 
@@ -343,18 +415,6 @@ Not yet set: `RESEND_API_KEY`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID`, `NEXT_PUBL
 
 ---
 
-## 15. Outstanding items
-
-| Item | Impact | Action |
-|---|---|---|
-| **Domain not pointed** | High — SEO indexes the wrong address | Point `casements.co.ug` at Vercel |
-| **Email not configured** | Staff must log in to see new leads | Add a Resend API key |
-| **WhatsApp alerts inactive** | No instant alert for large enquiries | Add Meta WhatsApp credentials |
-| **Default passwords** | Security | Change both seeded passwords |
-| **Placeholder testimonials** | Credibility + blocks review markup | Replace with genuine client reviews |
-| **Blog images show old contact details** | Brand consistency | Re-export with current Casements details |
-| **5 products lack photography** | Presentation | Supply images for Facade, Glass, Interiors, Railings, Steel |
-| **Brochure mapping unverified** | Wrong PDF may be attached | Confirm in Products; Railings and Steel have none |
 
 ---
 

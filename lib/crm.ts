@@ -1,6 +1,7 @@
 import type { Lead, LeadStatus, User } from '@prisma/client';
 import { prisma } from '@/lib/db';
 import { autoReplyTemplate, quoteNotificationTemplate, sendEmail, SALES_EMAIL } from '@/lib/email';
+import type { LeadSource } from '@/lib/pipeline';
 
 export interface LeadInput {
   fullName: string;
@@ -11,7 +12,17 @@ export interface LeadInput {
   timeline?: string;
   message?: string;
   sourcePage?: string;
+  /** Where the lead came from. Web forms default to WEBSITE_FORM. */
+  source?: LeadSource;
+  sourceDetail?: string;
 }
+
+/**
+ * How long a newly captured lead has before its first action falls due.
+ * Every lead is created with a next action already set, so no lead can enter
+ * the system without one — the rule holds from the moment of capture.
+ */
+const FIRST_ACTION_HOURS = 4;
 
 export interface CRMStats {
   total: number;
@@ -23,15 +34,76 @@ export interface CRMStats {
   topCategories: { category: string; count: number }[];
 }
 
-// Validates + writes new lead to DB, status = NEW
+// Validates + writes new lead to DB, status = NEW.
+// Every lead is born with a source and an opening next action so it can never
+// sit in the pipeline as an undefined, actionless record.
 export async function createCRMLead(data: LeadInput): Promise<Lead> {
+  const { source = 'WEBSITE_FORM', sourceDetail, ...rest } = data;
+
+  const nextActionDate = new Date();
+  nextActionDate.setHours(nextActionDate.getHours() + FIRST_ACTION_HOURS);
+
   const lead = await prisma.lead.create({
-    data: { ...data, status: 'NEW' },
+    data: {
+      ...rest,
+      source: source as any,
+      sourceDetail,
+      status: 'NEW',
+      nextAction: 'First contact — call and qualify',
+      nextActionDate,
+    },
   });
   await prisma.activity.create({
-    data: { leadId: lead.id, type: 'STATUS_CHANGE', note: 'Lead created from website form' },
+    data: {
+      leadId: lead.id,
+      type: 'STATUS_CHANGE',
+      note: `Lead captured (${source.toLowerCase().replace(/_/g, ' ')})`,
+    },
   });
   return lead;
+}
+
+/**
+ * Records a contact attempt with a structured outcome. This is the entry point
+ * behind the one-click buttons on the lead page — "called, no answer" becomes a
+ * recorded fact with a timestamp instead of a note nobody typed.
+ *
+ * Also stamps firstResponseAt the first time anyone reaches out, which is what
+ * the response-time SLA is measured from.
+ */
+export async function logContactAttempt(
+  leadId: string,
+  outcome: string,
+  note: string | undefined,
+  actor: { id?: string | null; name?: string | null },
+): Promise<void> {
+  const lead = await prisma.lead.findUnique({
+    where: { id: leadId },
+    select: { firstResponseAt: true, contactAttempts: true },
+  });
+  if (!lead) return;
+
+  const now = new Date();
+  await prisma.$transaction([
+    prisma.lead.update({
+      where: { id: leadId },
+      data: {
+        lastContactedAt: now,
+        contactAttempts: { increment: 1 },
+        ...(lead.firstResponseAt ? {} : { firstResponseAt: now }),
+      },
+    }),
+    prisma.activity.create({
+      data: {
+        leadId,
+        type: 'CONTACT_ATTEMPT',
+        outcome,
+        note: note?.trim() || null,
+        actorId: actor.id ?? null,
+        actorName: actor.name ?? null,
+      },
+    }),
+  ]);
 }
 
 // Assigns the lead to the sales rep mapped to the product category (rep_product_map).
@@ -54,6 +126,14 @@ export async function assignLeadToRep(leadId: string, category: string): Promise
   }
   if (!rep) {
     rep = await prisma.user.findFirst({ where: { role: 'SALES_REP', active: true } });
+  }
+  // Last resort: an owner is mandatory, so rather than leave the lead
+  // unassigned, hand it to a manager or admin who will see it immediately.
+  if (!rep) {
+    rep = await prisma.user.findFirst({
+      where: { active: true, role: { in: ['ADMIN', 'MANAGER'] } },
+      orderBy: { role: 'asc' },
+    });
   }
   if (rep) {
     await prisma.lead.update({ where: { id: leadId }, data: { assignedToId: rep.id } });
