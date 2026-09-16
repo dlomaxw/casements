@@ -79,7 +79,11 @@ export function needsLossReason(stage: string): boolean {
  * qualification gate is not.
  */
 const FORWARD: Record<Stage, Stage[]> = {
-  NEW: ['CONTACTED'],
+  // NEW may jump straight to QUALIFIED: qualifying is a single act of work —
+  // you call, you establish the five answers, the lead is qualified. Nothing is
+  // skipped by doing it in one save, because validateLead still demands all
+  // five answers before QUALIFIED can be reached.
+  NEW: ['CONTACTED', 'QUALIFIED'],
   CONTACTED: ['QUALIFIED'],
   QUALIFIED: ['SITE_ASSESSED', 'QUOTED'],
   SITE_ASSESSED: ['QUOTED'],

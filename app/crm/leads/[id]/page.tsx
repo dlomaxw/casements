@@ -17,7 +17,6 @@ import {
   URGENCY_LABELS,
   attentionState,
   formatUgx,
-  handoverBlockers,
   isClosed,
   responseHours,
   type Stage,
@@ -265,20 +264,22 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
             canAssign={canAssign}
           />
 
-          {canHandover && lead.assignedToId === session.user.id && (
+          {canHandover && !closed && lead.assignedToId === session.user.id && (
             <HandoverForm
-              leadId={lead.id}
-              colleagues={reps.filter((r) => r.id !== session.user.id)}
-              blockers={handoverBlockers({
+              lead={{
+                id: lead.id,
                 status: lead.status,
-                firstResponseAt: lead.firstResponseAt,
                 contactAttempts: lead.contactAttempts,
+                firstResponseAt: iso(lead.firstResponseAt),
                 qualNeed: lead.qualNeed,
                 qualLocation: lead.qualLocation,
                 qualBudget: lead.qualBudget,
                 qualUrgency: lead.qualUrgency,
                 qualDecision: lead.qualDecision,
-              })}
+                nextAction: lead.nextAction,
+                nextActionDate: iso(lead.nextActionDate),
+              }}
+              colleagues={reps.filter((r) => r.id !== session.user.id)}
             />
           )}
 

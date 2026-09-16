@@ -171,8 +171,10 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       // in, so qualifying and handing over in one save is allowed.
       const blockers = handoverBlockers({
         status: stage,
-        firstResponseAt: existing.firstResponseAt,
-        contactAttempts: existing.contactAttempts,
+        // A contact attempt logged in this same request counts: `existing` was
+        // read before logContactAttempt() ran, so its timestamps are stale.
+        firstResponseAt: existing.firstResponseAt ?? (p.contact ? new Date() : null),
+        contactAttempts: existing.contactAttempts + (p.contact ? 1 : 0),
         qualNeed: pick(p.qualNeed, existing.qualNeed),
         qualLocation: pick(p.qualLocation, existing.qualLocation),
         qualBudget: pick(p.qualBudget, existing.qualBudget),

@@ -277,15 +277,22 @@ Every website enquiry is auto-assigned to the front-line sales account, which
 calls and qualifies it. Once it is verified, the rep hands it to whoever will
 take it forward — they do not need a manager to reassign it for them.
 
-Handover unlocks only when all three are true:
+A lead is handed over from the **Verify & hand over** panel on the lead page.
+The panel always shows the colleague picker and the button; it asks for
+whatever verification is still outstanding and submits the lot in one request:
 
-1. Somebody has actually made contact (a contact attempt is recorded)
-2. All five qualification answers are filled in
-3. The lead has reached **Qualified**, **Site assessed** or **Quoted**
+1. A tick to confirm the customer has actually been spoken to (recorded as a
+   contact attempt if none exists yet)
+2. Any of the five qualification answers not already filled in
+3. An opening action and date for the colleague receiving the lead
 
-Until then the panel on the lead lists exactly what is still missing rather
-than offering a button that would be refused. The same three rules are enforced
-by the API, so the gate cannot be bypassed.
+Submitting moves the lead to **Qualified**, records the qualification and the
+contact, sets the next action and changes the owner — one click from a raw
+enquiry to a verified lead sitting in a colleague's pipeline.
+
+The requirement itself is unchanged and still enforced by the API: contact
+made, all five answers recorded, and the lead at **Qualified**, **Site
+assessed** or **Quoted**. A handover where nobody has called is still refused.
 
 A rep may only ever hand a lead **on**: they cannot take a lead from a
 colleague, and cannot unassign one, because every lead must always have an
