@@ -59,15 +59,16 @@ export default function HandoverForm({
 }) {
   const router = useRouter();
 
+  // The only bar is the phone call. Qualification detail is welcome but never
+  // stands between a rep and routing a lead to the right colleague.
   const needsContact = !lead.firstResponseAt && lead.contactAttempts === 0;
   const missing = missingQualification(lead);
-  const needsQualification = missing.length > 0;
-  const needsStage = !['QUALIFIED', 'SITE_ASSESSED', 'QUOTED'].includes(lead.status);
-  const verified = !needsContact && !needsQualification && !needsStage;
+  const stillNew = lead.status === 'NEW';
 
   const [to, setTo] = useState('');
   const [note, setNote] = useState('');
   const [spoke, setSpoke] = useState(!needsContact);
+  const [showQualification, setShowQualification] = useState(false);
   const [qualNeed, setQualNeed] = useState(lead.qualNeed ?? '');
   const [qualLocation, setQualLocation] = useState(lead.qualLocation ?? '');
   const [qualBudget, setQualBudget] = useState(lead.qualBudget ?? '');
@@ -95,19 +96,20 @@ export default function HandoverForm({
 
     setSaving(true);
 
-    // One request does the lot: record the contact if it was never logged,
-    // save the qualification answers, move the lead to Qualified, set an
-    // opening action for the person receiving it, and change the owner.
+    // One request does the lot: record the contact if it was never logged, save
+    // any qualification detail the rep filled in, move a still-new lead to
+    // Contacted, set an opening action for the person receiving it, and change
+    // the owner.
     const body: Record<string, unknown> = {
       assignedToId: to,
-      qualNeed,
-      qualLocation,
-      qualBudget,
-      qualUrgency,
-      qualDecision,
       nextAction,
       nextActionDate,
-      ...(needsStage ? { status: 'QUALIFIED' } : {}),
+      ...(qualNeed ? { qualNeed } : {}),
+      ...(qualLocation ? { qualLocation } : {}),
+      ...(qualBudget ? { qualBudget } : {}),
+      ...(qualUrgency ? { qualUrgency } : {}),
+      ...(qualDecision ? { qualDecision } : {}),
+      ...(stillNew ? { status: 'CONTACTED' } : {}),
       ...(needsContact ? { contact: { outcome: 'SPOKE', note: 'Verified before handover' } } : {}),
       ...(note.trim() ? { notes: `Handover note: ${note.trim()}` } : {}),
     };
@@ -152,12 +154,10 @@ export default function HandoverForm({
     <section className="rounded-xl border-2 border-primary/40 bg-white p-6">
       <h2 className="flex items-center gap-2 font-work font-semibold text-industrial-blue">
         <Icon name="forward_to_inbox" className="text-primary" />
-        {verified ? 'Hand over' : 'Verify & hand over'}
+        Hand over to a colleague
       </h2>
       <p className="mt-1 font-sans text-xs text-on-surface-variant">
-        {verified
-          ? 'This lead is verified. Choose who takes it from here.'
-          : 'Confirm this is real work, then pass it to the right colleague.'}
+        You have spoken to them and know it is real work — pass it to whoever takes it forward.
       </p>
 
       <form onSubmit={handOver} className="mt-4 space-y-4">
@@ -193,10 +193,21 @@ export default function HandoverForm({
         </label>
 
         {/* Only what is still missing */}
-        {needsQualification && (
-          <div className="space-y-3 rounded-lg border border-safety-orange/40 bg-safety-orange/5 p-3">
+        {missing.length > 0 && !showQualification && (
+          <button
+            type="button"
+            onClick={() => setShowQualification(true)}
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-outline-variant px-3 py-2 font-mono text-[11px] text-on-surface-variant hover:border-safety-orange"
+          >
+            <Icon name="add" className="text-[14px]" />
+            Add what you learned ({missing.length} of 5 blank) — optional
+          </button>
+        )}
+
+        {missing.length > 0 && showQualification && (
+          <div className="space-y-3 rounded-lg border border-outline-variant bg-surface-container-lowest p-3">
             <p className="font-mono text-[11px] uppercase tracking-wide text-on-surface-variant">
-              Qualification — {missing.length} still needed
+              What you learned — optional, fill in what you know
             </p>
             {!lead.qualNeed && (
               <div>
@@ -276,7 +287,7 @@ export default function HandoverForm({
 
         <button type="submit" disabled={saving}
           className="w-full rounded-lg bg-primary px-4 py-3 font-mono text-xs font-semibold uppercase tracking-wide text-white hover:opacity-90 disabled:opacity-50">
-          {saving ? 'Handing over…' : verified ? 'Hand over this lead' : 'Verify & hand over'}
+          {saving ? 'Handing over…' : 'Hand over this lead'}
         </button>
         <p className="text-center font-mono text-[11px] text-on-surface-variant">
           The lead moves to their pipeline and leaves yours.

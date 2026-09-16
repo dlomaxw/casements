@@ -167,19 +167,15 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         );
       }
 
-      // Verification gate — checked against the state the lead is being left
-      // in, so qualifying and handing over in one save is allowed.
+      // Verification gate: the rep must have actually tried to reach the
+      // customer and logged the outcome. Checked against the state the lead is
+      // being left in, so logging the call and handing over in one save works —
+      // `existing` was read before logContactAttempt() ran, so its timestamps
+      // would otherwise be stale.
       const blockers = handoverBlockers({
         status: stage,
-        // A contact attempt logged in this same request counts: `existing` was
-        // read before logContactAttempt() ran, so its timestamps are stale.
         firstResponseAt: existing.firstResponseAt ?? (p.contact ? new Date() : null),
         contactAttempts: existing.contactAttempts + (p.contact ? 1 : 0),
-        qualNeed: pick(p.qualNeed, existing.qualNeed),
-        qualLocation: pick(p.qualLocation, existing.qualLocation),
-        qualBudget: pick(p.qualBudget, existing.qualBudget),
-        qualUrgency: pick(p.qualUrgency, existing.qualUrgency),
-        qualDecision: pick(p.qualDecision, existing.qualDecision),
       });
       if (blockers.length > 0) {
         return Response.json(

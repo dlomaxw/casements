@@ -152,6 +152,25 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
             />
           )}
 
+          {canHandover && !closed && lead.assignedToId === session.user.id && (
+            <HandoverForm
+              lead={{
+                id: lead.id,
+                status: lead.status,
+                contactAttempts: lead.contactAttempts,
+                firstResponseAt: iso(lead.firstResponseAt),
+                qualNeed: lead.qualNeed,
+                qualLocation: lead.qualLocation,
+                qualBudget: lead.qualBudget,
+                qualUrgency: lead.qualUrgency,
+                qualDecision: lead.qualDecision,
+                nextAction: lead.nextAction,
+                nextActionDate: iso(lead.nextActionDate),
+              }}
+              colleagues={reps.filter((r) => r.id !== session.user.id)}
+            />
+          )}
+
           <DuplicateNotice
             leadId={lead.id}
             duplicates={duplicates.map((d) => ({
@@ -263,25 +282,6 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
             reps={reps}
             canAssign={canAssign}
           />
-
-          {canHandover && !closed && lead.assignedToId === session.user.id && (
-            <HandoverForm
-              lead={{
-                id: lead.id,
-                status: lead.status,
-                contactAttempts: lead.contactAttempts,
-                firstResponseAt: iso(lead.firstResponseAt),
-                qualNeed: lead.qualNeed,
-                qualLocation: lead.qualLocation,
-                qualBudget: lead.qualBudget,
-                qualUrgency: lead.qualUrgency,
-                qualDecision: lead.qualDecision,
-                nextAction: lead.nextAction,
-                nextActionDate: iso(lead.nextActionDate),
-              }}
-              colleagues={reps.filter((r) => r.id !== session.user.id)}
-            />
-          )}
 
           {/* Response time */}
           <section className="rounded-xl border border-outline-variant bg-white p-6">

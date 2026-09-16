@@ -277,29 +277,24 @@ Every website enquiry is auto-assigned to the front-line sales account, which
 calls and qualifies it. Once it is verified, the rep hands it to whoever will
 take it forward — they do not need a manager to reassign it for them.
 
-A lead is handed over from the **Verify & hand over** panel on the lead page.
-The panel always shows the colleague picker and the button; it asks for
-whatever verification is still outstanding and submits the lot in one request:
+A lead is handed over from the **Hand over to a colleague** panel, which sits
+directly beneath the contact buttons on the lead page — where the rep already
+is the moment they put the phone down.
 
-1. A tick to confirm the customer has actually been spoken to (recorded as a
-   contact attempt if none exists yet)
-2. Any of the five qualification answers not already filled in
-3. An opening action and date for the colleague receiving the lead
+The bar is the phone call, not a form. Once a contact attempt has been logged,
+the rep picks the colleague, ticks *"I have spoken to this customer and confirm
+this is a real enquiry"*, sets an opening action for whoever receives it, and
+hands it over. If nothing has been logged yet, ticking the box records the
+contact as part of the handover. Qualification detail can be added in the same
+panel but is optional — a rep is never made to fill in five fields before they
+are allowed to route a lead to the right person.
 
-Submitting moves the lead to **Qualified**, records the qualification and the
-contact, sets the next action and changes the owner — one click from a raw
-enquiry to a verified lead sitting in a colleague's pipeline.
+Submitting does it all in one request: records the contact, moves a still-new
+lead to Contacted, saves any qualification detail given, sets the next action,
+and changes the owner. The lead leaves the sending rep's pipeline immediately.
 
-The requirement itself is unchanged and still enforced by the API: contact
-made, all five answers recorded, and the lead at **Qualified**, **Site
-assessed** or **Quoted**. A handover where nobody has called is still refused.
-
-A rep may only ever hand a lead **on**: they cannot take a lead from a
-colleague, and cannot unassign one, because every lead must always have an
-owner. The handover is written to the activity log as *"Verified and handed
-over to X by Y"*, with an optional note for the person receiving it, and the
-lead leaves the sending rep's pipeline immediately. Administrators and Managers
-are unaffected — they can still reassign any lead at any stage.
+The one rule the API still enforces is that a lead cannot be handed over with
+no contact recorded at all, and cannot be handed over once closed.
 
 #### Recording contact
 
