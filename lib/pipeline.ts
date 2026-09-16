@@ -323,6 +323,62 @@ export function validateLead(next: LeadState): string[] {
   return errors;
 }
 
+// ---------------------------------------------------------------------------
+// Handover — passing a verified lead to a colleague.
+// ---------------------------------------------------------------------------
+
+/**
+ * Stages from which a lead may be handed over.
+ *
+ * The front-line rep who receives every website enquiry qualifies it first and
+ * only then passes it on, so handover is deliberately not available while the
+ * lead is still NEW or merely CONTACTED — that is the point of the gate.
+ */
+export const HANDOVER_STAGES: Stage[] = ['QUALIFIED', 'SITE_ASSESSED', 'QUOTED'];
+
+export interface HandoverCandidate extends Qualification {
+  status: string;
+  firstResponseAt?: Date | string | null;
+  contactAttempts?: number | null;
+}
+
+/**
+ * Why this lead cannot be handed over yet. An empty array means it is verified
+ * — somebody has actually spoken to them, all five qualification answers are
+ * recorded, and the lead has passed the qualification gate — so it can be
+ * passed to a colleague as confirmed real work.
+ */
+export function handoverBlockers(lead: HandoverCandidate): string[] {
+  const blockers: string[] = [];
+
+  if (isClosed(lead.status)) {
+    blockers.push('This lead is closed. Reopen it before handing it over.');
+    return blockers;
+  }
+
+  if (!(HANDOVER_STAGES as string[]).includes(lead.status)) {
+    blockers.push(
+      `Move the lead to ${STAGE_LABELS.QUALIFIED} first — only a verified lead can be handed over.`,
+    );
+  }
+
+  if (!lead.firstResponseAt && !lead.contactAttempts) {
+    blockers.push('Nobody has contacted this lead yet. Speak to them before handing over.');
+  }
+
+  const missing = missingQualification(lead);
+  if (missing.length > 0) {
+    blockers.push(`Qualification incomplete — still missing: ${missing.join(', ')}.`);
+  }
+
+  return blockers;
+}
+
+/** True when the lead has been verified and may be passed to a colleague. */
+export function canHandOver(lead: HandoverCandidate): boolean {
+  return handoverBlockers(lead).length === 0;
+}
+
 /** Whether a stage move is permitted from where the lead is now. */
 export function canMove(from: string, to: string): boolean {
   if (from === to) return true;

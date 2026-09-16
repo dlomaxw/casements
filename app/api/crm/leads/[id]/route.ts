@@ -8,6 +8,7 @@ import {
   LEAD_SOURCES,
   STAGES,
   canMove,
+  handoverBlockers,
   isClosed,
   isOpen,
   validateLead,
@@ -136,18 +137,65 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     );
   }
 
-  // Reassignment is a privileged action.
+  const pick = <T>(patched: T | undefined, current: T): T => (patched === undefined ? current : patched);
+
+  // --- Changing who owns the lead -----------------------------------------
+  // Two different rights:
+  //   assign_leads   (admin/manager) — move any lead to anyone, at any stage.
+  //   handover_leads (sales rep)     — pass on a lead you own, once you have
+  //                                    verified it: contacted, fully qualified
+  //                                    and past the qualification gate.
+  // The front-line rep who receives every website enquiry works this way:
+  // qualify first, confirm it is real, then hand it to the right colleague.
+  let isHandover = false;
   if (p.assignedToId !== undefined && p.assignedToId !== existing.assignedToId) {
-    if (!can(session.user.role, 'assign_leads')) {
+    const mayAssign = can(session.user.role, 'assign_leads');
+    const mayHandOver =
+      can(session.user.role, 'handover_leads') && existing.assignedToId === session.user.id;
+
+    if (!mayAssign && !mayHandOver) {
       return Response.json({ error: 'You are not allowed to reassign leads' }, { status: 403 });
     }
+
+    if (!mayAssign) {
+      // A rep may only ever hand a lead ON, never take ownership away from
+      // somebody else and never leave it unowned.
+      if (!p.assignedToId) {
+        return Response.json(
+          { error: 'A lead must always have an owner. Hand it to a colleague instead of unassigning it.' },
+          { status: 422 },
+        );
+      }
+
+      // Verification gate — checked against the state the lead is being left
+      // in, so qualifying and handing over in one save is allowed.
+      const blockers = handoverBlockers({
+        status: stage,
+        firstResponseAt: existing.firstResponseAt,
+        contactAttempts: existing.contactAttempts,
+        qualNeed: pick(p.qualNeed, existing.qualNeed),
+        qualLocation: pick(p.qualLocation, existing.qualLocation),
+        qualBudget: pick(p.qualBudget, existing.qualBudget),
+        qualUrgency: pick(p.qualUrgency, existing.qualUrgency),
+        qualDecision: pick(p.qualDecision, existing.qualDecision),
+      });
+      if (blockers.length > 0) {
+        return Response.json(
+          { error: `This lead cannot be handed over yet. ${blockers[0]}`, errors: blockers },
+          { status: 422 },
+        );
+      }
+      isHandover = true;
+    }
+
     if (p.assignedToId) {
       const rep = await prisma.user.findUnique({ where: { id: p.assignedToId } });
       if (!rep?.active) return Response.json({ error: 'Invalid assignee' }, { status: 400 });
+      if (isHandover && rep.id === session.user.id) {
+        return Response.json({ error: 'That lead is already yours.' }, { status: 400 });
+      }
     }
   }
-
-  const pick = <T>(patched: T | undefined, current: T): T => (patched === undefined ? current : patched);
 
   const nextActionDate =
     p.nextActionDate === undefined
@@ -246,7 +294,16 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   if (p.notes) entries.push({ type: 'NOTE', note: p.notes });
   if (p.assignedToId !== undefined && p.assignedToId !== existing.assignedToId) {
     const rep = p.assignedToId ? await prisma.user.findUnique({ where: { id: p.assignedToId } }) : null;
-    entries.push({ type: 'STATUS_CHANGE', note: rep ? `Reassigned to ${rep.name}` : 'Unassigned' });
+    entries.push({
+      type: isHandover ? 'HANDOVER' : 'STATUS_CHANGE',
+      note: rep
+        ? isHandover
+          // Say plainly that this was a verified lead being passed on, so the
+          // receiving colleague can see it was checked, not just dumped.
+          ? `Verified and handed over to ${rep.name} by ${actor.name ?? 'a colleague'}`
+          : `Reassigned to ${rep.name}`
+        : 'Unassigned',
+    });
   }
   if (
     (p.nextAction !== undefined && p.nextAction !== existing.nextAction) ||

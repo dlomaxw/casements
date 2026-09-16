@@ -8,14 +8,15 @@ export type Capability =
   | 'manage_content' // edit website page content (text & images)
   | 'view_analytics' // website traffic dashboard
   | 'view_leads'     // access the CRM lead pipeline
-  | 'assign_leads';  // reassign leads to other reps
+  | 'assign_leads'   // reassign any lead, at any stage, to anyone
+  | 'handover_leads';// hand a lead you own to a colleague, once it is verified
 
 const CAPS: Record<Role, Capability[]> = {
-  ADMIN: ['admin', 'manage_users', 'manage_blog', 'manage_media', 'manage_content', 'view_analytics', 'view_leads', 'assign_leads'],
-  MANAGER: ['manage_users', 'manage_blog', 'manage_media', 'manage_content', 'view_analytics', 'view_leads', 'assign_leads'],
+  ADMIN: ['admin', 'manage_users', 'manage_blog', 'manage_media', 'manage_content', 'view_analytics', 'view_leads', 'assign_leads', 'handover_leads'],
+  MANAGER: ['manage_users', 'manage_blog', 'manage_media', 'manage_content', 'view_analytics', 'view_leads', 'assign_leads', 'handover_leads'],
   DEVELOPER: ['manage_media', 'manage_blog', 'manage_content', 'view_analytics'],
   MARKETING: ['manage_blog', 'manage_media', 'manage_content', 'view_analytics'],
-  SALES_REP: ['view_leads'],
+  SALES_REP: ['view_leads', 'handover_leads'],
 };
 
 export const ROLE_LABELS: Record<Role, string> = {

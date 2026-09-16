@@ -126,10 +126,12 @@ Five roles, each granting a set of capabilities.
 | View analytics | ✅ | ✅ | ✅ | ✅ | — |
 | View leads | ✅ | ✅ | — | — | ✅ (own only) |
 | Assign / reassign leads | ✅ | ✅ | — | — | — |
+| Hand over a verified lead | ✅ | ✅ | — | — | ✅ (own, once verified) |
 
 ### How the rules behave
 
 - **Sales Reps see only their own leads** — enforced on every page *and* every API endpoint, not just hidden in the interface.
+- **Sales Reps can hand a lead on, but only after verifying it** (see §10). This is how the front-line account (`sales@casements.co.ug`, which receives every website enquiry) works: qualify first, confirm it is real, then pass it to the right colleague. Reps still cannot reassign somebody else's lead, take a lead from a colleague, or leave one unowned.
 - **Admins and Managers see all leads** and can reassign them to any active team member.
 - **Managers cannot create Admins or other Managers** — they may only create Developer, Marketing and Sales Rep accounts.
 - **An admin cannot deactivate or demote their own account** (prevents lock-out).
@@ -268,6 +270,29 @@ Two further gates:
   decision readiness.
 - **Value** — a lead cannot be marked QUOTED or WON without a quotation value in
   UGX, so the pipeline can be reported in shillings rather than in lead counts.
+
+#### Handing a verified lead to a colleague
+
+Every website enquiry is auto-assigned to the front-line sales account, which
+calls and qualifies it. Once it is verified, the rep hands it to whoever will
+take it forward — they do not need a manager to reassign it for them.
+
+Handover unlocks only when all three are true:
+
+1. Somebody has actually made contact (a contact attempt is recorded)
+2. All five qualification answers are filled in
+3. The lead has reached **Qualified**, **Site assessed** or **Quoted**
+
+Until then the panel on the lead lists exactly what is still missing rather
+than offering a button that would be refused. The same three rules are enforced
+by the API, so the gate cannot be bypassed.
+
+A rep may only ever hand a lead **on**: they cannot take a lead from a
+colleague, and cannot unassign one, because every lead must always have an
+owner. The handover is written to the activity log as *"Verified and handed
+over to X by Y"*, with an optional note for the person receiving it, and the
+lead leaves the sending rep's pipeline immediately. Administrators and Managers
+are unaffected — they can still reassign any lead at any stage.
 
 #### Recording contact
 

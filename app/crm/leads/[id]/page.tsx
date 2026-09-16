@@ -17,6 +17,7 @@ import {
   URGENCY_LABELS,
   attentionState,
   formatUgx,
+  handoverBlockers,
   isClosed,
   responseHours,
   type Stage,
@@ -25,6 +26,7 @@ import PipelineForm from '@/components/crm/lead/PipelineForm';
 import ContactStrip from '@/components/crm/lead/ContactStrip';
 import LeadDetailsForm from '@/components/crm/lead/LeadDetailsForm';
 import DuplicateNotice from '@/components/crm/lead/DuplicateNotice';
+import HandoverForm from '@/components/crm/lead/HandoverForm';
 import Icon from '@/components/crm/Icon';
 
 export const dynamic = 'force-dynamic';
@@ -35,6 +37,8 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
   const session = await requireSession();
   if (!can(session.user.role, 'view_leads')) notFound();
   const canAssign = can(session.user.role, 'assign_leads');
+  // A rep who owns the lead may pass it on once it is verified.
+  const canHandover = !canAssign && can(session.user.role, 'handover_leads');
 
   const lead = await prisma.lead.findUnique({
     where: { id: params.id },
@@ -49,7 +53,7 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
   if (!canAssign && lead.assignedToId !== session.user.id) notFound();
 
   const [reps, categories, duplicates] = await Promise.all([
-    canAssign
+    canAssign || canHandover
       ? prisma.user.findMany({
           where: { active: true, role: { in: ['ADMIN', 'MANAGER', 'SALES_REP'] } },
           orderBy: { name: 'asc' },
@@ -207,7 +211,13 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
                   <li key={a.id} className="flex gap-3">
                     <span
                       className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
-                        a.type === 'CONTACT_ATTEMPT' ? 'bg-primary' : a.type === 'NOTE' ? 'bg-outline' : 'bg-safety-orange'
+                        a.type === 'CONTACT_ATTEMPT'
+                          ? 'bg-primary'
+                          : a.type === 'HANDOVER'
+                            ? 'bg-[#25D366]'
+                            : a.type === 'NOTE'
+                              ? 'bg-outline'
+                              : 'bg-safety-orange'
                       }`}
                     />
                     <div>
@@ -254,6 +264,23 @@ export default async function LeadDetailPage({ params }: { params: { id: string 
             reps={reps}
             canAssign={canAssign}
           />
+
+          {canHandover && lead.assignedToId === session.user.id && (
+            <HandoverForm
+              leadId={lead.id}
+              colleagues={reps.filter((r) => r.id !== session.user.id)}
+              blockers={handoverBlockers({
+                status: lead.status,
+                firstResponseAt: lead.firstResponseAt,
+                contactAttempts: lead.contactAttempts,
+                qualNeed: lead.qualNeed,
+                qualLocation: lead.qualLocation,
+                qualBudget: lead.qualBudget,
+                qualUrgency: lead.qualUrgency,
+                qualDecision: lead.qualDecision,
+              })}
+            />
+          )}
 
           {/* Response time */}
           <section className="rounded-xl border border-outline-variant bg-white p-6">
