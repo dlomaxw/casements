@@ -81,10 +81,12 @@ export function resolveRange(
 const STATUS_LABELS: Record<LeadStatus, string> = {
   NEW: 'New',
   CONTACTED: 'Contacted',
+  QUALIFIED: 'Qualified',
   SITE_ASSESSED: 'Site assessed',
   QUOTED: 'Quoted',
   WON: 'Won',
   LOST: 'Lost',
+  DISQUALIFIED: 'Disqualified',
 };
 
 const SIZE_LABELS: Record<ProjectSize, string> = {

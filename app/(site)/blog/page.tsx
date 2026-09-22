@@ -5,7 +5,10 @@ import { getPublishedPosts } from '@/lib/blog';
 import { canonical } from '@/lib/seo';
 import { CORE_KEYWORDS } from '@/lib/seo-keywords';
 
-export const dynamic = 'force-dynamic';
+// Rebuilt at most once a minute instead of on every visit. Each visit used to
+// run several database queries, which kept the database permanently awake and
+// exhausted its usage quota — taking the whole site down.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Blog & News — Aluminium and Glazing Insights',

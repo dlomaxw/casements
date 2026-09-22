@@ -1,10 +1,14 @@
 import type { MetadataRoute } from 'next';
 import { prisma } from '@/lib/db';
+import { fallbackPosts, fallbackProducts } from '@/lib/fallback';
 import { SITE_URL } from '@/lib/seo';
 
 // Always generated fresh: crawlers fetch this rarely, so a live DB read is
 // cheap and guarantees newly published products/posts are discoverable at once.
 export const dynamic = 'force-dynamic';
+
+// Crawlers fetch this often; rebuild it at most hourly.
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: { path: string; priority: number; freq: 'daily' | 'weekly' | 'monthly' }[] = [
@@ -57,8 +61,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
   } catch (err) {
-    // Never fail the sitemap because the DB is briefly unreachable
-    console.error('[sitemap] db error:', err);
+    // Never fail the sitemap because the DB is unreachable — and never drop the
+    // product and blog URLs either: list them from the built-in copy instead.
+    console.error('[sitemap] db error, using built-in content:', err);
+    const now = new Date();
+    for (const p of fallbackProducts) {
+      entries.push({ url: `${SITE_URL}/products/${p.slug}`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 });
+    }
+    for (const p of fallbackPosts) {
+      entries.push({ url: `${SITE_URL}/blog/${p.slug}`, lastModified: p.updatedAt, changeFrequency: 'monthly', priority: 0.6 });
+    }
   }
 
   return entries;

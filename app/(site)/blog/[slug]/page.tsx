@@ -2,16 +2,24 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { prisma } from '@/lib/db';
-import { toEmbedUrl } from '@/lib/blog';
+import { getPublishedPostBySlug, getPublishedPosts, toEmbedUrl } from '@/lib/blog';
 import JsonLd from '@/components/seo/JsonLd';
 import { blogPostingSchema, breadcrumbSchema } from '@/lib/schema';
 import { canonical } from '@/lib/seo';
 
-export const dynamic = 'force-dynamic';
+// Rebuilt at most once a minute instead of on every visit. Each visit used to
+// run several database queries, which kept the database permanently awake and
+// exhausted its usage quota — taking the whole site down.
+export const revalidate = 60;
+
+// Pre-build every published post so visits are served from cache.
+export async function generateStaticParams() {
+  const posts = await getPublishedPosts();
+  return posts.map((p) => ({ slug: p.slug }));
+}
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = await prisma.post.findUnique({ where: { slug: params.slug } });
+  const post = await getPublishedPostBySlug(params.slug);
   if (!post || post.status !== 'PUBLISHED') return { title: 'Post Not Found' };
   const url = canonical(`/blog/${params.slug}`);
   return {
@@ -30,10 +38,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = await prisma.post.findUnique({
-    where: { slug: params.slug },
-    include: { author: { select: { name: true } } },
-  });
+  const post = await getPublishedPostBySlug(params.slug);
   if (!post || post.status !== 'PUBLISHED') notFound();
 
   const embed = toEmbedUrl(post.videoUrl);

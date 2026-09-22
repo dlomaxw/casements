@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db';
+import { fallbackPosts, withFallback } from '@/lib/fallback';
 
 export const POST_CATEGORIES = ['News', 'Projects', 'Products', 'Tips', 'Company'] as const;
 
@@ -37,10 +38,28 @@ export function toEmbedUrl(url?: string | null): string | null {
 }
 
 export function getPublishedPosts(take?: number) {
-  return prisma.post.findMany({
-    where: { status: 'PUBLISHED' },
-    orderBy: { publishedAt: 'desc' },
-    take,
-    include: { author: { select: { name: true } } },
-  });
+  return withFallback(
+    'getPublishedPosts',
+    () =>
+      prisma.post.findMany({
+        where: { status: 'PUBLISHED' },
+        orderBy: { publishedAt: 'desc' },
+        take,
+        include: { author: { select: { name: true } } },
+      }),
+    () => fallbackPosts.slice(0, take ?? fallbackPosts.length),
+  );
+}
+
+/** One published post by slug, falling back to the built-in copy if the database is down. */
+export function getPublishedPostBySlug(slug: string) {
+  return withFallback(
+    'getPublishedPostBySlug',
+    () =>
+      prisma.post.findUnique({
+        where: { slug },
+        include: { author: { select: { name: true } } },
+      }),
+    () => fallbackPosts.find((p) => p.slug === slug) ?? null,
+  );
 }

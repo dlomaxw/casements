@@ -7,7 +7,10 @@ import { canonical } from '@/lib/seo';
 import { getSiteContent, telHref } from '@/lib/content';
 import { CORE_KEYWORDS } from '@/lib/seo-keywords';
 
-export const dynamic = 'force-dynamic';
+// Rebuilt at most once a minute instead of on every visit. Each visit used to
+// run several database queries, which kept the database permanently awake and
+// exhausted its usage quota — taking the whole site down.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Contact Us — Free Quote on Aluminium & Glass Works',

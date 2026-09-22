@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { contactEmailTemplate, sendEmail, SALES_EMAIL } from '@/lib/email';
 import { assignLeadToRep, createCRMLead, notifyRep } from '@/lib/crm';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
+import { queueLead } from '@/lib/lead-queue';
 
 const schema = z.object({
   name: z.string().min(2),
@@ -34,8 +35,16 @@ export async function POST(request: Request) {
     const rep = await assignLeadToRep(lead.id, 'general-enquiry');
     await notifyRep(lead, rep);
   } catch (err) {
-    // Never fail the visitor's submission because of a CRM/DB hiccup — still email.
+    // Never fail the visitor's submission because of a CRM/DB hiccup — keep the
+    // enquiry for import once the database is back, and still email.
     console.error('[api/contact] Could not save lead:', err);
+    await queueLead('contact', {
+      fullName: data.name,
+      email: data.email,
+      productCategory: 'general-enquiry',
+      message: data.message,
+      sourcePage: request.headers.get('referer') ?? undefined,
+    });
   }
 
   await sendEmail({

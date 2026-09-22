@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db';
 import { sendEmail } from '@/lib/email';
+import { flushLeadQueue } from '@/lib/lead-queue';
 
 // §18: Daily CRM follow-up reminder emails to reps — invoked by Vercel Cron.
 // Vercel sends "Authorization: Bearer ${CRON_SECRET}" automatically when
@@ -11,6 +12,9 @@ export async function GET(request: Request) {
   if (secret && request.headers.get('authorization') !== `Bearer ${secret}`) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
+
+  // Import any enquiries that were queued while the database was down.
+  const queue = await flushLeadQueue();
 
   const overdue = await prisma.lead.findMany({
     where: {
@@ -52,5 +56,5 @@ export async function GET(request: Request) {
     sent += 1;
   }
 
-  return Response.json({ success: true, overdueLeads: overdue.length, emailsSent: sent });
+  return Response.json({ success: true, overdueLeads: overdue.length, emailsSent: sent, queue });
 }

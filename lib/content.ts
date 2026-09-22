@@ -1,5 +1,6 @@
 import { cache } from 'react';
 import { prisma } from '@/lib/db';
+import { fallbackSiteContent, withFallback } from '@/lib/fallback';
 import { testimonials as defaultTestimonials } from '@/lib/testimonials';
 
 export type BlockType = 'text' | 'textarea' | 'image';
@@ -124,13 +125,15 @@ export type ContentResolver = (key: string) => string;
 
 // Cached per request: one DB read supplies all page content.
 export const getSiteContent = cache(async (): Promise<ContentResolver> => {
-  let overrides: Record<string, string> = {};
-  try {
-    const rows = await prisma.siteContent.findMany();
-    overrides = Object.fromEntries(rows.map((r) => [r.key, r.value]));
-  } catch {
-    // DB unavailable (e.g. build) — fall back to defaults
-  }
+  // DB unavailable: use the last saved CMS overrides, then the built-in defaults.
+  const overrides = await withFallback(
+    'getSiteContent',
+    async () => {
+      const rows = await prisma.siteContent.findMany();
+      return Object.fromEntries(rows.map((r) => [r.key, r.value])) as Record<string, string>;
+    },
+    () => fallbackSiteContent,
+  );
   return (key: string) => overrides[key] ?? DEFAULTS[key] ?? '';
 });
 

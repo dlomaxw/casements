@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { assignLeadToRep, createCRMLead, notifyRep, sendAutoReply } from '@/lib/crm';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
+import { queueLead } from '@/lib/lead-queue';
 
 const schema = z.object({
   name: z.string().min(2),
@@ -39,8 +40,19 @@ export async function POST(request: Request) {
     await notifyRep(lead, rep); // emails the sales team / assigned rep
     if (email) await sendAutoReply(email, name); // confirmation to the visitor
   } catch (err) {
-    // Never fail the visitor's submission because of a CRM/DB hiccup.
+    // Never fail the visitor's submission because of a CRM/DB hiccup — keep the
+    // enquiry for import once the database is back.
     console.error('[api/register-interest] Could not save lead:', err);
+    await queueLead('register-interest', {
+      fullName: name,
+      phone,
+      email: email || undefined,
+      productCategory: 'general-enquiry',
+      message: country
+        ? `Registered interest via homepage popup. Country: ${country}.`
+        : 'Registered interest via homepage popup.',
+      sourcePage: request.headers.get('referer') ?? undefined,
+    });
   }
 
   return Response.json({ success: true });

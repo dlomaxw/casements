@@ -1,5 +1,6 @@
 import { cache } from 'react';
 import { prisma } from '@/lib/db';
+import { fallbackVideos, withFallback } from '@/lib/fallback';
 
 export interface HomeVideoRecord {
   id: string;
@@ -21,14 +22,13 @@ export function youtubeId(url: string): string | null {
 }
 
 // Published videos for the public home page (cached per request).
-export const getHomeVideos = cache(async (): Promise<HomeVideoRecord[]> => {
-  try {
-    return await prisma.homeVideo.findMany({ where: { published: true }, orderBy: { order: 'asc' } });
-  } catch {
-    // DB unavailable (e.g. during build) — the section simply renders nothing.
-    return [];
-  }
-});
+export const getHomeVideos = cache(async (): Promise<HomeVideoRecord[]> =>
+  withFallback(
+    'getHomeVideos',
+    () => prisma.homeVideo.findMany({ where: { published: true }, orderBy: { order: 'asc' } }),
+    () => fallbackVideos,
+  ),
+);
 
 // All videos incl. drafts, for the admin list.
 export async function getAllVideosAdmin(): Promise<HomeVideoRecord[]> {
