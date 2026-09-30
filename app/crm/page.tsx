@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/session';
+import { flushLeadQueue } from '@/lib/lead-queue';
 import { getLeadStats, getOverdueFollowUps } from '@/lib/crm';
 import { prisma } from '@/lib/db';
 import { can, ROLE_LABELS, type Role } from '@/lib/roles';
@@ -32,6 +33,16 @@ const QUOTATION_URL = 'http://favourwings.com/quotations/quotation_system/';
 
 export default async function CrmDashboardPage() {
   const session = await requireSession();
+
+  // Import any website enquiries that were queued while the database was down,
+  // so they are in the pipeline the moment staff open the CRM. Bounded, so an
+  // unhealthy store can never hold up the dashboard.
+  if (can(session.user.role, 'view_leads')) {
+    await Promise.race([
+      flushLeadQueue().catch((err) => console.error('[crm] queue flush failed:', err)),
+      new Promise((resolve) => setTimeout(resolve, 4000)),
+    ]);
+  }
   const role = session.user.role;
   const isManagerish = role === 'ADMIN' || role === 'MANAGER';
   const viewLeads = can(role, 'view_leads');

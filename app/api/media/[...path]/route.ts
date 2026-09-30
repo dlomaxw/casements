@@ -8,6 +8,12 @@ export const runtime = 'nodejs';
 export async function GET(_request: Request, { params }: { params: { path: string[] } }) {
   const pathname = params.path.map((p) => decodeURIComponent(p)).join('/');
   if (!pathname) return new Response('Not found', { status: 404 });
+  // The same private store also holds queued enquiries (customer contact
+  // details). Serve website images only — everything uploaded through the CRM
+  // lives under casements/ — and nothing else, however the path is spelt.
+  if (!pathname.startsWith('casements/') || pathname.includes('..')) {
+    return new Response('Not found', { status: 404 });
+  }
 
   let result;
   try {

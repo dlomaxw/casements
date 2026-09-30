@@ -1,5 +1,6 @@
 import { cache } from 'react';
 import { prisma } from '@/lib/db';
+import { fallbackProducts, withFallback } from '@/lib/fallback';
 
 // Selectable product types (material / service category)
 export const PRODUCT_TYPES = [
@@ -89,27 +90,43 @@ function shape(p: any): ProductRecord {
 }
 
 // Published products for the public site (cached per request).
-export const getProducts = cache(async (): Promise<ProductRecord[]> => {
-  const rows = await prisma.product.findMany({
-    where: { published: true },
-    orderBy: { order: 'asc' },
-  });
-  return rows.map(shape);
-});
+export const getProducts = cache(async (): Promise<ProductRecord[]> =>
+  withFallback(
+    'getProducts',
+    async () => {
+      const rows = await prisma.product.findMany({
+        where: { published: true },
+        orderBy: { order: 'asc' },
+      });
+      return rows.map(shape);
+    },
+    () => fallbackProducts,
+  ),
+);
 
 // Compact list for nav dropdowns / category pickers (cached per request).
-export const getProductNav = cache(async (): Promise<{ slug: string; title: string; shortTitle: string }[]> => {
-  const rows = await prisma.product.findMany({
-    where: { published: true },
-    orderBy: { order: 'asc' },
-    select: { slug: true, title: true, shortTitle: true },
-  });
-  return rows;
-});
+export const getProductNav = cache(async (): Promise<{ slug: string; title: string; shortTitle: string }[]> =>
+  withFallback(
+    'getProductNav',
+    () =>
+      prisma.product.findMany({
+        where: { published: true },
+        orderBy: { order: 'asc' },
+        select: { slug: true, title: true, shortTitle: true },
+      }),
+    () => fallbackProducts.map(({ slug, title, shortTitle }) => ({ slug, title, shortTitle })),
+  ),
+);
 
 export async function getProductBySlugDb(slug: string): Promise<ProductRecord | null> {
-  const p = await prisma.product.findUnique({ where: { slug } });
-  return p && p.published ? shape(p) : null;
+  return withFallback(
+    'getProductBySlugDb',
+    async () => {
+      const p = await prisma.product.findUnique({ where: { slug } });
+      return p && p.published ? shape(p) : null;
+    },
+    () => fallbackProducts.find((p) => p.slug === slug) ?? null,
+  );
 }
 
 // All products incl. drafts, for the admin list.

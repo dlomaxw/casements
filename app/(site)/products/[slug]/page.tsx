@@ -5,7 +5,7 @@ import ProductHero from '@/components/products/ProductHero';
 import ProductGallery from '@/components/products/ProductGallery';
 import PriceTable from '@/components/products/PriceTable';
 import QuoteForm from '@/components/ui/QuoteForm';
-import { getProductBySlugDb } from '@/lib/products-db';
+import { getProductBySlugDb, getProducts } from '@/lib/products-db';
 import { getProductNav } from '@/lib/products-db';
 import { toEmbedUrl } from '@/lib/blog';
 import JsonLd from '@/components/seo/JsonLd';
@@ -13,7 +13,17 @@ import { breadcrumbSchema, faqPageSchema, productServiceSchema } from '@/lib/sch
 import { canonical } from '@/lib/seo';
 import { keywordsFor } from '@/lib/seo-keywords';
 
-export const dynamic = 'force-dynamic';
+// Rebuilt at most once a minute instead of on every visit. Each visit used to
+// run several database queries, which kept the database permanently awake and
+// exhausted its usage quota — taking the whole site down.
+export const revalidate = 60;
+
+// Pre-build every product page (from the database, or the built-in copy if it
+// is down) so visits are served from cache rather than rendered each time.
+export async function generateStaticParams() {
+  const products = await getProducts();
+  return products.map((p) => ({ slug: p.slug }));
+}
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const product = await getProductBySlugDb(params.slug);

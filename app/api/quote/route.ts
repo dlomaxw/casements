@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { assignLeadToRep, createCRMLead, notifyRep, sendAutoReply } from '@/lib/crm';
 import { sendWhatsAppAlert } from '@/lib/whatsapp';
+import { queueLead } from '@/lib/lead-queue';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 
 const quoteSchema = z.object({
@@ -43,6 +44,11 @@ export async function POST(request: Request) {
     return Response.json({ success: true, leadId: lead.id });
   } catch (err) {
     console.error('[api/quote] Failed to process lead:', err);
+    // Database down: keep the enquiry and import it when the database is back,
+    // rather than losing it and showing the visitor an error.
+    if (await queueLead('quote', { ...data, email })) {
+      return Response.json({ success: true, queued: true });
+    }
     return Response.json({ error: 'Could not process request' }, { status: 500 });
   }
 }

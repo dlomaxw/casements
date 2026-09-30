@@ -11,7 +11,10 @@ import { localBusinessSchema, organizationSchema, websiteSchema } from '@/lib/sc
 import QuoteModalProvider from '@/components/shared/QuoteModal';
 import Chatbot from '@/components/shared/Chatbot';
 
-export const dynamic = 'force-dynamic';
+// Rebuilt at most once a minute instead of on every visit. Each visit used to
+// run several database queries, which kept the database permanently awake and
+// exhausted its usage quota — taking the whole site down.
+export const revalidate = 60;
 
 // Public marketing site chrome (Header + Footer). The CRM has its own layout.
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {

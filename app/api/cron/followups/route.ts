@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db';
 import { sendEmail } from '@/lib/email';
 import { ATTENTION_LABELS, STAGE_LABELS, attentionState, type Stage } from '@/lib/pipeline';
+import { flushLeadQueue } from '@/lib/lead-queue';
 
 /**
  * Daily CRM discipline digest — invoked by Vercel Cron at 06:00 UTC.
@@ -26,6 +27,9 @@ export async function GET(request: Request) {
 
   const endOfToday = new Date();
   endOfToday.setHours(23, 59, 59, 999);
+
+  // Import any enquiries that were queued while the database was down.
+  const queue = await flushLeadQueue();
 
   const stalled = await prisma.lead.findMany({
     where: {
@@ -120,6 +124,7 @@ export async function GET(request: Request) {
 
   return Response.json({
     success: true,
+    queue,
     stalledLeads: stalled.length,
     reps: byRep.size,
     unowned: unowned.length,
