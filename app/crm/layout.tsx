@@ -71,6 +71,7 @@ export default async function CrmLayout({ children }: { children: React.ReactNod
     ...(can(role, 'manage_content') ? [{ href: '/crm/projects', icon: 'work', label: 'Projects' }] : []),
     ...(can(role, 'manage_content') ? [{ href: '/crm/content', icon: 'language', label: 'Website Content' }] : []),
     ...(can(role, 'manage_content') ? [{ href: '/crm/videos', icon: 'smart_display', label: 'Home Videos' }] : []),
+    ...(can(role, 'manage_content') ? [{ href: '/crm/foundation', icon: 'volunteer_activism', label: 'Foundation' }] : []),
     ...(can(role, 'manage_blog') ? [{ href: '/crm/blog', icon: 'article', label: 'Blog' }] : []),
     ...(can(role, 'manage_media') ? [{ href: '/crm/media', icon: 'image', label: 'Media Library' }] : []),
     ...(can(role, 'manage_users') ? [{ href: '/crm/users', icon: 'groups', label: 'Staff' }] : []),

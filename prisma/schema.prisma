@@ -198,6 +198,41 @@ model HomeVideo {
   updatedAt DateTime @updatedAt
 }
 
+// Community outreach — the Casements Foundation page at /foundation.
+// One row per thing the company did for a community: a food distribution, a
+// school supported, a donation. Managed from /crm/foundation. The running
+// totals on the public page (people reached, items given) are summed from
+// these rows, so every entry staff add moves the meter on its own.
+model OutreachEntry {
+  id       String @id @default(cuid())
+  title    String
+  category String @default("Food") // Food | Education | Health | Environment | Other
+
+  summary String // one or two lines, shown on the card
+  body    String // the full story
+
+  location   String?
+  happenedOn DateTime // the day it happened — drives the ordering
+
+  // Feeds the meter. "People fed" for a food distribution, pupils supported
+  // for a school, patients seen at a health camp.
+  peopleReached Int @default(0)
+
+  // What was actually handed out: [{ item, quantity, unit }] — e.g.
+  // { item: "Maize flour", quantity: 250, unit: "kg" }.
+  items Json?
+
+  image   String // main photograph
+  gallery Json? // [{ src, alt }] — more photographs
+
+  published Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, happenedOn])
+}
+
 // Product catalogue — managed from /crm/products (replaces the hardcoded list).
 model Product {
   id              String   @id @default(cuid())

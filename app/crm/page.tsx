@@ -57,6 +57,7 @@ export default async function CrmDashboardPage() {
     { show: can(role, 'manage_content'), href: '/crm/projects', icon: 'work', title: 'Projects', desc: 'Manage portfolio' },
     { show: can(role, 'manage_content'), href: '/crm/content', icon: 'language', title: 'Website Content', desc: 'Edit pages & media' },
     { show: can(role, 'manage_content'), href: '/crm/videos', icon: 'smart_display', title: 'Home Videos', desc: 'Manage YouTube videos' },
+    { show: can(role, 'manage_content'), href: '/crm/foundation', icon: 'volunteer_activism', title: 'Foundation', desc: 'Community outreach' },
     { show: can(role, 'manage_blog'), href: '/crm/blog', icon: 'article', title: 'Blog', desc: 'Publish posts' },
     { show: can(role, 'manage_media'), href: '/crm/media', icon: 'image', title: 'Media Library', desc: 'Upload images' },
     { show: can(role, 'manage_users'), href: '/crm/users', icon: 'groups', title: 'Staff', desc: 'Manage team' },

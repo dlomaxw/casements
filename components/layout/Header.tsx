@@ -23,6 +23,7 @@ const navLinks = [
   { href: '/products', label: 'Products', dropdown: true },
   { href: '/projects', label: 'Projects' },
   { href: '/csr', label: 'CSR' },
+  { href: '/foundation', label: 'Foundation' },
   { href: '/blog', label: 'Blog' },
   { href: '/contact', label: 'Contact' },
 ];

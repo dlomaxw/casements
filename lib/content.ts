@@ -95,6 +95,17 @@ const MANUAL_BLOCKS: ContentBlock[] = [
   { key: 'testimonials.hero.subtitle', page: 'Testimonials', label: 'Testimonials hero subtitle', type: 'textarea', default: 'We would love your feedback. If we’ve worked together, post a review to our profile — and read what others have said below.' },
 
   // CSR
+  // Foundation — the community outreach page at /foundation
+  { key: 'foundation.hero.eyebrow', page: 'Foundation', label: 'Foundation eyebrow', type: 'text', default: 'Casements Foundation' },
+  { key: 'foundation.hero.title', page: 'Foundation', label: 'Foundation heading', type: 'text', default: 'Giving Back to Our Community' },
+  { key: 'foundation.hero.intro', page: 'Foundation', label: 'Foundation introduction', type: 'textarea', default: 'At Casements, we believe our responsibility goes beyond the work we fabricate and install. Real progress is measured not only by the buildings we complete, but by the lives we touch. Through the Casements Foundation we give food and essential supplies to families in need, support schools, and stand beside our neighbours when it matters most. Our success is rooted in the people we serve, and it is our honour to give back.' },
+  { key: 'foundation.hero.image', page: 'Foundation', label: 'Foundation hero image', type: 'image', default: '/images/hero/img10.jpg' },
+  { key: 'foundation.meter.label', page: 'Foundation', label: 'Meter label', type: 'text', default: 'People Reached to Date' },
+  { key: 'foundation.meter.goal', page: 'Foundation', label: 'Meter goal (a number, for the progress bar)', type: 'text', default: '25000' },
+  { key: 'foundation.entries.title', page: 'Foundation', label: 'Outreach section heading', type: 'text', default: 'What We Have Been Doing' },
+  { key: 'foundation.entries.subtitle', page: 'Foundation', label: 'Outreach section subtitle', type: 'textarea', default: 'Every distribution, donation and sponsorship we have carried out, with what was given and how many people it reached.' },
+  { key: 'foundation.empty', page: 'Foundation', label: 'Text shown before any outreach is added', type: 'textarea', default: 'Our outreach work is being added here. Please check back shortly.' },
+
   { key: 'csr.hero.eyebrow', page: 'CSR', label: 'CSR hero eyebrow', type: 'text', default: 'Corporate Social Responsibility' },
   { key: 'csr.hero.title', page: 'CSR', label: 'CSR hero heading', type: 'text', default: 'Building More Than Structures' },
   { key: 'csr.hero.subtitle', page: 'CSR', label: 'CSR hero subtitle', type: 'textarea', default: 'For over 60 years, our work has been about people as much as materials. We invest in local craftsmanship, sustainable building and the communities we serve.' },

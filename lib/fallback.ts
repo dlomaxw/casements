@@ -37,6 +37,16 @@ export interface FallbackPost {
 export const fallbackProducts = snapshot.products as unknown as ProductRecord[];
 export const fallbackProjects = snapshot.projects as unknown as ProjectItemRecord[];
 export const fallbackVideos = snapshot.videos as unknown as HomeVideoRecord[];
+/**
+ * Outreach entries as last saved from the live database. Without these the
+ * foundation page would claim nobody had been reached during an outage, which
+ * is worse than showing slightly stale figures.
+ */
+export const fallbackOutreach = ((snapshot as { outreach?: Record<string, unknown>[] }).outreach ?? []).map((e) => ({
+  ...e,
+  happenedOn: new Date(e.happenedOn as string),
+})) as unknown as import('@/lib/outreach').OutreachRecord[];
+
 /** CMS text overrides (phone numbers, headings...) as last saved from the live database. */
 export const fallbackSiteContent = ((snapshot as { siteContent?: Record<string, string> }).siteContent ?? {}) as Record<
   string,

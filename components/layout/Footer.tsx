@@ -69,6 +69,7 @@ export default function Footer({ contact, products }: { contact: SiteContact; pr
             <li><Link href="/about-us" className="text-brand-200 hover:text-accent-400">About Us</Link></li>
             <li><Link href="/projects" className="text-brand-200 hover:text-accent-400">Projects</Link></li>
             <li><Link href="/csr" className="text-brand-200 hover:text-accent-400">CSR</Link></li>
+            <li><Link href="/foundation" className="text-brand-200 hover:text-accent-400">Foundation</Link></li>
             <li><Link href="/testimonials" className="text-brand-200 hover:text-accent-400">Testimonials</Link></li>
             <li><Link href="/contact" className="text-brand-200 hover:text-accent-400">Contact</Link></li>
             <li><Link href="/crm" className="text-brand-200 hover:text-accent-400">Staff CRM Login</Link></li>

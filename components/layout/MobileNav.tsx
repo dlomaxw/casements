@@ -81,6 +81,9 @@ export default function MobileNav({ phone, phoneHref, products, scrolled = false
             <Link href="/csr" onClick={close} className="rounded px-3 py-3 font-medium text-brand-900 hover:bg-brand-50">
               CSR
             </Link>
+            <Link href="/foundation" onClick={close} className="rounded px-3 py-3 font-medium text-brand-900 hover:bg-brand-50">
+              Foundation
+            </Link>
             <Link href="/testimonials" onClick={close} className="rounded px-3 py-3 font-medium text-brand-900 hover:bg-brand-50">
               Testimonials
             </Link>

@@ -13,7 +13,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-const [products, projects, posts, videos, siteContent] = await Promise.all([
+const [products, projects, posts, videos, siteContent, outreach] = await Promise.all([
   prisma.product.findMany({ where: { published: true }, orderBy: { order: 'asc' } }),
   prisma.projectItem.findMany({ where: { published: true }, orderBy: { order: 'asc' } }),
   prisma.post.findMany({
@@ -23,6 +23,7 @@ const [products, projects, posts, videos, siteContent] = await Promise.all([
   }),
   prisma.homeVideo.findMany({ where: { published: true }, orderBy: { order: 'asc' } }),
   prisma.siteContent.findMany(),
+  prisma.outreachEntry.findMany({ where: { published: true }, orderBy: [{ happenedOn: 'desc' }, { order: 'asc' }] }),
 ]);
 
 const snapshot = {
@@ -71,12 +72,19 @@ const snapshot = {
   videos: videos.map(({ createdAt, updatedAt, ...rest }) => rest),
   // CMS overrides — phone numbers, headings — so an outage never reverts them.
   siteContent: Object.fromEntries(siteContent.map((r) => [r.key, r.value])),
+  // Community outreach, so the foundation meter keeps its figures in an outage.
+  outreach: outreach.map(({ createdAt, updatedAt, happenedOn, ...rest }) => ({
+    ...rest,
+    happenedOn: happenedOn.toISOString(),
+    items: Array.isArray(rest.items) ? rest.items : [],
+    gallery: Array.isArray(rest.gallery) ? rest.gallery : [],
+  })),
 };
 
 writeFileSync(new URL('../lib/fallback-content.json', import.meta.url), JSON.stringify(snapshot, null, 1));
 console.log(
   `Snapshot written: ${snapshot.products.length} products, ${snapshot.projects.length} projects, ` +
     `${snapshot.posts.length} posts, ${snapshot.videos.length} videos, ` +
-    `${Object.keys(snapshot.siteContent).length} content overrides.`,
+    `${Object.keys(snapshot.siteContent).length} content overrides, ${snapshot.outreach.length} outreach entries.`,
 );
 await prisma.$disconnect();
